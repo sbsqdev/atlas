@@ -4,13 +4,15 @@ import type { Bi } from '../types';
 
 /**
  * Convenience hook: `t('login')` for UI labels and `tr(biString)` for
- * bilingual content, both bound to the active language.
+ * multilingual content, both bound to the active language. Content falls back
+ * to English (then Russian) when a translation is missing — e.g. Turkish on
+ * coach-authored content that only has RU/EN.
  */
 export function useT() {
   const lang = useAuth((s) => s.lang);
   return {
     lang,
     t: (key: StringKey) => translate(key, lang),
-    tr: (bi: Bi | undefined) => (bi ? bi[lang] : ''),
+    tr: (bi: Bi | undefined) => (bi ? bi[lang] ?? bi.en ?? bi.ru : ''),
   };
 }

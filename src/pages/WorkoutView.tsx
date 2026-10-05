@@ -1,18 +1,25 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
+import { useBrandStyle } from '../components/useBrandStyle';
 import type { MuscleId } from '../types';
 
 export default function WorkoutView() {
   const { courseId, workoutId } = useParams();
   const { t, tr } = useT();
   const navigate = useNavigate();
+  const brand = useBrandStyle(courseId);
 
   const course = useStore((s) => s.courses.find((c) => c.id === courseId));
   const workout = course?.workouts.find((w) => w.id === workoutId);
+
+  const user = useAuth((s) => s.user);
+  const completedFor = useAuth((s) => s.completedFor);
+  const toggleWorkoutDone = useAuth((s) => s.toggleWorkoutDone);
 
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -29,21 +36,33 @@ export default function WorkoutView() {
   if (!course || !workout) return <p className="placeholder">404</p>;
 
   const selectedExercise = workout.exercises.find((e) => e.id === selected);
+  const isDone = completedFor(course.id).includes(workout.id);
 
   return (
-    <div>
+    <div style={brand}>
       <div className="breadcrumb">
-        <Link to="/trainers">{t('trainers')}</Link>
-        <span>›</span>
         <Link to={`/course/${course.id}`}>{tr(course.title)}</Link>
         <span>›</span>
         <span>{tr(workout.title)}</span>
       </div>
 
-      <h1>{tr(workout.title)}</h1>
-      <p className="sub">
-        {isAggregate ? t('workoutMuscleMap') : tr(selectedExercise?.name)}
-      </p>
+      <div className="toolbar">
+        <div>
+          <h1 style={{ margin: 0 }}>{tr(workout.title)}</h1>
+          <p className="sub" style={{ margin: '4px 0 0' }}>
+            {isAggregate ? t('workoutMuscleMap') : tr(selectedExercise?.name)}
+          </p>
+        </div>
+        <span className="spacer" />
+        {user?.role === 'student' && (
+          <button
+            className={`btn ${isDone ? '' : 'primary'}`}
+            onClick={() => toggleWorkoutDone(course.id, workout.id)}
+          >
+            {isDone ? `✓ ${t('markUndone')}` : t('markDone')}
+          </button>
+        )}
+      </div>
 
       <div className="split anatomy">
         <AnatomyPanel primary={primary} secondary={secondary} />

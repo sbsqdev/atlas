@@ -1,12 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Course, Exercise, Trainer, Workout } from '../types';
-import { COURSES, TRAINERS } from '../data/seed';
+import type { Course, Exercise, Workout } from '../types';
+import { COURSES } from '../data/seed';
 
-const VERSION = 2;
+const VERSION = 3;
 
 interface DataState {
-  trainers: Trainer[];
   courses: Course[];
 
   // course-level
@@ -34,7 +33,6 @@ function mapCourse(courses: Course[], id: string, fn: (c: Course) => Course): Co
 export const useStore = create<DataState>()(
   persist(
     (set) => ({
-      trainers: TRAINERS,
       courses: COURSES,
 
       addCourse: (course) => set((s) => ({ courses: [...s.courses, course] })),
@@ -101,13 +99,13 @@ export const useStore = create<DataState>()(
           })),
         })),
 
-      reset: () => set({ trainers: TRAINERS, courses: COURSES }),
+      reset: () => set({ courses: COURSES }),
     }),
     {
       name: 'human-atlas-data',
       version: VERSION,
       // On a version bump, drop stale persisted content and fall back to seed.
-      migrate: () => ({ trainers: TRAINERS, courses: COURSES }) as Partial<DataState>,
+      migrate: () => ({ courses: COURSES }) as Partial<DataState>,
     },
   ),
 );

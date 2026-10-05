@@ -1,4 +1,5 @@
-import type { Bi, Course, Exercise, MuscleId, Trainer } from '../types';
+import type { Account, Bi, Course, Exercise, MuscleId } from '../types';
+import { hash } from '../store/hash';
 
 /**
  * Seed content for the platform.
@@ -248,43 +249,20 @@ function ex(key: LibKey, prescription: Bi, note?: Bi): Exercise {
 const p = (ru: string, en: string): Bi => ({ ru, en });
 
 // ---------------------------------------------------------------------------
-// Trainers
-// ---------------------------------------------------------------------------
-
-export const TRAINERS: Trainer[] = [
-  {
-    id: 'trainer-rauana',
-    name: 'Rauana Kuangaliyeva',
-    bio: {
-      ru: 'Персональный тренер. Силовые программы для девушек с акцентом на ягодицы, ноги и сильный кор.',
-      en: 'Personal trainer. Strength programs for women focused on glutes, legs and a strong core.',
-    },
-    avatarColor: '#5e8a73',
-  },
-  {
-    id: 'trainer-demo',
-    name: 'Demo Coach',
-    bio: {
-      ru: 'Демонстрационный аккаунт тренера — создайте здесь свой собственный курс.',
-      en: 'Demonstration trainer account — build your own course here.',
-    },
-    avatarColor: '#c08a5e',
-  },
-];
-
-// ---------------------------------------------------------------------------
 // Courses
 // ---------------------------------------------------------------------------
 
 const legsCourse: Course = {
   id: 'course-glutes-legs',
   trainerId: 'trainer-rauana',
-  title: { ru: 'Сила: ягодицы и ноги', en: 'Strength: glutes & legs' },
+  code: 'RAUANA',
+  title: { ru: 'Сила: ягодицы и ноги', en: 'Strength: glutes & legs', tr: 'Güç: kalça ve bacak' },
   summary: {
     ru: 'Программа из повторяющихся тренировок A/B/C с прогрессией весов. После каждой силовой — блок на кор.',
     en: 'A/B/C rotating program with weight progression. Finish every session with the core block.',
+    tr: 'Ağırlık artışlı A/B/C döngülü program. Her antrenmanı core bloğuyla bitirin.',
   },
-  level: { ru: 'Начальный–средний', en: 'Beginner–intermediate' },
+  level: { ru: 'Начальный–средний', en: 'Beginner–intermediate', tr: 'Başlangıç–orta' },
   workouts: [
     {
       id: uid('wk'),
@@ -381,5 +359,33 @@ const legsCourse: Course = {
 
 export const COURSES: Course[] = [legsCourse];
 
-/** The seed trainer user accounts available for the quick-login buttons. */
-export const SEED_TRAINER_ID = 'trainer-rauana';
+// ---------------------------------------------------------------------------
+// Seed accounts — a demo coach (owns the seeded course) and a demo student
+// (already enrolled), so the quick-login buttons have content to show.
+// ---------------------------------------------------------------------------
+
+export const SEED_ACCOUNTS: Account[] = [
+  {
+    id: 'trainer-rauana',
+    name: 'Rauana Kuangaliyeva',
+    email: 'rauana@demo.app',
+    passHash: hash('demo1234'),
+    role: 'trainer',
+    bio: 'Персональный тренер. Силовые программы для девушек с акцентом на ягодицы, ноги и сильный кор. / Personal coach — strength programs focused on glutes, legs and a strong core.',
+    brandName: 'Rauana Training',
+    brandColor: '#5e8a73',
+    avatarColor: '#5e8a73',
+  },
+  {
+    id: 'student-demo',
+    name: 'Demo Student',
+    email: 'student@demo.app',
+    passHash: hash('demo1234'),
+    role: 'student',
+    avatarColor: '#c08a5e',
+    enrolledCourseIds: ['course-glutes-legs'],
+  },
+];
+
+export const DEMO_COACH = { email: 'rauana@demo.app', password: 'demo1234' };
+export const DEMO_STUDENT = { email: 'student@demo.app', password: 'demo1234' };

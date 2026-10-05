@@ -14,22 +14,24 @@ interface Props {
   compact?: boolean;
 }
 
-const PRESETS: { key: string; label: { ru: string; en: string }; systems: SystemId[] }[] = [
-  { key: 'muscles', label: { ru: 'Мышцы', en: 'Muscles' }, systems: ['muscular'] },
-  { key: 'withBones', label: { ru: 'Мышцы + скелет', en: 'Muscles + bones' }, systems: ['muscular', 'skeletal'] },
-  { key: 'skeleton', label: { ru: 'Скелет', en: 'Skeleton' }, systems: ['skeletal'] },
+type Label = { ru: string; en: string; tr: string };
+
+const PRESETS: { key: string; label: Label; systems: SystemId[] }[] = [
+  { key: 'muscles', label: { ru: 'Мышцы', en: 'Muscles', tr: 'Kaslar' }, systems: ['muscular'] },
+  { key: 'withBones', label: { ru: 'Мышцы + скелет', en: 'Muscles + bones', tr: 'Kaslar + kemik' }, systems: ['muscular', 'skeletal'] },
+  { key: 'skeleton', label: { ru: 'Скелет', en: 'Skeleton', tr: 'İskelet' }, systems: ['skeletal'] },
   {
     key: 'all',
-    label: { ru: 'Все системы', en: 'All systems' },
+    label: { ru: 'Все системы', en: 'All systems', tr: 'Tüm sistemler' },
     systems: ['skeletal', 'muscular', 'cardiac', 'arterial', 'venous', 'nervous', 'respiratory', 'digestive', 'urinary', 'reproductive', 'lymphatic', 'endocrine', 'connective', 'sensory'],
   },
 ];
 
-const VIEWS: { key: View; label: { ru: string; en: string } }[] = [
-  { key: 'three-quarter', label: { ru: '¾', en: '¾' } },
-  { key: 'front', label: { ru: 'Спереди', en: 'Front' } },
-  { key: 'back', label: { ru: 'Сзади', en: 'Back' } },
-  { key: 'side', label: { ru: 'Сбоку', en: 'Side' } },
+const VIEWS: { key: View; label: Label }[] = [
+  { key: 'three-quarter', label: { ru: '¾', en: '¾', tr: '¾' } },
+  { key: 'front', label: { ru: 'Спереди', en: 'Front', tr: 'Önden' } },
+  { key: 'back', label: { ru: 'Сзади', en: 'Back', tr: 'Arkadan' } },
+  { key: 'side', label: { ru: 'Сбоку', en: 'Side', tr: 'Yandan' } },
 ];
 
 function partsFor(muscles: MuscleId[]): string[] {

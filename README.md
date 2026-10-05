@@ -10,11 +10,24 @@ highlights which muscles each exercise activates**.
 
 ## Features / Возможности
 
-- **Roles / Роли** — log in as a **trainer** (authors courses) or a **student**
-  (follows them). Demo auth, no password, state kept in the browser.
-- **Trainers → Courses → Workouts → Exercises** — a full catalogue. Seeded with
-  Rauana Kuangaliyeva's real glutes-&-legs strength program (exercises, set/rep
-  schemes, progression notes and demo video links).
+- **Languages / Языки** — RU · EN · **TR** (Turkish). One-click toggle; content
+  falls back to English where a coach hasn't added a translation.
+- **Accounts / Аккаунты** — real **sign up / sign in** for **coaches** and
+  **students** (client-side, light-hashed passwords — demo-grade, see the
+  security note). Demo logins are on the sign-in screen.
+- **Invite-code access / Доступ по коду** — students do **not** browse or
+  discover courses or coaches. A student joins **one coach's course via an
+  invite code** the coach shares. Coaches (who may be competitors) never appear
+  in a public directory.
+- **Coach branding / Брендинг тренера** — each coach sets a brand name and
+  accent colour; students see that branding inside the course.
+- **Progress / Прогресс** — students mark workouts done and see a completion bar
+  per course (edtech-style performance tracking).
+- **Calculators / Калькуляторы** — **КБЖУ / macros** (Mifflin–St Jeor TDEE +
+  protein/fat/carb split), **1RM** (Epley) and **BMI**.
+- **Courses → Workouts → Exercises** — seeded with Rauana Kuangaliyeva's real
+  glutes-&-legs strength program (exercises, set/rep schemes, progression notes
+  and demo video links). Demo course invite code: **`RAUANA`**.
 - **Real 3D anatomy atlas** — the viewer is the **BodyParts3D 4.0** adult-male
   reference: **2,234 selectable meshes across 15 systems**, ported from
   [Ashe Magalhaes's Human Atlas](https://github.com/ashemag/human-atlas). For
@@ -50,10 +63,15 @@ npm run build      # typecheck + production build into dist/
 npm run preview    # serve the production build
 ```
 
-Use the **Quick login** buttons on the sign-in screen:
+Demo logins on the sign-in screen (password `demo1234` for both):
 
-- **Быстрый вход — ученик / student** → browse trainers and the 3D muscle map.
-- **Быстрый вход — тренер / trainer** → open the dashboard and edit courses.
+- **Demo student** (`student@demo.app`) → already enrolled in the seeded
+  course; see progress and the 3D muscle map. Join more via code.
+- **Demo coach** (`rauana@demo.app`) → dashboard with invite codes, branding
+  and the course editor.
+
+To test the invite flow: sign up a new **student**, then enter code **`RAUANA`**
+(or any code a coach shows on their dashboard) to unlock that course.
 
 ## Data model
 
@@ -83,9 +101,12 @@ Use the **Quick login** buttons on the sign-in screen:
 
 ## Notes & next steps
 
-- Auth is **client-side only** for the MVP — there is no server, so "accounts"
-  are not shared between devices. Swapping `src/store/*` for a real backend
-  (e.g. Supabase / Firebase) is the natural next step.
+- Auth is **client-side only** for the MVP — there is no server, so accounts,
+  passwords (lightly hashed, **not** real security) and invite codes live in
+  the browser's `localStorage` and are not shared between devices. The
+  invite-code model is a UX gate, not enforced access control. Swapping
+  `src/store/*` for a real backend (e.g. Supabase / Firebase) with server-side
+  auth and invite validation is the natural next step.
 - Video links point to the trainer's originals (Google Drive / YouTube) and
   open in a new tab.
 - The anatomy viewer downloads ~33 MB of gzipped geometry on first load

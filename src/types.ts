@@ -1,12 +1,14 @@
 // Shared domain types for the Human Atlas training platform.
 
 /** Supported interface languages. */
-export type Lang = 'ru' | 'en';
+export type Lang = 'ru' | 'en' | 'tr';
 
-/** A bilingual string. Every piece of user-facing content carries both. */
+/** A multilingual string. `ru`/`en` are required; `tr` is optional and falls
+ *  back to English when a coach has not provided a Turkish translation. */
 export interface Bi {
   ru: string;
   en: string;
+  tr?: string;
 }
 
 /** Stable identifiers for the muscle regions we can highlight on the 3D map. */
@@ -28,7 +30,7 @@ export type MuscleId =
   | 'abductors'
   | 'calves';
 
-/** A muscle region: its bilingual name and the 3D meshes that represent it. */
+/** A muscle region: its name and which body view it shows on. */
 export interface Muscle {
   id: MuscleId;
   name: Bi;
@@ -36,9 +38,26 @@ export interface Muscle {
   side: 'front' | 'back' | 'both';
 }
 
-/** User roles. Trainers author courses; students follow them. */
+/** User roles. Trainers (coaches) author courses; students follow them. */
 export type Role = 'trainer' | 'student';
 
+/** A user account. Password is light-hashed (demo only — not real security). */
+export interface Account {
+  id: string;
+  name: string;
+  email: string;
+  passHash: string;
+  role: Role;
+  // Coach profile / branding:
+  bio?: string;
+  brandName?: string;
+  brandColor?: string;
+  avatarColor?: string;
+  // Student enrolment:
+  enrolledCourseIds?: string[];
+}
+
+/** The signed-in user as exposed to the UI (no password). */
 export interface User {
   id: string;
   name: string;
@@ -77,6 +96,8 @@ export interface Course {
   title: Bi;
   summary: Bi;
   level: Bi;
+  /** Invite code students enter to enrol. Students never browse courses. */
+  code: string;
   workouts: Workout[];
 }
 

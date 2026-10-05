@@ -1,102 +1,170 @@
 import type { Lang } from '../types';
 
-/** UI label dictionary. Keep keys flat and descriptive. */
+type Tri = { ru: string; en: string; tr: string };
+
+/** UI label dictionary (RU / EN / TR). */
 const dict = {
-  appName: { ru: 'Human Atlas', en: 'Human Atlas' },
+  appName: { ru: 'Human Atlas', en: 'Human Atlas', tr: 'Human Atlas' },
   tagline: {
-    ru: 'Тренировки от разных тренеров и 3D-карта мышц',
-    en: 'Courses from many trainers and a 3D muscle map',
+    ru: 'Курсы тренеров и 3D-карта мышц',
+    en: 'Coach-led courses and a 3D muscle map',
+    tr: 'Antrenör kursları ve 3D kas haritası',
   },
 
   // auth
-  login: { ru: 'Войти', en: 'Log in' },
-  logout: { ru: 'Выйти', en: 'Log out' },
-  signIn: { ru: 'Вход в систему', en: 'Sign in' },
-  name: { ru: 'Имя', en: 'Name' },
-  email: { ru: 'E-mail', en: 'Email' },
-  role: { ru: 'Роль', en: 'Role' },
-  student: { ru: 'Ученик', en: 'Student' },
-  trainer: { ru: 'Тренер', en: 'Trainer' },
-  continueAs: { ru: 'Продолжить как', en: 'Continue as' },
-  demoHint: {
-    ru: 'Демо-вход: данные хранятся локально в браузере. Пароль не требуется.',
-    en: 'Demo login: data is stored locally in your browser. No password required.',
+  signIn: { ru: 'Вход', en: 'Sign in', tr: 'Giriş' },
+  signUp: { ru: 'Регистрация', en: 'Sign up', tr: 'Kayıt ol' },
+  logout: { ru: 'Выйти', en: 'Log out', tr: 'Çıkış' },
+  name: { ru: 'Имя', en: 'Name', tr: 'İsim' },
+  email: { ru: 'E-mail', en: 'Email', tr: 'E-posta' },
+  password: { ru: 'Пароль', en: 'Password', tr: 'Şifre' },
+  role: { ru: 'Роль', en: 'Role', tr: 'Rol' },
+  student: { ru: 'Ученик', en: 'Student', tr: 'Öğrenci' },
+  trainer: { ru: 'Тренер', en: 'Coach', tr: 'Antrenör' },
+  createAccount: { ru: 'Создать аккаунт', en: 'Create account', tr: 'Hesap oluştur' },
+  haveAccount: { ru: 'Уже есть аккаунт? Войти', en: 'Already have an account? Sign in', tr: 'Zaten hesabın var mı? Giriş yap' },
+  noAccount: { ru: 'Нет аккаунта? Регистрация', en: "No account? Sign up", tr: 'Hesabın yok mu? Kayıt ol' },
+  inviteCode: { ru: 'Код приглашения', en: 'Invite code', tr: 'Davet kodu' },
+  inviteCodeHint: {
+    ru: 'Код выдаёт ваш тренер. Без него курс не откроется.',
+    en: 'Your coach gives you this code. You need it to open the course.',
+    tr: 'Bu kodu antrenörünüz verir. Kursu açmak için gereklidir.',
   },
-  quickStudent: { ru: 'Быстрый вход — ученик', en: 'Quick login — student' },
-  quickTrainer: { ru: 'Быстрый вход — тренер', en: 'Quick login — trainer' },
+  joinByCode: { ru: 'Присоединиться по коду', en: 'Join with a code', tr: 'Kodla katıl' },
+  join: { ru: 'Присоединиться', en: 'Join', tr: 'Katıl' },
+  codeInvalid: { ru: 'Код не найден. Проверьте и попробуйте снова.', en: 'Code not found. Check it and try again.', tr: 'Kod bulunamadı. Kontrol edip tekrar deneyin.' },
+  alreadyEnrolled: { ru: 'Вы уже записаны на этот курс.', en: 'You are already enrolled in this course.', tr: 'Bu kursa zaten kayıtlısınız.' },
+  enrolledOk: { ru: 'Готово! Курс добавлен.', en: 'Done! Course added.', tr: 'Tamam! Kurs eklendi.' },
+  emailTaken: { ru: 'Этот e-mail уже зарегистрирован.', en: 'This email is already registered.', tr: 'Bu e-posta zaten kayıtlı.' },
+  wrongCredentials: { ru: 'Неверный e-mail или пароль.', en: 'Wrong email or password.', tr: 'Hatalı e-posta veya şifre.' },
+  fillFields: { ru: 'Заполните все поля.', en: 'Please fill in all fields.', tr: 'Lütfen tüm alanları doldurun.' },
+  demoHint: {
+    ru: 'Демо: аккаунты хранятся локально в браузере. Это не настоящая защита.',
+    en: 'Demo: accounts are stored locally in your browser. Not real security.',
+    tr: 'Demo: hesaplar tarayıcınızda yerel olarak saklanır. Gerçek güvenlik değildir.',
+  },
+  demoCoach: { ru: 'Демо-тренер', en: 'Demo coach', tr: 'Demo antrenör' },
+  demoStudent: { ru: 'Демо-ученик', en: 'Demo student', tr: 'Demo öğrenci' },
 
   // nav
-  trainers: { ru: 'Тренеры', en: 'Trainers' },
-  courses: { ru: 'Курсы', en: 'Courses' },
-  dashboard: { ru: 'Кабинет тренера', en: 'Trainer dashboard' },
+  dashboard: { ru: 'Кабинет тренера', en: 'Coach dashboard', tr: 'Antrenör paneli' },
+  myCourses: { ru: 'Мои курсы', en: 'My courses', tr: 'Kurslarım' },
+  calculators: { ru: 'Калькуляторы', en: 'Calculators', tr: 'Hesaplayıcılar' },
 
-  // catalogue
-  chooseTrainer: { ru: 'Выберите тренера', en: 'Choose a trainer' },
-  coursesBy: { ru: 'Курсы тренера', en: 'Courses by' },
-  level: { ru: 'Уровень', en: 'Level' },
-  workouts: { ru: 'тренировок', en: 'workouts' },
-  openCourse: { ru: 'Открыть курс', en: 'Open course' },
-  workout: { ru: 'Тренировка', en: 'Workout' },
-  workoutsTitle: { ru: 'Тренировки', en: 'Workouts' },
-  exercises: { ru: 'упражнений', en: 'exercises' },
+  // catalogue / course
+  level: { ru: 'Уровень', en: 'Level', tr: 'Seviye' },
+  workouts: { ru: 'тренировок', en: 'workouts', tr: 'antrenman' },
+  openCourse: { ru: 'Открыть курс', en: 'Open course', tr: 'Kursu aç' },
+  workout: { ru: 'Тренировка', en: 'Workout', tr: 'Antrenman' },
+  workoutsTitle: { ru: 'Тренировки', en: 'Workouts', tr: 'Antrenmanlar' },
+  exercises: { ru: 'упражнений', en: 'exercises', tr: 'egzersiz' },
+  by: { ru: 'Тренер', en: 'Coach', tr: 'Antrenör' },
+
+  // student home / progress
+  noEnrollments: {
+    ru: 'У вас пока нет курсов. Введите код от тренера, чтобы открыть курс.',
+    en: 'You have no courses yet. Enter the code from your coach to open a course.',
+    tr: 'Henüz kursunuz yok. Kursu açmak için antrenörünüzün kodunu girin.',
+  },
+  progress: { ru: 'Прогресс', en: 'Progress', tr: 'İlerleme' },
+  completed: { ru: 'выполнено', en: 'completed', tr: 'tamamlandı' },
+  markDone: { ru: 'Отметить выполненной', en: 'Mark done', tr: 'Tamamlandı işaretle' },
+  markUndone: { ru: 'Снять отметку', en: 'Mark not done', tr: 'İşareti kaldır' },
+  done: { ru: 'Выполнено', en: 'Done', tr: 'Tamam' },
 
   // exercise / muscle
-  musclesWorked: { ru: 'Какие мышцы работают', en: 'Muscles worked' },
-  primaryMuscles: { ru: 'Основные мышцы', en: 'Primary muscles' },
-  secondaryMuscles: { ru: 'Вспомогательные мышцы', en: 'Synergists / stabilisers' },
-  prescription: { ru: 'Подходы и повторы', en: 'Sets & reps' },
-  coachNote: { ru: 'Заметка тренера', en: 'Coach note' },
-  watchVideo: { ru: 'Смотреть видео', en: 'Watch video' },
-  description: { ru: 'Описание', en: 'Description' },
-  front: { ru: 'Спереди', en: 'Front' },
-  back: { ru: 'Сзади', en: 'Back' },
-  rotateHint: {
-    ru: 'Тяните, чтобы повернуть · колесо — приблизить',
-    en: 'Drag to rotate · scroll to zoom',
-  },
-  workoutMuscleMap: {
-    ru: 'Карта мышц всей тренировки',
-    en: 'Muscle map for the whole workout',
-  },
-  selectExercise: {
-    ru: 'Выберите упражнение, чтобы увидеть целевые мышцы',
-    en: 'Select an exercise to see its target muscles',
-  },
+  primaryMuscles: { ru: 'Основные мышцы', en: 'Primary muscles', tr: 'Birincil kaslar' },
+  secondaryMuscles: { ru: 'Вспомогательные мышцы', en: 'Synergists / stabilisers', tr: 'Yardımcı kaslar' },
+  prescription: { ru: 'Подходы и повторы', en: 'Sets & reps', tr: 'Set ve tekrar' },
+  coachNote: { ru: 'Заметка тренера', en: 'Coach note', tr: 'Antrenör notu' },
+  watchVideo: { ru: 'Смотреть видео', en: 'Watch video', tr: 'Videoyu izle' },
+  description: { ru: 'Описание', en: 'Description', tr: 'Açıklama' },
+  workoutMuscleMap: { ru: 'Карта мышц всей тренировки', en: 'Muscle map for the whole workout', tr: 'Tüm antrenmanın kas haritası' },
 
   // editor
-  myCourses: { ru: 'Мои курсы', en: 'My courses' },
-  newCourse: { ru: 'Новый курс', en: 'New course' },
-  editCourse: { ru: 'Редактировать курс', en: 'Edit course' },
-  addWorkout: { ru: 'Добавить тренировку', en: 'Add workout' },
-  addExercise: { ru: 'Добавить упражнение', en: 'Add exercise' },
-  save: { ru: 'Сохранить', en: 'Save' },
-  cancel: { ru: 'Отмена', en: 'Cancel' },
-  delete: { ru: 'Удалить', en: 'Delete' },
-  edit: { ru: 'Изменить', en: 'Edit' },
-  title: { ru: 'Название', en: 'Title' },
-  summary: { ru: 'Краткое описание', en: 'Summary' },
-  fieldRu: { ru: 'по-русски', en: 'in Russian' },
-  fieldEn: { ru: 'по-английски', en: 'in English' },
-  targetMuscles: { ru: 'Целевые мышцы (нажмите, чтобы выбрать)', en: 'Target muscles (tap to toggle)' },
-  markPrimary: { ru: 'осн.', en: 'primary' },
-  videoUrl: { ru: 'Ссылка на видео', en: 'Video URL' },
-  noCoursesYet: {
-    ru: 'У вас пока нет курсов. Создайте первый!',
-    en: 'You have no courses yet. Create your first one!',
+  newCourse: { ru: 'Новый курс', en: 'New course', tr: 'Yeni kurs' },
+  editCourse: { ru: 'Редактировать курс', en: 'Edit course', tr: 'Kursu düzenle' },
+  addWorkout: { ru: 'Добавить тренировку', en: 'Add workout', tr: 'Antrenman ekle' },
+  addExercise: { ru: 'Добавить упражнение', en: 'Add exercise', tr: 'Egzersiz ekle' },
+  save: { ru: 'Сохранить', en: 'Save', tr: 'Kaydet' },
+  cancel: { ru: 'Отмена', en: 'Cancel', tr: 'İptal' },
+  delete: { ru: 'Удалить', en: 'Delete', tr: 'Sil' },
+  edit: { ru: 'Изменить', en: 'Edit', tr: 'Düzenle' },
+  title: { ru: 'Название', en: 'Title', tr: 'Başlık' },
+  summary: { ru: 'Краткое описание', en: 'Summary', tr: 'Özet' },
+  fieldRu: { ru: 'по-русски', en: 'in Russian', tr: 'Rusça' },
+  fieldEn: { ru: 'по-английски', en: 'in English', tr: 'İngilizce' },
+  targetMuscles: { ru: 'Целевые мышцы (нажмите, чтобы выбрать)', en: 'Target muscles (tap to toggle)', tr: 'Hedef kaslar (seçmek için dokunun)' },
+  markPrimary: { ru: 'осн.', en: 'primary', tr: 'birincil' },
+  videoUrl: { ru: 'Ссылка на видео', en: 'Video URL', tr: 'Video bağlantısı' },
+  noCoursesYet: { ru: 'У вас пока нет курсов. Создайте первый!', en: 'You have no courses yet. Create your first one!', tr: 'Henüz kursunuz yok. İlkini oluşturun!' },
+  emptyWorkout: { ru: 'В этой тренировке пока нет упражнений.', en: 'No exercises in this workout yet.', tr: 'Bu antrenmanda henüz egzersiz yok.' },
+  resetDemo: { ru: 'Сбросить демо-данные', en: 'Reset demo data', tr: 'Demo verisini sıfırla' },
+  confirmReset: { ru: 'Сбросить все локальные данные к начальным?', en: 'Reset all local data to the seed?', tr: 'Tüm yerel verileri başlangıç durumuna sıfırla?' },
+
+  // coach branding / invite
+  inviteCodeLabel: { ru: 'Код приглашения', en: 'Invite code', tr: 'Davet kodu' },
+  copyCode: { ru: 'Копировать', en: 'Copy', tr: 'Kopyala' },
+  copied: { ru: 'Скопировано', en: 'Copied', tr: 'Kopyalandı' },
+  shareCodeHint: {
+    ru: 'Поделитесь этим кодом с учениками — по нему они откроют курс.',
+    en: 'Share this code with your students — they use it to open the course.',
+    tr: 'Bu kodu öğrencilerinizle paylaşın — kursu açmak için kullanırlar.',
   },
-  emptyWorkout: { ru: 'В этой тренировке пока нет упражнений.', en: 'No exercises in this workout yet.' },
-  resetDemo: { ru: 'Сбросить демо-данные', en: 'Reset demo data' },
-  confirmReset: {
-    ru: 'Сбросить все локальные данные к начальным? Ваши изменения будут потеряны.',
-    en: 'Reset all local data to the seed? Your changes will be lost.',
+  regenCode: { ru: 'Новый код', en: 'New code', tr: 'Yeni kod' },
+  brandName: { ru: 'Название бренда', en: 'Brand name', tr: 'Marka adı' },
+  brandColor: { ru: 'Цвет бренда', en: 'Brand color', tr: 'Marka rengi' },
+  coachProfile: { ru: 'Профиль тренера', en: 'Coach profile', tr: 'Antrenör profili' },
+  bioLabel: { ru: 'О себе (био)', en: 'About you (bio)', tr: 'Hakkınızda (bio)' },
+  saveProfile: { ru: 'Сохранить профиль', en: 'Save profile', tr: 'Profili kaydet' },
+
+  // calculators
+  macroCalc: { ru: 'КБЖУ (калории и макросы)', en: 'Calories & macros (TDEE)', tr: 'Kalori ve makrolar' },
+  macroDesc: {
+    ru: 'Оценка суточной нормы калорий и БЖУ по формуле Миффлина–Сан Жеора.',
+    en: 'Estimate daily calories and macros with the Mifflin–St Jeor formula.',
+    tr: 'Mifflin–St Jeor formülüyle günlük kalori ve makroları tahmin edin.',
   },
+  sex: { ru: 'Пол', en: 'Sex', tr: 'Cinsiyet' },
+  male: { ru: 'Муж.', en: 'Male', tr: 'Erkek' },
+  female: { ru: 'Жен.', en: 'Female', tr: 'Kadın' },
+  age: { ru: 'Возраст', en: 'Age', tr: 'Yaş' },
+  weightKg: { ru: 'Вес, кг', en: 'Weight, kg', tr: 'Kilo, kg' },
+  heightCm: { ru: 'Рост, см', en: 'Height, cm', tr: 'Boy, cm' },
+  activity: { ru: 'Активность', en: 'Activity', tr: 'Aktivite' },
+  actSedentary: { ru: 'Малоподвижный', en: 'Sedentary', tr: 'Hareketsiz' },
+  actLight: { ru: 'Лёгкая (1–3/нед)', en: 'Light (1–3/wk)', tr: 'Hafif (1–3/hf)' },
+  actModerate: { ru: 'Средняя (3–5/нед)', en: 'Moderate (3–5/wk)', tr: 'Orta (3–5/hf)' },
+  actActive: { ru: 'Высокая (6–7/нед)', en: 'Active (6–7/wk)', tr: 'Aktif (6–7/hf)' },
+  actVery: { ru: 'Очень высокая', en: 'Very active', tr: 'Çok aktif' },
+  goal: { ru: 'Цель', en: 'Goal', tr: 'Hedef' },
+  goalLose: { ru: 'Снижение веса', en: 'Lose weight', tr: 'Kilo ver' },
+  goalMaintain: { ru: 'Поддержание', en: 'Maintain', tr: 'Koru' },
+  goalGain: { ru: 'Набор массы', en: 'Gain muscle', tr: 'Kas kazan' },
+  calculate: { ru: 'Рассчитать', en: 'Calculate', tr: 'Hesapla' },
+  calories: { ru: 'Калории', en: 'Calories', tr: 'Kalori' },
+  protein: { ru: 'Белки', en: 'Protein', tr: 'Protein' },
+  fats: { ru: 'Жиры', en: 'Fats', tr: 'Yağ' },
+  carbs: { ru: 'Углеводы', en: 'Carbs', tr: 'Karbonhidrat' },
+  perDay: { ru: 'в день', en: 'per day', tr: 'günlük' },
+  oneRM: { ru: 'Расчёт 1ПМ (разовый максимум)', en: '1RM (one-rep max)', tr: '1TM (tek tekrar maks.)' },
+  oneRMDesc: {
+    ru: 'Оценка максимального веса на 1 повторение (формула Эпли).',
+    en: 'Estimate your one-rep max (Epley formula).',
+    tr: 'Tek tekrar maksimumunuzu tahmin edin (Epley formülü).',
+  },
+  liftedWeight: { ru: 'Вес, кг', en: 'Weight, kg', tr: 'Ağırlık, kg' },
+  reps: { ru: 'Повторы', en: 'Reps', tr: 'Tekrar' },
+  estimated1RM: { ru: 'Расчётный 1ПМ', en: 'Estimated 1RM', tr: 'Tahmini 1TM' },
+  bmiCalc: { ru: 'Индекс массы тела (ИМТ)', en: 'Body mass index (BMI)', tr: 'Vücut kitle indeksi (VKİ)' },
+  bmiResult: { ru: 'Ваш ИМТ', en: 'Your BMI', tr: 'VKİ değeriniz' },
 } as const;
 
 export type StringKey = keyof typeof dict;
 
-/** Translate a key into the active language. */
 export function t(key: StringKey, lang: Lang): string {
-  return dict[key][lang];
+  const entry = dict[key] as Tri;
+  return entry[lang] ?? entry.en;
 }
 
 export default dict;

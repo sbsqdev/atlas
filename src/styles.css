@@ -244,3 +244,29 @@ h2 { font-size: 19px; margin: 0 0 10px; }
 .quick { display: flex; gap: 10px; margin-top: 10px; }
 .quick .btn { flex: 1; justify-content: center; }
 .hint { font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.5; }
+
+/* ---------- Progress / enrolment / codes ---------- */
+.progress-line { margin-top: 6px; }
+.progress-track { height: 7px; border-radius: 999px; background: var(--panel-2); overflow: hidden; }
+.progress-track span { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.3s; }
+.progress-label { font-size: 12px; color: var(--muted); display: block; margin-top: 5px; }
+.done-badge { float: right; font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-dim); padding: 3px 9px; border-radius: 999px; }
+
+.code-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--panel-2); border: 1px dashed var(--border-strong); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.code-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.code-value { font-size: 20px; font-weight: 800; letter-spacing: 2px; color: var(--accent); font-family: 'SFMono-Regular', ui-monospace, Menlo, Consolas, monospace; }
+.shareline { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+
+/* ---------- Calculators ---------- */
+.calc h3 { margin: 0 0 6px; }
+.calc-desc { color: var(--muted); font-size: 13px; margin: 0 0 14px; line-height: 1.5; }
+.calc-out { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+.big-num { font-size: 30px; font-weight: 800; color: var(--accent); }
+.big-num small { font-size: 13px; font-weight: 500; color: var(--muted); }
+.macro-row { display: flex; gap: 10px; margin-top: 12px; }
+.macro { flex: 1; text-align: center; border-radius: 10px; padding: 10px 6px; background: var(--panel-2); }
+.macro span { display: block; font-size: 19px; font-weight: 700; }
+.macro small { font-size: 12px; color: var(--muted); }
+.macro.p span { color: #5e8a73; }
+.macro.f span { color: #c08a5e; }
+.macro.c span { color: #7c9bb5; }

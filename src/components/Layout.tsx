@@ -31,19 +31,19 @@ export default function Layout({ children }: { children: ReactNode }) {
         </NavLink>
 
         <nav className="navlinks">
-          <NavLink to="/trainers">{t('trainers')}</NavLink>
+          {user?.role === 'student' && <NavLink to="/home">{t('myCourses')}</NavLink>}
           {user?.role === 'trainer' && <NavLink to="/dashboard">{t('dashboard')}</NavLink>}
+          {user && <NavLink to="/calculators">{t('calculators')}</NavLink>}
         </nav>
 
         <span className="spacer" />
 
         <div className="lang-toggle">
-          <button className={lang === 'ru' ? 'active' : ''} onClick={() => setLang('ru')}>
-            RU
-          </button>
-          <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>
-            EN
-          </button>
+          {(['ru', 'en', 'tr'] as const).map((l) => (
+            <button key={l} className={lang === l ? 'active' : ''} onClick={() => setLang(l)}>
+              {l.toUpperCase()}
+            </button>
+          ))}
         </div>
 
         {user && (

@@ -2,10 +2,12 @@ import { Link, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useT } from '../i18n/useT';
 import AnatomyPanel from '../components/AnatomyPanel';
+import { useBrandStyle } from '../components/useBrandStyle';
 
 export default function ExerciseView() {
   const { courseId, workoutId, exerciseId } = useParams();
   const { t, tr } = useT();
+  const brand = useBrandStyle(courseId);
 
   const course = useStore((s) => s.courses.find((c) => c.id === courseId));
   const workout = course?.workouts.find((w) => w.id === workoutId);
@@ -14,10 +16,8 @@ export default function ExerciseView() {
   if (!course || !workout || !exercise) return <p className="placeholder">404</p>;
 
   return (
-    <div>
+    <div style={brand}>
       <div className="breadcrumb">
-        <Link to="/trainers">{t('trainers')}</Link>
-        <span>›</span>
         <Link to={`/course/${course.id}`}>{tr(course.title)}</Link>
         <span>›</span>
         <Link to={`/course/${course.id}/workout/${workout.id}`}>{tr(workout.title)}</Link>
