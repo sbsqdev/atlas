@@ -5,6 +5,8 @@ import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { MUSCLES } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
+import { useAtlas } from '../anatomy/useAtlas';
+import { inferMuscles } from '../lib/inferMuscles';
 import type { Bi, Exercise, MuscleId, Workout } from '../types';
 
 let n = 0;
@@ -156,6 +158,142 @@ function MusclePicker({ exercise, onChange }: { exercise: Exercise; onChange: (e
   );
 }
 
+/** AI auto-detect: coach writes which muscles work; map to regions via DeepSeek
+ *  (or local keyword fallback). */
+function AutoDetect({ draft, onChange }: { draft: Exercise; onChange: (e: Exercise) => void }) {
+  const { t } = useT();
+  const [note, setNote] = useState(draft.muscleNote ?? '');
+  const [busy, setBusy] = useState(false);
+  const [source, setSource] = useState<'deepseek' | 'local' | 'none' | null>(null);
+
+  const run = async () => {
+    if (!note.trim()) return;
+    setBusy(true);
+    setSource(null);
+    const res = await inferMuscles({ name: draft.name.en || draft.name.ru, description: draft.description.en, note });
+    setBusy(false);
+    if (!res.primary.length && !res.secondary.length) { setSource('none'); return; }
+    setSource(res.source);
+    onChange({ ...draft, muscleNote: note, primary: res.primary, secondary: res.secondary });
+  };
+
+  return (
+    <div className="field">
+      <label>{t('muscleNoteLabel')}</label>
+      <textarea
+        value={note}
+        onChange={(e) => { setNote(e.target.value); onChange({ ...draft, muscleNote: e.target.value }); }}
+        placeholder="напр.: работают ягодичные и бицепс бедра, поясница стабилизирует"
+      />
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 6 }}>
+        <button className="btn small primary" onClick={run} disabled={busy || !note.trim()}>
+          {busy ? t('detecting') : t('autoDetect')}
+        </button>
+        {source === 'deepseek' && <span style={{ fontSize: 12, color: 'var(--accent-2)' }}>{t('byAI')}</span>}
+        {source === 'local' && <span style={{ fontSize: 12, color: 'var(--sand)' }}>{t('byKeywords')}</span>}
+        {source === 'none' && <span style={{ fontSize: 12, color: 'var(--danger)' }}>{t('noneDetected')}</span>}
+      </div>
+    </div>
+  );
+}
+
+/** Search BodyParts3D structures by name and add them as highlighted parts. */
+function NamedPartsPicker({ draft, onChange }: { draft: Exercise; onChange: (e: Exercise) => void }) {
+  const { t, lang } = useT();
+  const { atlas } = useAtlas();
+  const [q, setQ] = useState('');
+
+  const extra = draft.extraParts ?? [];
+  const nameById = (id: string) => atlas?.parts.find((p) => p.id === id)?.name ?? id;
+
+  const results = (() => {
+    if (!atlas || q.trim().length < 2) return [] as { label: string; ids: string[] }[];
+    const needle = q.toLowerCase();
+    const parts = atlas.parts.filter((p) => p.name.toLowerCase().includes(needle)).slice(0, 8)
+      .map((p) => ({ label: p.name, ids: [p.id] }));
+    const concepts = atlas.concepts.filter((c) => c.name.toLowerCase().includes(needle) && c.elements.length > 1).slice(0, 4)
+      .map((c) => ({ label: `${c.name} (${c.elements.length})`, ids: c.elements }));
+    return [...concepts, ...parts];
+  })();
+
+  const add = (ids: string[]) => onChange({ ...draft, extraParts: [...new Set([...extra, ...ids])] });
+  const remove = (id: string) => onChange({ ...draft, extraParts: extra.filter((x) => x !== id) });
+
+  return (
+    <div className="field">
+      <label>{t('searchStructures')}</label>
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={lang === 'ru' ? 'gluteus, soleus, biceps femoris…' : 'gluteus, soleus, biceps femoris…'} />
+      {results.length > 0 && (
+        <div className="search-results">
+          {results.map((r, i) => (
+            <button key={i} className="search-result" onClick={() => { add(r.ids); setQ(''); }}>+ {r.label}</button>
+          ))}
+        </div>
+      )}
+      {extra.length > 0 && (
+        <>
+          <div className="small-label">{t('namedStructures')}</div>
+          <div className="muscle-grid">
+            {extra.map((id) => (
+              <span key={id} className="muscle-btn on-primary">
+                {nameById(id)}
+                <button className="chip-x" onClick={() => remove(id)}>×</button>
+              </span>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Coach analytics: each student's workouts done and videos watched. */
+function CourseStudents({ courseId }: { courseId: string }) {
+  const { t } = useT();
+  const course = useStore((s) => s.courses.find((c) => c.id === courseId));
+  const accounts = useAuth((s) => s.accounts);
+  const completedForUser = useAuth((s) => s.completedForUser);
+  const watchedForUser = useAuth((s) => s.watchedForUser);
+  if (!course) return null;
+
+  const totalW = course.workouts.length;
+  const totalEx = course.workouts.reduce((n, w) => n + w.exercises.length, 0);
+  const students = accounts.filter(
+    (a) => a.role === 'student' && (a.enrolledCourseIds?.includes(courseId) || (course.grantedEmails ?? []).some((g) => g.toLowerCase() === a.email.toLowerCase())),
+  );
+
+  return (
+    <div className="card" style={{ marginBottom: 24 }}>
+      <h2 style={{ marginTop: 0 }}>{t('studentsProgress')}</h2>
+      {students.length === 0 ? (
+        <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>{t('noStudents')}</p>
+      ) : (
+        <div className="student-stats">
+          {students.map((s) => {
+            const done = completedForUser(s.id, courseId).filter((w) => course.workouts.some((x) => x.id === w)).length;
+            const watched = watchedForUser(s.id, courseId).length;
+            const pct = totalW ? Math.round((done / totalW) * 100) : 0;
+            return (
+              <div key={s.id} className="student-row">
+                <div className="student-id">
+                  <strong>{s.name}</strong>
+                  <span>{s.email}</span>
+                </div>
+                <div className="student-metrics">
+                  <div className="progress-track" style={{ width: 120 }}><span style={{ width: `${pct}%` }} /></div>
+                  <span className="metric">{done}/{totalW} {t('workouts')} · {pct}%</span>
+                  <span className="metric">▶ {watched}/{totalEx} {t('videosWord')} {t('watchedLabel')}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <p className="shareline" style={{ marginTop: 12, marginBottom: 0 }}>{t('crossDeviceNote')}</p>
+    </div>
+  );
+}
+
 function ExerciseModal({
   initial,
   onSave,
@@ -197,10 +335,14 @@ function ExerciseModal({
             onChange={(e) => setDraft({ ...draft, videoUrl: e.target.value })}
           />
         </div>
+        <AutoDetect draft={draft} onChange={setDraft} />
         <div className="editor-muscles">
-          <MusclePicker exercise={draft} onChange={setDraft} />
+          <div>
+            <MusclePicker exercise={draft} onChange={setDraft} />
+            <NamedPartsPicker draft={draft} onChange={setDraft} />
+          </div>
           <div className="editor-preview-wrap">
-            <AnatomyPanel primary={draft.primary} secondary={draft.secondary} compact />
+            <AnatomyPanel primary={draft.primary} secondary={draft.secondary} extraParts={draft.extraParts} compact />
           </div>
         </div>
         <div className="row-actions" style={{ justifyContent: 'flex-end', marginTop: 18 }}>
@@ -268,6 +410,7 @@ export default function CourseEditor() {
       </div>
 
       <AccessByEmail courseId={course.id} />
+      <CourseStudents courseId={course.id} />
 
       <div className="toolbar">
         <h2 style={{ margin: 0 }}>{t('workoutsTitle')}</h2>

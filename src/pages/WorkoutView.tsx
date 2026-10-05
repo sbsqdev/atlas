@@ -23,14 +23,14 @@ export default function WorkoutView() {
 
   const [selected, setSelected] = useState<string | null>(null);
 
-  const { primary, secondary, isAggregate } = useMemo(() => {
-    if (!workout) return { primary: [], secondary: [], isAggregate: true };
+  const { primary, secondary, extraParts, isAggregate } = useMemo(() => {
+    if (!workout) return { primary: [], secondary: [], extraParts: [] as string[], isAggregate: true };
     const sel = workout.exercises.find((e) => e.id === selected);
-    if (sel) return { primary: sel.primary, secondary: sel.secondary, isAggregate: false };
+    if (sel) return { primary: sel.primary, secondary: sel.secondary, extraParts: sel.extraParts ?? [], isAggregate: false };
     // Aggregate: every primary muscle in the session.
     const prim = new Set<MuscleId>();
     workout.exercises.forEach((e) => e.primary.forEach((m) => prim.add(m)));
-    return { primary: [...prim], secondary: [], isAggregate: true };
+    return { primary: [...prim], secondary: [], extraParts: [] as string[], isAggregate: true };
   }, [workout, selected]);
 
   if (!course || !workout) return <p className="placeholder">404</p>;
@@ -65,7 +65,7 @@ export default function WorkoutView() {
       </div>
 
       <div className="split anatomy">
-        <AnatomyPanel primary={primary} secondary={secondary} />
+        <AnatomyPanel primary={primary} secondary={secondary} extraParts={extraParts} />
 
         <div>
           <div className="exercise-list">

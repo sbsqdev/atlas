@@ -28,6 +28,8 @@ interface AuthState {
   lang: Lang;
   /** key `${userId}:${courseId}` -> completed workout ids */
   progress: Record<string, string[]>;
+  /** key `${userId}:${courseId}` -> watched exercise ids */
+  watched: Record<string, string[]>;
 
   signUp: (name: string, email: string, password: string, role: Role, code?: string) => Result;
   signIn: (email: string, password: string) => Result;
@@ -40,6 +42,10 @@ interface AuthState {
   enrolledCourses: () => string[];
   toggleWorkoutDone: (courseId: string, workoutId: string) => void;
   completedFor: (courseId: string) => string[];
+  markWatched: (courseId: string, exerciseId: string) => void;
+  // coach analytics (read any student's activity)
+  completedForUser: (userId: string, courseId: string) => string[];
+  watchedForUser: (userId: string, courseId: string) => string[];
 
   // coach
   updateProfile: (patch: Partial<Pick<Account, 'bio' | 'brandName' | 'brandColor' | 'name'>>) => void;
@@ -55,6 +61,7 @@ export const useAuth = create<AuthState>()(
       user: null,
       lang: 'ru',
       progress: {},
+      watched: {},
 
       signUp: (name, email, password, role, code) => {
         const e = email.trim().toLowerCase();
@@ -141,6 +148,18 @@ export const useAuth = create<AuthState>()(
         if (!u) return [];
         return get().progress[`${u.id}:${courseId}`] ?? [];
       },
+      markWatched: (courseId, exerciseId) => {
+        const u = get().user;
+        if (!u || u.role !== 'student') return;
+        const key = `${u.id}:${courseId}`;
+        set((s) => {
+          const list = s.watched[key] ?? [];
+          if (list.includes(exerciseId)) return {} as Partial<AuthState>;
+          return { watched: { ...s.watched, [key]: [...list, exerciseId] } };
+        });
+      },
+      completedForUser: (userId, courseId) => get().progress[`${userId}:${courseId}`] ?? [],
+      watchedForUser: (userId, courseId) => get().watched[`${userId}:${courseId}`] ?? [],
 
       updateProfile: (patch) => {
         const u = get().user;
@@ -191,7 +210,7 @@ export const useAuth = create<AuthState>()(
       name: 'human-atlas-auth',
       version: VERSION,
       // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {} }) as Partial<AuthState>,
+      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {} }) as Partial<AuthState>,
     },
   ),
 );

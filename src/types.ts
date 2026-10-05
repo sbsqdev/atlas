@@ -80,6 +80,10 @@ export interface Exercise {
   primary: MuscleId[];
   /** Muscles it recruits as synergists / stabilisers. */
   secondary: MuscleId[];
+  /** Specific BodyParts3D part IDs the coach picked by name (highlighted too). */
+  extraParts?: string[];
+  /** The coach's free-text note of which muscles work (fed to auto-detect). */
+  muscleNote?: string;
 }
 
 /** A workout = an ordered list of exercises. */

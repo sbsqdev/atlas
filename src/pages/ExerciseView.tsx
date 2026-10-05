@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import AnatomyPanel from '../components/AnatomyPanel';
 import { useBrandStyle } from '../components/useBrandStyle';
@@ -9,10 +11,16 @@ export default function ExerciseView() {
   const { courseId, workoutId, exerciseId } = useParams();
   const { t, tr } = useT();
   const brand = useBrandStyle(courseId);
+  const markWatched = useAuth((s) => s.markWatched);
 
   const course = useStore((s) => s.courses.find((c) => c.id === courseId));
   const workout = course?.workouts.find((w) => w.id === workoutId);
   const exercise = workout?.exercises.find((e) => e.id === exerciseId);
+
+  // Record that the student opened this exercise (coach analytics).
+  useEffect(() => {
+    if (courseId && exerciseId) markWatched(courseId, exerciseId);
+  }, [courseId, exerciseId, markWatched]);
 
   if (!course || !workout || !exercise) return <p className="placeholder">404</p>;
 
@@ -27,7 +35,7 @@ export default function ExerciseView() {
       </div>
 
       <div className="split anatomy">
-        <AnatomyPanel primary={exercise.primary} secondary={exercise.secondary} />
+        <AnatomyPanel primary={exercise.primary} secondary={exercise.secondary} extraParts={exercise.extraParts} />
 
         <div className="detail">
           <h1>{tr(exercise.name)}</h1>

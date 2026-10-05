@@ -29,8 +29,16 @@ highlights which muscles each exercise activates**.
   playback without one.
 - **Coach branding / Брендинг тренера** — each coach sets a brand name and
   accent colour; students see that branding inside the course.
-- **Progress / Прогресс** — students mark workouts done and see a completion bar
-  per course (edtech-style performance tracking).
+- **Progress & coach analytics / Прогресс и аналитика** — students mark workouts
+  done and auto-record which exercises they opened (watched); coaches see each
+  student's **workouts done % and videos watched** in the course editor.
+- **Set muscles by name / Мышцы по названию** — besides the 16 regions, a coach
+  can **search the BodyParts3D structures by name** (e.g. `gluteus`, `soleus`,
+  `biceps femoris`) and highlight those exact meshes.
+- **AI muscle detection / ИИ-определение мышц** — the coach types which muscles
+  work in free text (any language) and the app maps it to body parts and
+  highlights them, via **DeepSeek** (`/api/infer-muscles`, key in env) with a
+  local keyword fallback.
 - **Calculators / Калькуляторы** — **КБЖУ / macros** (Mifflin–St Jeor TDEE +
   protein/fat/carb split), **1RM** (Epley) and **BMI**.
 - **Courses → Workouts → Exercises** — seeded with Rauana Kuangaliyeva's real
@@ -50,6 +58,19 @@ highlights which muscles each exercise activates**.
 - **Trainer dashboard / Кабинет тренера** — create, edit and delete courses,
   workouts and exercises, with a tri-state muscle picker (off → primary →
   synergist) to drive the 3D highlighting.
+
+## DeepSeek (AI muscle detection)
+
+The `/api/infer-muscles` Vercel function calls DeepSeek. The API key is read
+from the `DEEPSEEK_API_KEY` environment variable and is **never committed**:
+
+```sh
+vercel env add DEEPSEEK_API_KEY        # paste your DeepSeek key (sk-...)
+# or set it in the Vercel dashboard → Project → Settings → Environment Variables
+```
+
+Without a key (e.g. local `vite preview`), the feature falls back to a
+multilingual keyword heuristic, so it still works — just less precisely.
 
 ## Tech stack
 

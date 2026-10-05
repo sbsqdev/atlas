@@ -24,3 +24,7 @@ pnpm-debug.log*
 
 # TS build info
 *.tsbuildinfo
+
+# Local env (never commit secrets)
+.env
+.env.*.local

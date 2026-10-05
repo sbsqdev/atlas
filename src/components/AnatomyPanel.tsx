@@ -10,6 +10,8 @@ import type { MuscleId } from '../types';
 interface Props {
   primary: MuscleId[];
   secondary: MuscleId[];
+  /** Specific BodyParts3D part IDs chosen by name — highlighted as primary. */
+  extraParts?: string[];
   /** Minimal viewer for embedding (e.g. the course editor preview). */
   compact?: boolean;
 }
@@ -40,7 +42,7 @@ function partsFor(muscles: MuscleId[]): string[] {
   return [...out];
 }
 
-export default function AnatomyPanel({ primary, secondary, compact }: Props) {
+export default function AnatomyPanel({ primary, secondary, extraParts, compact }: Props) {
   const { t, tr, lang } = useT();
   const { atlas, error } = useAtlas();
   const [progress, setProgress] = useState(0);
@@ -56,11 +58,11 @@ export default function AnatomyPanel({ primary, secondary, compact }: Props) {
   const [inspectedName, setInspectedName] = useState<string | null>(null);
 
   const { exerciseSelected, exerciseSecondary } = useMemo(() => {
-    const prim = partsFor(primary);
+    const prim = [...new Set([...partsFor(primary), ...(extraParts ?? [])])];
     const primSet = new Set(prim);
     const sec = partsFor(secondary).filter((id) => !primSet.has(id));
     return { exerciseSelected: [...prim, ...sec], exerciseSecondary: sec };
-  }, [primary, secondary]);
+  }, [primary, secondary, extraParts]);
 
   const state: SceneState = useMemo(() => {
     const systems = PRESETS.find((p) => p.key === preset)!.systems;

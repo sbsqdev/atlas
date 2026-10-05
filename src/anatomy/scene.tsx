@@ -56,7 +56,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError}:P
     shader.fragmentShader='varying float partVisible; varying float partSelected; varying float partSecondary;\n'+shader.fragmentShader;
     shader.fragmentShader=shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif (partVisible < 0.5) discard;');
     // Two-tone highlight: primary target muscles glow sage, synergists warm gold.
-    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\nvec3 hiColor = partSecondary > 0.5 ? vec3(0.92, 0.74, 0.40) : vec3(0.26, 0.72, 0.50);\ndiffuseColor.rgb = mix(diffuseColor.rgb, hiColor, partSelected * 0.85);');
+    // A small additive term makes the highlighted structures read clearly.
+    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\nvec3 hiColor = partSecondary > 0.5 ? vec3(0.96, 0.72, 0.26) : vec3(0.15, 0.80, 0.47);\ndiffuseColor.rgb = mix(diffuseColor.rgb, hiColor, partSelected * 0.92);\ndiffuseColor.rgb += hiColor * partSelected * 0.18;');
    };materials.push(m);return m;
   };
   const mats=new Map(SYSTEMS.map(s=>[s.id,materialFor(s.id)]));
