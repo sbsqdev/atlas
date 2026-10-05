@@ -13,6 +13,15 @@ function project(a: Account): User {
   return { id: a.id, name: a.name, email: a.email, role: a.role };
 }
 
+/** Course ids whose coach has granted access to this email. */
+function grantedCourseIds(email: string): string[] {
+  const e = email.toLowerCase();
+  return useStore
+    .getState()
+    .courses.filter((c) => (c.grantedEmails ?? []).some((g) => g.toLowerCase() === e))
+    .map((c) => c.id);
+}
+
 interface AuthState {
   accounts: Account[];
   user: User | null;
@@ -35,6 +44,8 @@ interface AuthState {
   // coach
   updateProfile: (patch: Partial<Pick<Account, 'bio' | 'brandName' | 'brandColor' | 'name'>>) => void;
   getAccount: (id: string | undefined) => Account | undefined;
+  grantAccess: (courseId: string, email: string) => Result;
+  revokeAccess: (courseId: string, email: string) => void;
 }
 
 export const useAuth = create<AuthState>()(
@@ -49,6 +60,8 @@ export const useAuth = create<AuthState>()(
         const e = email.trim().toLowerCase();
         if (!name.trim() || !e || !password) return { ok: false, error: 'fillFields' };
         if (get().accounts.some((a) => a.email.toLowerCase() === e)) return { ok: false, error: 'emailTaken' };
+        // Auto-enrol into any course a coach granted this email before signup.
+        const granted = role === 'student' ? grantedCourseIds(e) : [];
         const account: Account = {
           id: `${role}-${Date.now().toString(36)}`,
           name: name.trim(),
@@ -57,7 +70,7 @@ export const useAuth = create<AuthState>()(
           role,
           ...(role === 'trainer'
             ? { brandName: name.trim(), brandColor: '#5e8a73', avatarColor: '#5e8a73', bio: '' }
-            : { avatarColor: '#c08a5e', enrolledCourseIds: [] }),
+            : { avatarColor: '#c08a5e', enrolledCourseIds: granted }),
         };
         set((s) => ({ accounts: [...s.accounts, account], user: project(account) }));
         if (role === 'student' && code && code.trim()) get().joinByCode(code);
@@ -69,7 +82,13 @@ export const useAuth = create<AuthState>()(
         if (!e || !password) return { ok: false, error: 'fillFields' };
         const acc = get().accounts.find((a) => a.email.toLowerCase() === e);
         if (!acc || acc.passHash !== hash(password)) return { ok: false, error: 'wrongCredentials' };
-        set({ user: project(acc) });
+        // Reconcile any email-based grants made since the account last signed in.
+        if (acc.role === 'student') {
+          const merged = Array.from(new Set([...(acc.enrolledCourseIds ?? []), ...grantedCourseIds(acc.email)]));
+          set((s) => ({ accounts: s.accounts.map((a) => (a.id === acc.id ? { ...a, enrolledCourseIds: merged } : a)), user: project(acc) }));
+        } else {
+          set({ user: project(acc) });
+        }
         return { ok: true };
       },
 
@@ -132,6 +151,41 @@ export const useAuth = create<AuthState>()(
         }));
       },
       getAccount: (id) => get().accounts.find((a) => a.id === id),
+
+      grantAccess: (courseId, email) => {
+        const e = email.trim().toLowerCase();
+        if (!e || !/.+@.+\..+/.test(e)) return { ok: false, error: 'fillFields' };
+        const course = useStore.getState().courses.find((c) => c.id === courseId);
+        if (!course) return { ok: false, error: 'codeInvalid' };
+        if ((course.grantedEmails ?? []).some((g) => g.toLowerCase() === e)) return { ok: false, error: 'alreadyEnrolled' };
+        useStore.getState().updateCourse(courseId, { grantedEmails: [...(course.grantedEmails ?? []), e] });
+        // If that student already has an account, enrol them immediately.
+        set((s) => ({
+          accounts: s.accounts.map((a) =>
+            a.email.toLowerCase() === e && a.role === 'student'
+              ? { ...a, enrolledCourseIds: Array.from(new Set([...(a.enrolledCourseIds ?? []), courseId])) }
+              : a,
+          ),
+        }));
+        return { ok: true };
+      },
+
+      revokeAccess: (courseId, email) => {
+        const e = email.trim().toLowerCase();
+        const course = useStore.getState().courses.find((c) => c.id === courseId);
+        if (course) {
+          useStore.getState().updateCourse(courseId, {
+            grantedEmails: (course.grantedEmails ?? []).filter((g) => g.toLowerCase() !== e),
+          });
+        }
+        set((s) => ({
+          accounts: s.accounts.map((a) =>
+            a.email.toLowerCase() === e
+              ? { ...a, enrolledCourseIds: (a.enrolledCourseIds ?? []).filter((id) => id !== courseId) }
+              : a,
+          ),
+        }));
+      },
     }),
     {
       name: 'human-atlas-auth',

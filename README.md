@@ -15,10 +15,18 @@ highlights which muscles each exercise activates**.
 - **Accounts / Аккаунты** — real **sign up / sign in** for **coaches** and
   **students** (client-side, light-hashed passwords — demo-grade, see the
   security note). Demo logins are on the sign-in screen.
-- **Invite-code access / Доступ по коду** — students do **not** browse or
-  discover courses or coaches. A student joins **one coach's course via an
-  invite code** the coach shares. Coaches (who may be competitors) never appear
-  in a public directory.
+- **Access control / Доступ** — students do **not** browse or discover courses
+  or coaches. They get in two ways: (1) an **invite code** the coach shares, or
+  (2) the coach **grants access by email** (e.g. after purchase) from the course
+  editor — a matching account is auto-enrolled immediately, and an email granted
+  before signup enrols automatically when that student registers. Coaches (who
+  may be competitors) never appear in a public directory.
+- **Google Drive video / Видео из Google Drive** — exercise videos hosted on
+  Google Drive (or YouTube) **play inline** inside the exercise page via Drive's
+  `/preview` player, for enrolled students — no new tab, no API key. Drive files
+  must be shared as **"anyone with the link can view"**. A full Drive-API/OAuth
+  sync would require a backend; the inline embed delivers the same in-app
+  playback without one.
 - **Coach branding / Брендинг тренера** — each coach sets a brand name and
   accent colour; students see that branding inside the course.
 - **Progress / Прогресс** — students mark workouts done and see a completion bar

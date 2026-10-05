@@ -118,6 +118,30 @@ const dict = {
   bioLabel: { ru: 'О себе (био)', en: 'About you (bio)', tr: 'Hakkınızda (bio)' },
   saveProfile: { ru: 'Сохранить профиль', en: 'Save profile', tr: 'Profili kaydet' },
 
+  // access by email
+  accessByEmail: { ru: 'Доступ по e-mail', en: 'Access by email', tr: 'E-posta ile erişim' },
+  accessByEmailHint: {
+    ru: 'Выдайте доступ ученику по e-mail (например, после покупки). Курс откроется автоматически, когда он войдёт.',
+    en: 'Grant a student access by email (e.g. after purchase). The course unlocks automatically when they log in.',
+    tr: 'Öğrenciye e-posta ile erişim verin (ör. satın alma sonrası). Giriş yaptığında kurs otomatik açılır.',
+  },
+  studentEmail: { ru: 'E-mail ученика', en: 'Student email', tr: 'Öğrenci e-postası' },
+  grant: { ru: 'Выдать доступ', en: 'Grant access', tr: 'Erişim ver' },
+  grantedStudents: { ru: 'Ученики с доступом', en: 'Students with access', tr: 'Erişimi olan öğrenciler' },
+  noGranted: { ru: 'Пока никому не выдан доступ.', en: 'No access granted yet.', tr: 'Henüz erişim verilmedi.' },
+  accessActive: { ru: 'активен', en: 'active', tr: 'aktif' },
+  accessPending: { ru: 'ещё не зарегистрирован', en: 'not registered yet', tr: 'henüz kayıtlı değil' },
+  revoke: { ru: 'Отозвать', en: 'Revoke', tr: 'Kaldır' },
+
+  // video
+  videoDrive: { ru: 'Видео', en: 'Video', tr: 'Video' },
+  openInDrive: { ru: 'Открыть в Google Drive', en: 'Open in Google Drive', tr: "Google Drive'da aç" },
+  videoShareHint: {
+    ru: 'Видео открывается прямо здесь для учеников с доступом (через Google Drive).',
+    en: 'The video plays here for students with access (via Google Drive).',
+    tr: 'Video, erişimi olan öğrenciler için burada oynatılır (Google Drive üzerinden).',
+  },
+
   // calculators
   macroCalc: { ru: 'КБЖУ (калории и макросы)', en: 'Calories & macros (TDEE)', tr: 'Kalori ve makrolar' },
   macroDesc: {

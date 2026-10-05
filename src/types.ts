@@ -98,6 +98,9 @@ export interface Course {
   level: Bi;
   /** Invite code students enter to enrol. Students never browse courses. */
   code: string;
+  /** Emails the coach granted access to (e.g. after purchase). A matching
+   *  account is auto-enrolled; an email granted before signup enrols on signup. */
+  grantedEmails?: string[];
   workouts: Workout[];
 }
 

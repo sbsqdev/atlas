@@ -256,6 +256,7 @@ const legsCourse: Course = {
   id: 'course-glutes-legs',
   trainerId: 'trainer-rauana',
   code: 'RAUANA',
+  grantedEmails: ['student@demo.app'],
   title: { ru: 'Сила: ягодицы и ноги', en: 'Strength: glutes & legs', tr: 'Güç: kalça ve bacak' },
   summary: {
     ru: 'Программа из повторяющихся тренировок A/B/C с прогрессией весов. После каждой силовой — блок на кор.',

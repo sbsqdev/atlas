@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { useT } from '../i18n/useT';
 import AnatomyPanel from '../components/AnatomyPanel';
 import { useBrandStyle } from '../components/useBrandStyle';
+import { toEmbed } from '../lib/video';
 
 export default function ExerciseView() {
   const { courseId, workoutId, exerciseId } = useParams();
@@ -41,18 +42,35 @@ export default function ExerciseView() {
             </div>
           )}
 
-          {exercise.videoUrl && (
-            <p style={{ marginTop: 18 }}>
-              <a
-                className="btn primary"
-                href={exercise.videoUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                ▶ {t('watchVideo')}
-              </a>
-            </p>
-          )}
+          {exercise.videoUrl && (() => {
+            const embed = toEmbed(exercise.videoUrl);
+            return (
+              <div style={{ marginTop: 18 }}>
+                <h2>{t('videoDrive')}</h2>
+                {embed ? (
+                  <>
+                    <div className="video-embed">
+                      <iframe
+                        src={embed.url}
+                        title={tr(exercise.name)}
+                        allow="autoplay; encrypted-media; fullscreen"
+                        allowFullScreen
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="video-hint">{t('videoShareHint')}</p>
+                    <a className="btn small" href={exercise.videoUrl} target="_blank" rel="noreferrer noopener">
+                      ↗ {t('openInDrive')}
+                    </a>
+                  </>
+                ) : (
+                  <a className="btn primary" href={exercise.videoUrl} target="_blank" rel="noreferrer noopener">
+                    ▶ {t('watchVideo')}
+                  </a>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>
