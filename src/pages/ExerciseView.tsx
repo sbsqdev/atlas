@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useT } from '../i18n/useT';
-import MusclePanel from '../components/MusclePanel';
+import AnatomyPanel from '../components/AnatomyPanel';
 
 export default function ExerciseView() {
   const { courseId, workoutId, exerciseId } = useParams();
@@ -25,8 +25,8 @@ export default function ExerciseView() {
         <span>{tr(exercise.name)}</span>
       </div>
 
-      <div className="split">
-        <MusclePanel primary={exercise.primary} secondary={exercise.secondary} />
+      <div className="split anatomy">
+        <AnatomyPanel primary={exercise.primary} secondary={exercise.secondary} />
 
         <div className="detail">
           <h1>{tr(exercise.name)}</h1>

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
-import MusclePanel from '../components/MusclePanel';
+import AnatomyPanel from '../components/AnatomyPanel';
 import type { MuscleId } from '../types';
 
 export default function WorkoutView() {
@@ -45,8 +45,8 @@ export default function WorkoutView() {
         {isAggregate ? t('workoutMuscleMap') : tr(selectedExercise?.name)}
       </p>
 
-      <div className="split">
-        <MusclePanel primary={primary} secondary={secondary} />
+      <div className="split anatomy">
+        <AnatomyPanel primary={primary} secondary={secondary} />
 
         <div>
           <div className="exercise-list">
