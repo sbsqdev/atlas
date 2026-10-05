@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useT } from '../i18n/useT';
 import { MUSCLES } from '../data/muscles';
+import AnatomyPanel from '../components/AnatomyPanel';
 import type { Bi, Exercise, MuscleId, Workout } from '../types';
 
 let n = 0;
@@ -137,8 +138,13 @@ function ExerciseModal({
             onChange={(e) => setDraft({ ...draft, videoUrl: e.target.value })}
           />
         </div>
-        <MusclePicker exercise={draft} onChange={setDraft} />
-        <div className="row-actions" style={{ justifyContent: 'flex-end' }}>
+        <div className="editor-muscles">
+          <MusclePicker exercise={draft} onChange={setDraft} />
+          <div className="editor-preview-wrap">
+            <AnatomyPanel primary={draft.primary} secondary={draft.secondary} compact />
+          </div>
+        </div>
+        <div className="row-actions" style={{ justifyContent: 'flex-end', marginTop: 18 }}>
           <button className="btn ghost" onClick={onClose}>{t('cancel')}</button>
           <button className="btn primary" onClick={() => onSave(draft)}>{t('save')}</button>
         </div>

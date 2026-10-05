@@ -50,7 +50,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="user-chip">
             <span
               className="avatar"
-              style={{ background: user.role === 'trainer' ? '#f97316' : '#38bdf8' }}
+              style={{ background: user.role === 'trainer' ? '#5e8a73' : '#c08a5e' }}
             >
               {initials(user.name)}
             </span>

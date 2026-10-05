@@ -259,7 +259,7 @@ export const TRAINERS: Trainer[] = [
       ru: 'Персональный тренер. Силовые программы для девушек с акцентом на ягодицы, ноги и сильный кор.',
       en: 'Personal trainer. Strength programs for women focused on glutes, legs and a strong core.',
     },
-    avatarColor: '#f97316',
+    avatarColor: '#5e8a73',
   },
   {
     id: 'trainer-demo',
@@ -268,7 +268,7 @@ export const TRAINERS: Trainer[] = [
       ru: 'Демонстрационный аккаунт тренера — создайте здесь свой собственный курс.',
       en: 'Demonstration trainer account — build your own course here.',
     },
-    avatarColor: '#38bdf8',
+    avatarColor: '#c08a5e',
   },
 ];
 

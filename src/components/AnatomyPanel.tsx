@@ -10,9 +10,10 @@ import type { MuscleId } from '../types';
 interface Props {
   primary: MuscleId[];
   secondary: MuscleId[];
+  /** Minimal viewer for embedding (e.g. the course editor preview). */
+  compact?: boolean;
 }
 
-// System visibility presets offered as quick buttons.
 const PRESETS: { key: string; label: { ru: string; en: string }; systems: SystemId[] }[] = [
   { key: 'muscles', label: { ru: 'Мышцы', en: 'Muscles' }, systems: ['muscular'] },
   { key: 'withBones', label: { ru: 'Мышцы + скелет', en: 'Muscles + bones' }, systems: ['muscular', 'skeletal'] },
@@ -37,7 +38,7 @@ function partsFor(muscles: MuscleId[]): string[] {
   return [...out];
 }
 
-export default function AnatomyPanel({ primary, secondary }: Props) {
+export default function AnatomyPanel({ primary, secondary, compact }: Props) {
   const { t, tr, lang } = useT();
   const { atlas, error } = useAtlas();
   const [progress, setProgress] = useState(0);
@@ -49,7 +50,6 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
   const [rotate, setRotate] = useState(false);
   const [isolate, setIsolate] = useState(false);
   const [reset, setReset] = useState(0);
-  // A tapped structure overrides the exercise highlight until cleared.
   const [override, setOverride] = useState<string | null>(null);
   const [inspectedName, setInspectedName] = useState<string | null>(null);
 
@@ -65,47 +65,62 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
     const selected = override ? [override] : exerciseSelected;
     const secondaryIds = override ? [] : exerciseSecondary;
     return {
-      explode,
-      visible: systems,
+      explode: compact ? 0 : explode,
+      visible: compact ? ['muscular'] : systems,
       selected,
       secondary: secondaryIds,
-      isolate,
+      isolate: compact ? false : isolate,
       view,
-      rotate,
+      rotate: compact ? false : rotate,
       reset,
       inspectorOpen: false,
     };
-  }, [preset, override, exerciseSelected, exerciseSecondary, explode, isolate, view, rotate, reset]);
+  }, [compact, preset, override, exerciseSelected, exerciseSecondary, explode, isolate, view, rotate, reset]);
 
   const onSelect = (id: string) => {
+    if (compact) return;
     setOverride(id);
     const part = atlas?.parts.find((p) => p.id === id);
     setInspectedName(part ? part.name : id);
   };
 
+  const viewer = (
+    <div className={`viewer anatomy${compact ? ' small' : ''}`}>
+      {atlas && !error ? (
+        <AnatomyScene atlas={atlas} state={state} onSelect={onSelect} onProgress={setProgress} onError={setSceneError} />
+      ) : (
+        <div className="viewer-loading">{error ?? (lang === 'ru' ? 'Загрузка 3D-анатомии…' : 'Loading 3D anatomy…')}</div>
+      )}
+      {atlas && progress < 100 && !sceneError && <div className="load-bar"><span style={{ width: `${progress}%` }} /></div>}
+      {sceneError && <div className="viewer-loading err">{sceneError}</div>}
+    </div>
+  );
+
+  // Compact preview (editor): viewer + view toggle only.
+  if (compact) {
+    return (
+      <div className="muscle-panel editor-preview">
+        {viewer}
+        <div className="anatomy-controls">
+          <div className="seg wrap">
+            {VIEWS.map((v) => (
+              <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => setView(v.key)}>
+                {v.label[lang]}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="hint">
+          {lang === 'ru' ? 'Так эти мышцы увидят ученики' : 'This is what students will see'}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="muscle-panel">
-      <div className="viewer anatomy">
-        {atlas && !error ? (
-          <AnatomyScene
-            atlas={atlas}
-            state={state}
-            onSelect={onSelect}
-            onProgress={setProgress}
-            onError={setSceneError}
-          />
-        ) : (
-          <div className="viewer-loading">
-            {error ?? (lang === 'ru' ? 'Загрузка 3D-анатомии…' : 'Loading 3D anatomy…')}
-          </div>
-        )}
-        {atlas && progress < 100 && !sceneError && (
-          <div className="load-bar"><span style={{ width: `${progress}%` }} /></div>
-        )}
-        {sceneError && <div className="viewer-loading err">{sceneError}</div>}
-      </div>
+      {viewer}
 
-      {/* controls */}
       <div className="anatomy-controls">
         <div className="seg wrap">
           {PRESETS.map((p) => (
@@ -126,14 +141,7 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
         <div className="ctl-row">
           <label className="explode">
             {lang === 'ru' ? 'Разложить' : 'Explode'}
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={explode}
-              onChange={(e) => setExplode(parseFloat(e.target.value))}
-            />
+            <input type="range" min={0} max={1} step={0.01} value={explode} onChange={(e) => setExplode(parseFloat(e.target.value))} />
           </label>
           <button className={`btn small ${rotate ? 'primary' : ''}`} onClick={() => setRotate((r) => !r)}>
             ⟳ {lang === 'ru' ? 'Вращать' : 'Rotate'}
@@ -143,13 +151,7 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
           </button>
           <button
             className="btn small"
-            onClick={() => {
-              setOverride(null);
-              setInspectedName(null);
-              setIsolate(false);
-              setExplode(0);
-              setReset((r) => r + 1);
-            }}
+            onClick={() => { setOverride(null); setInspectedName(null); setIsolate(false); setExplode(0); setReset((r) => r + 1); }}
           >
             ↺ {lang === 'ru' ? 'Сброс' : 'Reset'}
           </button>
@@ -165,15 +167,12 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
         )}
       </div>
 
-      {/* legend */}
       <div className="legend">
         {primary.length > 0 && (
           <div>
             <h4>{t('primaryMuscles')}</h4>
             <div className="tags">
-              {primary.map((id) => (
-                <span key={id} className="mtag primary"><span className="dot" />{tr(MUSCLE_BY_ID[id]?.name)}</span>
-              ))}
+              {primary.map((id) => (<span key={id} className="mtag primary"><span className="dot" />{tr(MUSCLE_BY_ID[id]?.name)}</span>))}
             </div>
           </div>
         )}
@@ -181,9 +180,7 @@ export default function AnatomyPanel({ primary, secondary }: Props) {
           <div>
             <h4>{t('secondaryMuscles')}</h4>
             <div className="tags">
-              {secondary.map((id) => (
-                <span key={id} className="mtag secondary"><span className="dot" />{tr(MUSCLE_BY_ID[id]?.name)}</span>
-              ))}
+              {secondary.map((id) => (<span key={id} className="mtag secondary"><span className="dot" />{tr(MUSCLE_BY_ID[id]?.name)}</span>))}
             </div>
           </div>
         )}
