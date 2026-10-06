@@ -44,10 +44,15 @@ export type Role = 'trainer' | 'student';
 /** A user account. Password is light-hashed (demo only — not real security). */
 export interface Account {
   id: string;
+  /** Login / display name. We store only this by default (minimal data). */
+  username: string;
   name: string;
+  /** Optional — only if the student chooses to add it (e.g. for email access). */
   email: string;
   passHash: string;
   role: Role;
+  /** When the user accepted the offer & consented to data processing. */
+  consentAt?: number;
   // Coach profile / branding:
   bio?: string;
   brandName?: string;

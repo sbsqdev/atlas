@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import StudentHome from './pages/StudentHome';
 import Calculators from './pages/Calculators';
 import Achievements from './pages/Achievements';
+import Legal from './pages/Legal';
 import CourseView from './pages/CourseView';
 import WorkoutView from './pages/WorkoutView';
 import ExerciseView from './pages/ExerciseView';
@@ -49,6 +50,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Home /> : <Login />} />
+      {/* Legal docs are public so people can read them before signing up. */}
+      <Route path="/legal/:doc" element={<Legal />} />
       <Route path="/" element={<Home />} />
 
       <Route path="/home" element={<RequireAuth role="student">{page(<StudentHome />)}</RequireAuth>} />

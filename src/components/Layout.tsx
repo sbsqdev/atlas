@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
+import Footer from './Footer';
 import type { ReactNode } from 'react';
 
 function initials(name: string) {
@@ -75,6 +76,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="content">{children}</main>
+      <Footer />
     </div>
   );
 }

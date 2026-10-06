@@ -420,3 +420,25 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .quick { display: flex; gap: 10px; margin-top: 12px; }
 .quick .btn { flex: 1; justify-content: center; }
 .hint { font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.55; }
+
+/* ---------- Legal / footer / consent ---------- */
+.site-footer { border-top: 1px solid var(--border); margin-top: 40px; padding: 22px; display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; color: var(--muted); font-size: 13px; }
+.site-footer.compact { margin-top: 14px; border-top: 0; padding: 14px 10px 4px; }
+.foot-links { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.foot-links a { color: var(--muted); font-weight: 600; }
+.foot-links a:hover { color: var(--accent-2); }
+.foot-legal { font-size: 12px; }
+
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); margin: 4px 0 14px; line-height: 1.45; }
+.consent input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--accent); flex: 0 0 auto; }
+.consent a { color: var(--accent-2); font-weight: 600; text-decoration: underline; }
+
+.legal-wrap { min-height: 100%; display: flex; flex-direction: column; }
+.legal-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
+.legal-body { flex: 1; width: 100%; max-width: 820px; margin: 0 auto; padding: 32px 22px 48px; }
+.legal-body h1 { font-size: 26px; }
+.legal-updated { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+.legal-section { margin-bottom: 22px; }
+.legal-section h2 { font-size: 17px; margin-bottom: 8px; }
+.legal-section p { line-height: 1.65; color: var(--text); margin: 0 0 8px; }
+.legal-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }

@@ -368,9 +368,11 @@ export const COURSES: Course[] = [legsCourse];
 export const SEED_ACCOUNTS: Account[] = [
   {
     id: 'trainer-rauana',
+    username: 'rauana',
     name: 'Rauana Kuangaliyeva',
     email: 'rauana@demo.app',
     passHash: hash('demo1234'),
+    consentAt: Date.now(),
     role: 'trainer',
     bio: 'Персональный тренер. Силовые программы для девушек с акцентом на ягодицы, ноги и сильный кор. / Personal coach — strength programs focused on glutes, legs and a strong core.',
     brandName: 'Rauana Training',
@@ -379,14 +381,16 @@ export const SEED_ACCOUNTS: Account[] = [
   },
   {
     id: 'student-demo',
+    username: 'student',
     name: 'Demo Student',
     email: 'student@demo.app',
     passHash: hash('demo1234'),
+    consentAt: Date.now(),
     role: 'student',
     avatarColor: '#c08a5e',
     enrolledCourseIds: ['course-glutes-legs'],
   },
 ];
 
-export const DEMO_COACH = { email: 'rauana@demo.app', password: 'demo1234' };
-export const DEMO_STUDENT = { email: 'student@demo.app', password: 'demo1234' };
+export const DEMO_COACH = { login: 'rauana', password: 'demo1234' };
+export const DEMO_STUDENT = { login: 'student', password: 'demo1234' };

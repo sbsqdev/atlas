@@ -5,9 +5,9 @@ import { SEED_ACCOUNTS } from '../data/seed';
 import { hash } from './hash';
 import { useStore } from './useStore';
 
-const VERSION = 2;
+const VERSION = 3;
 
-type Result = { ok: boolean; error?: 'emailTaken' | 'wrongCredentials' | 'fillFields' | 'codeInvalid' | 'alreadyEnrolled' };
+type Result = { ok: boolean; error?: 'emailTaken' | 'usernameTaken' | 'wrongCredentials' | 'fillFields' | 'codeInvalid' | 'alreadyEnrolled' | 'consentRequired' };
 
 function project(a: Account): User {
   return { id: a.id, name: a.name, email: a.email, role: a.role };
@@ -33,8 +33,8 @@ interface AuthState {
   /** userId -> ISO day strings the student was active (for streaks) */
   activityDays: Record<string, string[]>;
 
-  signUp: (name: string, email: string, password: string, role: Role, code?: string) => Result;
-  signIn: (email: string, password: string) => Result;
+  signUp: (username: string, password: string, role: Role, extras: { email?: string; code?: string; consent: boolean }) => Result;
+  signIn: (login: string, password: string) => Result;
   logout: () => void;
   setLang: (lang: Lang) => void;
 
@@ -67,31 +67,36 @@ export const useAuth = create<AuthState>()(
       watched: {},
       activityDays: {},
 
-      signUp: (name, email, password, role, code) => {
-        const e = email.trim().toLowerCase();
-        if (!name.trim() || !e || !password) return { ok: false, error: 'fillFields' };
-        if (get().accounts.some((a) => a.email.toLowerCase() === e)) return { ok: false, error: 'emailTaken' };
+      signUp: (username, password, role, extras) => {
+        const u = username.trim();
+        const e = (extras.email ?? '').trim().toLowerCase();
+        if (!u || !password) return { ok: false, error: 'fillFields' };
+        if (!extras.consent) return { ok: false, error: 'consentRequired' };
+        if (get().accounts.some((a) => (a.username ?? '').toLowerCase() === u.toLowerCase())) return { ok: false, error: 'usernameTaken' };
+        if (e && get().accounts.some((a) => a.email.toLowerCase() === e)) return { ok: false, error: 'emailTaken' };
         // Auto-enrol into any course a coach granted this email before signup.
-        const granted = role === 'student' ? grantedCourseIds(e) : [];
+        const granted = role === 'student' && e ? grantedCourseIds(e) : [];
         const account: Account = {
           id: `${role}-${Date.now().toString(36)}`,
-          name: name.trim(),
+          username: u,
+          name: u,
           email: e,
           passHash: hash(password),
+          consentAt: Date.now(),
           role,
           ...(role === 'trainer'
-            ? { brandName: name.trim(), brandColor: '#5e8a73', avatarColor: '#5e8a73', bio: '' }
+            ? { brandName: u, brandColor: '#5e8a73', avatarColor: '#5e8a73', bio: '' }
             : { avatarColor: '#c08a5e', enrolledCourseIds: granted }),
         };
         set((s) => ({ accounts: [...s.accounts, account], user: project(account) }));
-        if (role === 'student' && code && code.trim()) get().joinByCode(code);
+        if (role === 'student' && extras.code && extras.code.trim()) get().joinByCode(extras.code);
         return { ok: true };
       },
 
-      signIn: (email, password) => {
-        const e = email.trim().toLowerCase();
-        if (!e || !password) return { ok: false, error: 'fillFields' };
-        const acc = get().accounts.find((a) => a.email.toLowerCase() === e);
+      signIn: (login, password) => {
+        const l = login.trim().toLowerCase();
+        if (!l || !password) return { ok: false, error: 'fillFields' };
+        const acc = get().accounts.find((a) => (a.username ?? '').toLowerCase() === l || a.email.toLowerCase() === l);
         if (!acc || acc.passHash !== hash(password)) return { ok: false, error: 'wrongCredentials' };
         // Reconcile any email-based grants made since the account last signed in.
         if (acc.role === 'student') {
