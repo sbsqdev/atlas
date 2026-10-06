@@ -70,6 +70,13 @@ export interface User {
   role: Role;
 }
 
+/** Atomic-Habits implementation intention + habit stacking (per student). */
+export interface HabitPlan {
+  time?: string;      // "в 7:00"
+  place?: string;     // "дома / в зале"
+  afterHabit?: string;// habit stacking cue: "после утреннего кофе"
+}
+
 /** A single exercise inside a workout. */
 export interface Exercise {
   id: string;

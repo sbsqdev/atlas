@@ -82,7 +82,7 @@ export default function WorkoutView() {
               >
                 <span className="idx">{i + 1}</span>
                 <div className="body">
-                  <div className="name">{tr(e.name)}</div>
+                  <div className="name">{tr(e.name)}{e.videoUrl && <span className="vid-dot" title="видео">▶</span>}</div>
                   <div className="presc">{tr(e.prescription)}</div>
                   <div className="chips">
                     {e.primary.map((m) => (

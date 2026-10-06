@@ -32,6 +32,8 @@ interface AuthState {
   watched: Record<string, string[]>;
   /** userId -> ISO day strings the student was active (for streaks) */
   activityDays: Record<string, string[]>;
+  /** userId -> Atomic-Habits plan */
+  habitPlan: Record<string, import('../types').HabitPlan>;
 
   signUp: (username: string, password: string, role: Role, extras: { email?: string; code?: string; consent: boolean }) => Result;
   signIn: (login: string, password: string) => Result;
@@ -49,6 +51,8 @@ interface AuthState {
   completedForUser: (userId: string, courseId: string) => string[];
   watchedForUser: (userId: string, courseId: string) => string[];
   activityFor: (userId: string) => string[];
+  getHabitPlan: () => import('../types').HabitPlan;
+  setHabitPlan: (patch: Partial<import('../types').HabitPlan>) => void;
 
   // coach
   updateProfile: (patch: Partial<Pick<Account, 'bio' | 'brandName' | 'brandColor' | 'name'>>) => void;
@@ -66,6 +70,7 @@ export const useAuth = create<AuthState>()(
       progress: {},
       watched: {},
       activityDays: {},
+      habitPlan: {},
 
       signUp: (username, password, role, extras) => {
         const u = username.trim();
@@ -180,6 +185,15 @@ export const useAuth = create<AuthState>()(
       completedForUser: (userId, courseId) => get().progress[`${userId}:${courseId}`] ?? [],
       watchedForUser: (userId, courseId) => get().watched[`${userId}:${courseId}`] ?? [],
       activityFor: (userId) => get().activityDays[userId] ?? [],
+      getHabitPlan: () => {
+        const u = get().user;
+        return u ? get().habitPlan[u.id] ?? {} : {};
+      },
+      setHabitPlan: (patch) => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({ habitPlan: { ...s.habitPlan, [u.id]: { ...(s.habitPlan[u.id] ?? {}), ...patch } } }));
+      },
 
       updateProfile: (patch) => {
         const u = get().user;
@@ -230,7 +244,7 @@ export const useAuth = create<AuthState>()(
       name: 'human-atlas-auth',
       version: VERSION,
       // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {} }) as Partial<AuthState>,
+      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habitPlan: {} }) as Partial<AuthState>,
     },
   ),
 );

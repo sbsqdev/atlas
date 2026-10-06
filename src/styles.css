@@ -442,3 +442,31 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .legal-section h2 { font-size: 17px; margin-bottom: 8px; }
 .legal-section p { line-height: 1.65; color: var(--text); margin: 0 0 8px; }
 .legal-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+/* ---------- Habit builder (Atomic Habits) ---------- */
+.habit-card .habit-plan-box { background: linear-gradient(135deg, var(--accent-dim), #f2f8f4); border: 1px solid #d3e7db; border-radius: var(--radius); padding: 12px 15px; margin: 6px 0 12px; font-size: 15px; line-height: 1.5; }
+.laws-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.law { display: flex; gap: 11px; align-items: flex-start; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+.law-i { font-size: 22px; line-height: 1; flex: 0 0 auto; }
+.law-t { font-weight: 700; font-family: var(--font-display); font-size: 14px; }
+.law-d { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+
+/* ---------- Video card ---------- */
+.video-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-sm); }
+.video-card h2 { font-size: 16px; margin-bottom: 12px; }
+.video-empty { border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; background: var(--panel-2); }
+.vid-dot { font-size: 10px; color: var(--accent-2); margin-left: 7px; background: var(--accent-dim); padding: 2px 6px; border-radius: 999px; vertical-align: middle; }
+
+/* ---------- Extra mobile polish ---------- */
+@media (max-width: 760px) {
+  .laws-grid { grid-template-columns: 1fr; }
+  .detail h1 { font-size: 22px; }
+  .video-card { padding: 13px; }
+  .site-footer { margin-top: 28px; padding: 18px; }
+  .legal-body { padding: 22px 16px 36px; }
+  .legal-top { padding: 11px 16px; }
+  .code-value { font-size: 20px; letter-spacing: 2px; }
+  .big-num { font-size: 28px; }
+  .thread { margin-top: 24px; }
+  .game-banner .gb-bar { order: 5; flex-basis: 100%; }
+}

@@ -54,8 +54,8 @@ export default function ExerciseView() {
           {exercise.videoUrl && (() => {
             const embed = toEmbed(exercise.videoUrl);
             return (
-              <div style={{ marginTop: 18 }}>
-                <h2>{t('videoDrive')}</h2>
+              <div className="video-card" style={{ marginTop: 18 }}>
+                <h2>▶ {t('videoLesson')}</h2>
                 {embed ? (
                   <>
                     <div className="video-embed">
@@ -80,6 +80,13 @@ export default function ExerciseView() {
               </div>
             );
           })()}
+
+          {!exercise.videoUrl && (
+            <div className="video-card" style={{ marginTop: 18 }}>
+              <h2>▶ {t('videoLesson')}</h2>
+              <div className="video-empty">🎬 {tr({ ru: 'Видео пока не добавлено', en: 'No video yet', tr: 'Henüz video yok' })}</div>
+            </div>
+          )}
         </div>
       </div>
 
