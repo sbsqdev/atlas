@@ -470,3 +470,61 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
   .thread { margin-top: 24px; }
   .game-banner .gb-bar { order: 5; flex-basis: 100%; }
 }
+
+/* ---------- Habits tracker (psychology / Atomic Habits) ---------- */
+.habits-section { margin: 8px 0 28px; }
+.habit-list { display: flex; flex-direction: column; gap: 12px; margin: 14px 0; }
+.habit-item { padding: 14px 16px; }
+.habit-head { display: flex; gap: 13px; align-items: flex-start; }
+.check-btn {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--border-strong); background: var(--panel);
+  font-size: 20px; font-weight: 800; color: #fff; cursor: pointer;
+  display: grid; place-items: center; transition: all 0.14s;
+}
+.check-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+.check-btn.on { background: linear-gradient(135deg, var(--accent-soft), var(--accent-2)); border-color: var(--accent-2); box-shadow: var(--ring); }
+.habit-main { flex: 1; min-width: 0; }
+.habit-title { font-weight: 700; font-family: var(--font-display); font-size: 16px; }
+.habit-identity { font-size: 13px; color: var(--muted); font-style: italic; margin-top: 1px; }
+.habit-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 7px; }
+.streak-pill, .cons-pill, .rem-pill { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.streak-pill { background: rgba(192,133,78,0.15); color: #8a5a2c; }
+.cons-pill { background: var(--panel-2); color: var(--muted); }
+.rem-pill { background: var(--accent-dim); color: var(--accent-2); }
+
+.habit-edit { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+.law-block { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; }
+.law-head { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent-2); margin-bottom: 8px; }
+.law-block .field { margin: 0; }
+.law-block .field + .field, .law-block .field-row + .field { margin-top: 9px; }
+.switch-row { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
+.switch-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+.day-row { display: flex; gap: 6px; margin-top: 11px; flex-wrap: wrap; }
+.day-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--panel); font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.12s; }
+.day-btn.on { background: var(--accent-dim); color: var(--accent-2); border-color: var(--accent); }
+.btn.danger { color: var(--danger); align-self: flex-start; }
+
+.add-habit { display: flex; gap: 9px; margin-top: 4px; }
+.add-habit input { flex: 1; }
+.tmpl-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 700; margin: 16px 0 8px; }
+.tmpl-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tmpl-chip { border: 1px dashed var(--border-strong); background: var(--panel); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; color: var(--accent-2); cursor: pointer; transition: all 0.12s; }
+.tmpl-chip:hover { background: var(--accent-dim); border-style: solid; border-color: var(--accent); }
+
+.reminders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.notif-card { padding: 15px 16px; }
+.notif-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.muted-sm { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+.ok-pill { font-size: 12px; font-weight: 700; color: var(--accent-2); background: var(--accent-dim); padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
+.warn-sm { font-size: 12.5px; color: var(--danger); font-weight: 600; }
+.consent-row { display: flex; gap: 9px; align-items: flex-start; line-height: 1.4; }
+.consent-row input { margin-top: 2px; width: 17px; height: 17px; accent-color: var(--accent); flex: 0 0 auto; }
+
+@media (max-width: 760px) {
+  .reminders-grid { grid-template-columns: 1fr; }
+  .check-btn { width: 36px; height: 36px; font-size: 18px; }
+  .habit-title { font-size: 15px; }
+  .add-habit { flex-direction: column; }
+  .add-habit .btn { justify-content: center; }
+}

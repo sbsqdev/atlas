@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
+import { useReminders } from '../lib/reminders';
 import Footer from './Footer';
 import type { ReactNode } from 'react';
 
@@ -19,6 +20,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const logout = useAuth((s) => s.logout);
   const setLang = useAuth((s) => s.setLang);
   const navigate = useNavigate();
+  useReminders(); // fire browser habit reminders while the app is open
 
   return (
     <div className="app">

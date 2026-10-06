@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Account, Lang, Role, User } from '../types';
+import type { Account, Habit, Lang, Role, User } from '../types';
 import { SEED_ACCOUNTS } from '../data/seed';
 import { hash } from './hash';
 import { useStore } from './useStore';
+import { todayKey } from '../lib/habits';
 
-const VERSION = 3;
+const VERSION = 4;
 
 type Result = { ok: boolean; error?: 'emailTaken' | 'usernameTaken' | 'wrongCredentials' | 'fillFields' | 'codeInvalid' | 'alreadyEnrolled' | 'consentRequired' };
 
@@ -32,8 +33,8 @@ interface AuthState {
   watched: Record<string, string[]>;
   /** userId -> ISO day strings the student was active (for streaks) */
   activityDays: Record<string, string[]>;
-  /** userId -> Atomic-Habits plan */
-  habitPlan: Record<string, import('../types').HabitPlan>;
+  /** userId -> list of psychology-based habits */
+  habits: Record<string, Habit[]>;
 
   signUp: (username: string, password: string, role: Role, extras: { email?: string; code?: string; consent: boolean }) => Result;
   signIn: (login: string, password: string) => Result;
@@ -51,8 +52,15 @@ interface AuthState {
   completedForUser: (userId: string, courseId: string) => string[];
   watchedForUser: (userId: string, courseId: string) => string[];
   activityFor: (userId: string) => string[];
-  getHabitPlan: () => import('../types').HabitPlan;
-  setHabitPlan: (patch: Partial<import('../types').HabitPlan>) => void;
+  // habits (psychology-based)
+  getHabits: () => Habit[];
+  addHabit: (partial: Partial<Habit> & { title: string }) => void;
+  updateHabit: (id: string, patch: Partial<Habit>) => void;
+  removeHabit: (id: string) => void;
+  toggleHabitDone: (id: string, day?: string) => void;
+  // reminders (opt-in e-mail, collected only with consent)
+  setReminderEmail: (email: string, consent: boolean) => Result;
+  clearReminderEmail: () => void;
 
   // coach
   updateProfile: (patch: Partial<Pick<Account, 'bio' | 'brandName' | 'brandColor' | 'name'>>) => void;
@@ -70,7 +78,7 @@ export const useAuth = create<AuthState>()(
       progress: {},
       watched: {},
       activityDays: {},
-      habitPlan: {},
+      habits: {},
 
       signUp: (username, password, role, extras) => {
         const u = username.trim();
@@ -185,14 +193,82 @@ export const useAuth = create<AuthState>()(
       completedForUser: (userId, courseId) => get().progress[`${userId}:${courseId}`] ?? [],
       watchedForUser: (userId, courseId) => get().watched[`${userId}:${courseId}`] ?? [],
       activityFor: (userId) => get().activityDays[userId] ?? [],
-      getHabitPlan: () => {
+      getHabits: () => {
         const u = get().user;
-        return u ? get().habitPlan[u.id] ?? {} : {};
+        return u ? get().habits[u.id] ?? [] : [];
       },
-      setHabitPlan: (patch) => {
+      addHabit: (partial) => {
         const u = get().user;
         if (!u) return;
-        set((s) => ({ habitPlan: { ...s.habitPlan, [u.id]: { ...(s.habitPlan[u.id] ?? {}), ...patch } } }));
+        const habit: Habit = {
+          id: `h-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+          createdAt: Date.now(),
+          checkIns: [],
+          remindOn: false,
+          remindDays: [],
+          ...partial,
+          title: partial.title,
+        };
+        set((s) => ({ habits: { ...s.habits, [u.id]: [...(s.habits[u.id] ?? []), habit] } }));
+      },
+      updateHabit: (id, patch) => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({
+          habits: {
+            ...s.habits,
+            [u.id]: (s.habits[u.id] ?? []).map((h) => (h.id === id ? { ...h, ...patch } : h)),
+          },
+        }));
+      },
+      removeHabit: (id) => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({ habits: { ...s.habits, [u.id]: (s.habits[u.id] ?? []).filter((h) => h.id !== id) } }));
+      },
+      toggleHabitDone: (id, day) => {
+        const u = get().user;
+        if (!u) return;
+        const d = day ?? todayKey();
+        set((s) => {
+          const list = s.habits[u.id] ?? [];
+          let added = false;
+          const next = list.map((h) => {
+            if (h.id !== id) return h;
+            const has = h.checkIns.includes(d);
+            added = !has;
+            return { ...h, checkIns: has ? h.checkIns.filter((x) => x !== d) : [...h.checkIns, d] };
+          });
+          // Ticking a habit also counts as being active that day (streak).
+          const days = s.activityDays[u.id] ?? [];
+          const activityDays = added && !days.includes(d)
+            ? { ...s.activityDays, [u.id]: [...days, d] }
+            : s.activityDays;
+          return { habits: { ...s.habits, [u.id]: next }, activityDays };
+        });
+      },
+      setReminderEmail: (email, consent) => {
+        const u = get().user;
+        if (!u) return { ok: false, error: 'wrongCredentials' };
+        const e = email.trim().toLowerCase();
+        if (!e || !/.+@.+\..+/.test(e)) return { ok: false, error: 'fillFields' };
+        if (!consent) return { ok: false, error: 'consentRequired' };
+        set((s) => ({
+          accounts: s.accounts.map((a) =>
+            a.id === u.id ? { ...a, remindEmail: e, remindByEmail: true, remindConsentAt: Date.now() } : a,
+          ),
+          user: { ...u, email: e },
+        }));
+        return { ok: true };
+      },
+      clearReminderEmail: () => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({
+          accounts: s.accounts.map((a) =>
+            a.id === u.id ? { ...a, remindEmail: undefined, remindByEmail: false, remindConsentAt: undefined } : a,
+          ),
+        }));
       },
 
       updateProfile: (patch) => {
@@ -244,7 +320,7 @@ export const useAuth = create<AuthState>()(
       name: 'human-atlas-auth',
       version: VERSION,
       // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habitPlan: {} }) as Partial<AuthState>,
+      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habits: {} }) as Partial<AuthState>,
     },
   ),
 );

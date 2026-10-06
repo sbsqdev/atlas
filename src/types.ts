@@ -60,6 +60,11 @@ export interface Account {
   avatarColor?: string;
   // Student enrolment:
   enrolledCourseIds?: string[];
+  // Reminders (opt-in). E-mail is collected ONLY with separate consent and
+  // used ONLY to send habit reminders. Browser reminders need none of this.
+  remindEmail?: string;
+  remindByEmail?: boolean;
+  remindConsentAt?: number;
 }
 
 /** The signed-in user as exposed to the UI (no password). */
@@ -70,11 +75,32 @@ export interface User {
   role: Role;
 }
 
-/** Atomic-Habits implementation intention + habit stacking (per student). */
-export interface HabitPlan {
-  time?: string;      // "в 7:00"
-  place?: string;     // "дома / в зале"
-  afterHabit?: string;// habit stacking cue: "после утреннего кофе"
+/** A psychology-based habit built on the four laws of behaviour change
+ *  (Atomic Habits) plus an identity statement. Stored per student. */
+export interface Habit {
+  id: string;
+  /** The behaviour itself, e.g. "Тренировка". */
+  title: string;
+  /** Identity the habit builds: "Я — человек, который тренируется". */
+  identity?: string;
+  // 1. Make it OBVIOUS — implementation intention + habit stacking (the cue).
+  time?: string;        // "07:00"
+  place?: string;       // "дома / в зале"
+  afterHabit?: string;  // habit stacking: "после утреннего кофе"
+  // 2. Make it ATTRACTIVE — temptation bundling.
+  bundle?: string;      // "включу любимый подкаст"
+  // 3. Make it EASY — the 2-minute version.
+  twoMinute?: string;   // "просто надеть форму и размяться"
+  // 4. Make it SATISFYING — an immediate reward.
+  reward?: string;      // "галочка в трекере + смузи"
+  // Reminders: browser notifications now; e-mail when deployed (opt-in).
+  remindOn?: boolean;
+  /** Days to remind, 0=Mon … 6=Sun. Empty/undefined = every day. */
+  remindDays?: number[];
+  // Tracking.
+  createdAt: number;
+  /** ISO day strings (YYYY-MM-DD) the habit was completed. */
+  checkIns: string[];
 }
 
 /** A single exercise inside a workout. */

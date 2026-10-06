@@ -3,6 +3,9 @@ import { useStore } from '../store/useStore';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { computeGamification, type CourseProgress } from '../lib/gamification';
+import { habitStreak, consistency, doneToday, habitTemplates } from '../lib/habits';
+import { notificationState, requestNotifyPermission } from '../lib/reminders';
+import type { Habit } from '../types';
 
 export function useGamification() {
   const { lang } = useT();
@@ -27,57 +30,209 @@ export function useGamification() {
 
 const DAY_LABELS = { ru: ['П', 'В', 'С', 'Ч', 'П', 'С', 'В'], en: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], tr: ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'] };
 
-function HabitBuilder() {
-  const { t } = useT();
-  const getHabitPlan = useAuth((s) => s.getHabitPlan);
-  const setHabitPlan = useAuth((s) => s.setHabitPlan);
-  const plan = getHabitPlan();
-  const [time, setTime] = useState(plan.time ?? '');
-  const [place, setPlace] = useState(plan.place ?? '');
-  const [after, setAfter] = useState(plan.afterHabit ?? '');
-  const [saved, setSaved] = useState(false);
+/** One habit: identity + daily check-in + streak, expandable 4-laws editor. */
+function HabitCard({ habit }: { habit: Habit }) {
+  const { t, lang } = useT();
+  const updateHabit = useAuth((s) => s.updateHabit);
+  const removeHabit = useAuth((s) => s.removeHabit);
+  const toggleHabitDone = useAuth((s) => s.toggleHabitDone);
+  const [open, setOpen] = useState(false);
 
-  const intention = t('intentionSentence')
-    .replace('{time}', time || '…')
-    .replace('{place}', place || '…');
-  const stack = t('stackSentence').replace('{after}', after || '…');
+  const done = doneToday(habit);
+  const streak = habitStreak(habit.checkIns);
+  const cons = consistency(habit.checkIns);
+  const days = DAY_LABELS[lang];
 
-  const laws = [
-    { t: t('law1t'), d: t('law1d'), i: '👁' },
-    { t: t('law2t'), d: t('law2d'), i: '✨' },
-    { t: t('law3t'), d: t('law3d'), i: '🎯' },
-    { t: t('law4t'), d: t('law4d'), i: '🏆' },
-  ];
+  const field = (key: keyof Habit, value: string) => updateHabit(habit.id, { [key]: value } as Partial<Habit>);
+  const toggleDay = (i: number) => {
+    const set = new Set(habit.remindDays ?? []);
+    set.has(i) ? set.delete(i) : set.add(i);
+    updateHabit(habit.id, { remindDays: [...set].sort((a, b) => a - b) });
+  };
 
   return (
-    <div className="card habit-card" style={{ marginBottom: 20 }}>
-      <h2 style={{ marginTop: 0 }}>🧩 {t('habitBuilder')}</h2>
-      <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 0 }}>{t('habitBuilderHint')}</p>
-
-      <div className="habit-plan-box"><strong>{intention}</strong></div>
-      <div className="field-row">
-        <div className="field"><label>{t('intentionTitle')} · ⏰</label>
-          <input value={time} onChange={(e) => { setTime(e.target.value); setSaved(false); }} placeholder={t('timePh')} /></div>
-        <div className="field"><label>📍</label>
-          <input value={place} onChange={(e) => { setPlace(e.target.value); setSaved(false); }} placeholder={t('placePh')} /></div>
+    <div className="card habit-item">
+      <div className="habit-head">
+        <button
+          className={`check-btn ${done ? 'on' : ''}`}
+          onClick={() => toggleHabitDone(habit.id)}
+          aria-label={done ? t('doneTodayOk') : t('doneTodayBtn')}
+          title={done ? t('doneTodayOk') : t('doneTodayBtn')}
+        >
+          {done ? '✓' : ''}
+        </button>
+        <div className="habit-main">
+          <div className="habit-title">{habit.title}</div>
+          {habit.identity && <div className="habit-identity">“{habit.identity}”</div>}
+          <div className="habit-meta">
+            <span className="streak-pill">🔥 {streak} {t('streakLabel')}</span>
+            <span className="cons-pill">{cons}% {t('consistency30')}</span>
+            {habit.remindOn && habit.time && <span className="rem-pill">⏰ {habit.time}</span>}
+          </div>
+        </div>
+        <button className="btn ghost small" onClick={() => setOpen((v) => !v)} aria-label="edit">
+          {open ? '▲' : '⚙'}
+        </button>
       </div>
 
-      <div className="habit-plan-box"><strong>{stack}</strong></div>
-      <div className="field"><label>{t('stackTitle')}</label>
-        <input value={after} onChange={(e) => { setAfter(e.target.value); setSaved(false); }} placeholder={t('stackPh')} /></div>
+      {open && (
+        <div className="habit-edit">
+          <div className="field"><label>{t('identityLabel')}</label>
+            <input defaultValue={habit.identity ?? ''} placeholder={t('identityPh')} onBlur={(e) => field('identity', e.target.value)} /></div>
 
-      <button className="btn primary" onClick={() => { setHabitPlan({ time, place, afterHabit: after }); setSaved(true); }}>
-        {saved ? '✓ ' + t('myPlan') : t('saveHabit')}
-      </button>
-
-      <h4 style={{ margin: '20px 0 10px', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--muted)' }}>{t('fourLaws')}</h4>
-      <div className="laws-grid">
-        {laws.map((l, i) => (
-          <div key={i} className="law">
-            <div className="law-i">{l.i}</div>
-            <div><div className="law-t">{l.t}</div><div className="law-d">{l.d}</div></div>
+          <div className="law-block">
+            <div className="law-head">{t('cueLabel')}</div>
+            <div className="field-row">
+              <div className="field"><label>⏰</label>
+                <input type="time" defaultValue={habit.time ?? ''} onBlur={(e) => field('time', e.target.value)} /></div>
+              <div className="field"><label>📍</label>
+                <input defaultValue={habit.place ?? ''} placeholder={t('placePh')} onBlur={(e) => field('place', e.target.value)} /></div>
+            </div>
+            <div className="field"><label>{t('afterLabel')}</label>
+              <input defaultValue={habit.afterHabit ?? ''} placeholder={t('stackPh')} onBlur={(e) => field('afterHabit', e.target.value)} /></div>
           </div>
+
+          <div className="law-block">
+            <div className="law-head">{t('attractiveLabel')}</div>
+            <div className="field"><input defaultValue={habit.bundle ?? ''} placeholder={t('bundlePh')} onBlur={(e) => field('bundle', e.target.value)} /></div>
+          </div>
+          <div className="law-block">
+            <div className="law-head">{t('easyLabel')}</div>
+            <div className="field"><input defaultValue={habit.twoMinute ?? ''} placeholder={t('twoMinPh')} onBlur={(e) => field('twoMinute', e.target.value)} /></div>
+          </div>
+          <div className="law-block">
+            <div className="law-head">{t('satisfyingLabel')}</div>
+            <div className="field"><input defaultValue={habit.reward ?? ''} placeholder={t('rewardPh')} onBlur={(e) => field('reward', e.target.value)} /></div>
+          </div>
+
+          <div className="law-block">
+            <label className="switch-row">
+              <input type="checkbox" checked={!!habit.remindOn} onChange={(e) => updateHabit(habit.id, { remindOn: e.target.checked })} />
+              <span>{t('reminderLabel')}{habit.time ? ` · ${habit.time}` : ''}</span>
+            </label>
+            {habit.remindOn && (
+              <div className="day-row">
+                {days.map((d, i) => (
+                  <button
+                    key={i}
+                    className={`day-btn ${(habit.remindDays ?? []).includes(i) || !(habit.remindDays ?? []).length ? 'on' : ''}`}
+                    onClick={() => toggleDay(i)}
+                  >{d}</button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button className="btn ghost small danger" onClick={() => removeHabit(habit.id)}>🗑 {t('deleteHabit')}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Browser Web-Notifications toggle. */
+function BrowserReminders() {
+  const { t } = useT();
+  const [state, setState] = useState(notificationState());
+  return (
+    <div className="card notif-card">
+      <div className="notif-row">
+        <div>
+          <strong>🔔 {t('browserReminders')}</strong>
+          <div className="muted-sm">{t('notifHint')}</div>
+        </div>
+        {state === 'granted' && <span className="ok-pill">✓ {t('notifOn')}</span>}
+        {state === 'default' && (
+          <button className="btn primary small" onClick={async () => setState((await requestNotifyPermission()) ? 'granted' : notificationState())}>
+            {t('enableNotif')}
+          </button>
+        )}
+        {state === 'denied' && <span className="warn-sm">{t('notifDenied')}</span>}
+        {state === 'unsupported' && <span className="warn-sm">{t('notifUnsupported')}</span>}
+      </div>
+    </div>
+  );
+}
+
+/** Opt-in e-mail reminders (collected only with separate consent). */
+function EmailReminders() {
+  const { t } = useT();
+  const user = useAuth((s) => s.user);
+  const accounts = useAuth((s) => s.accounts);
+  const setReminderEmail = useAuth((s) => s.setReminderEmail);
+  const clearReminderEmail = useAuth((s) => s.clearReminderEmail);
+  const acc = accounts.find((a) => a.id === user?.id);
+  const [email, setEmail] = useState(acc?.remindEmail ?? '');
+  const [consent, setConsent] = useState(false);
+  const [err, setErr] = useState('');
+
+  if (acc?.remindByEmail && acc.remindEmail) {
+    return (
+      <div className="card notif-card">
+        <div className="notif-row">
+          <div><strong>✉️ {t('emailReminders')}</strong>
+            <div className="muted-sm">{t('emailSavedAs')} <b>{acc.remindEmail}</b></div></div>
+          <button className="btn ghost small" onClick={() => { clearReminderEmail(); setEmail(''); setConsent(false); }}>{t('turnOff')}</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card notif-card">
+      <strong>✉️ {t('emailReminders')}</strong>
+      <div className="muted-sm" style={{ margin: '4px 0 10px' }}>{t('emailRemindHint')}</div>
+      <div className="field"><input type="email" value={email} placeholder={t('emailPh')} onChange={(e) => { setEmail(e.target.value); setErr(''); }} /></div>
+      <label className="consent-row" style={{ fontSize: 13 }}>
+        <input type="checkbox" checked={consent} onChange={(e) => { setConsent(e.target.checked); setErr(''); }} />
+        <span>{t('emailConsent')}</span>
+      </label>
+      {err && <div className="warn-sm" style={{ marginTop: 6 }}>{err}</div>}
+      <button className="btn primary small" style={{ marginTop: 10 }}
+        onClick={() => { const r = setReminderEmail(email, consent); if (!r.ok) setErr(r.error === 'consentRequired' ? t('consentRequired') : t('emailPh')); }}>
+        {t('saveEmail')}
+      </button>
+    </div>
+  );
+}
+
+function Habits() {
+  const { t, lang } = useT();
+  const habits = useAuth((s) => (s.user ? s.habits[s.user.id] ?? [] : []));
+  const addHabit = useAuth((s) => s.addHabit);
+  const [name, setName] = useState('');
+  const templates = habitTemplates(lang);
+  const usedTitles = new Set(habits.map((h) => h.title.toLowerCase()));
+
+  return (
+    <div className="habits-section">
+      <h2 style={{ marginBottom: 4 }}>🧩 {t('myHabits')}</h2>
+      <p className="sub" style={{ marginTop: 0 }}>{t('habitsHint')}</p>
+
+      {habits.length === 0 && <p className="placeholder" style={{ margin: '8px 0' }}>{t('noHabitsYet')}</p>}
+
+      <div className="habit-list">
+        {habits.map((h) => <HabitCard key={h.id} habit={h} />)}
+      </div>
+
+      <div className="add-habit">
+        <input value={name} placeholder={t('habitNamePh')} onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) { addHabit({ title: name.trim() }); setName(''); } }} />
+        <button className="btn primary" disabled={!name.trim()} onClick={() => { if (name.trim()) { addHabit({ title: name.trim() }); setName(''); } }}>
+          + {t('addHabit')}
+        </button>
+      </div>
+
+      <div className="tmpl-label">{t('quickStart')}</div>
+      <div className="tmpl-row">
+        {templates.filter((tm) => !usedTitles.has(tm.title.toLowerCase())).map((tm) => (
+          <button key={tm.title} className="tmpl-chip" onClick={() => addHabit({ ...tm, remindOn: true })}>+ {tm.title}</button>
         ))}
+      </div>
+
+      <div className="reminders-grid">
+        <BrowserReminders />
+        <EmailReminders />
       </div>
     </div>
   );
@@ -114,7 +269,7 @@ export default function Achievements() {
         </div>
       </div>
 
-      <HabitBuilder />
+      <Habits />
 
       <h2>{t('rewards')}</h2>
       <div className="badge-grid">
