@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
+import { useGamification } from './Achievements';
 
 export default function StudentHome() {
   const { t, tr, lang } = useT();
@@ -29,10 +30,21 @@ export default function StudentHome() {
     }
   };
 
+  const g = useGamification();
+
   return (
     <div>
       <h1>{t('myCourses')}</h1>
       <p className="sub">{t('tagline')}</p>
+
+      <Link to="/achievements" className="game-banner">
+        <span className="gb-item">⭐ {t('level')} <b>{g.level}</b></span>
+        <span className="gb-bar"><span style={{ width: `${(g.intoLevel / g.span) * 100}%` }} /></span>
+        <span className="gb-item">🔥 <b>{g.streak}</b> {t('days')}</span>
+        <span className="gb-item">💪 <b>{g.totalDone}</b></span>
+        <span className="gb-item">▶ <b>{g.totalWatched}</b></span>
+        <span className="gb-cta">{t('achievements')} →</span>
+      </Link>
 
       <div className="card" style={{ marginBottom: 24, maxWidth: 560 }}>
         <h3 style={{ marginTop: 0 }}>{t('joinByCode')}</h3>

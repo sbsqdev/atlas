@@ -32,6 +32,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
         <nav className="navlinks">
           {user?.role === 'student' && <NavLink to="/home">{t('myCourses')}</NavLink>}
+          {user?.role === 'student' && <NavLink to="/achievements">{t('achievements')}</NavLink>}
           {user?.role === 'trainer' && <NavLink to="/dashboard">{t('dashboard')}</NavLink>}
           {user && <NavLink to="/calculators">{t('calculators')}</NavLink>}
         </nav>

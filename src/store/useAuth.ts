@@ -30,6 +30,8 @@ interface AuthState {
   progress: Record<string, string[]>;
   /** key `${userId}:${courseId}` -> watched exercise ids */
   watched: Record<string, string[]>;
+  /** userId -> ISO day strings the student was active (for streaks) */
+  activityDays: Record<string, string[]>;
 
   signUp: (name: string, email: string, password: string, role: Role, code?: string) => Result;
   signIn: (email: string, password: string) => Result;
@@ -46,6 +48,7 @@ interface AuthState {
   // coach analytics (read any student's activity)
   completedForUser: (userId: string, courseId: string) => string[];
   watchedForUser: (userId: string, courseId: string) => string[];
+  activityFor: (userId: string) => string[];
 
   // coach
   updateProfile: (patch: Partial<Pick<Account, 'bio' | 'brandName' | 'brandColor' | 'name'>>) => void;
@@ -62,6 +65,7 @@ export const useAuth = create<AuthState>()(
       lang: 'ru',
       progress: {},
       watched: {},
+      activityDays: {},
 
       signUp: (name, email, password, role, code) => {
         const e = email.trim().toLowerCase();
@@ -137,10 +141,17 @@ export const useAuth = create<AuthState>()(
         const u = get().user;
         if (!u) return;
         const key = `${u.id}:${courseId}`;
+        const today = new Date().toISOString().slice(0, 10);
         set((s) => {
           const list = s.progress[key] ?? [];
-          const next = list.includes(workoutId) ? list.filter((w) => w !== workoutId) : [...list, workoutId];
-          return { progress: { ...s.progress, [key]: next } };
+          const adding = !list.includes(workoutId);
+          const next = adding ? [...list, workoutId] : list.filter((w) => w !== workoutId);
+          // Record a "did something today" for the streak when completing.
+          const days = s.activityDays[u.id] ?? [];
+          const activityDays = adding && !days.includes(today)
+            ? { ...s.activityDays, [u.id]: [...days, today] }
+            : s.activityDays;
+          return { progress: { ...s.progress, [key]: next }, activityDays };
         });
       },
       completedFor: (courseId) => {
@@ -152,14 +163,18 @@ export const useAuth = create<AuthState>()(
         const u = get().user;
         if (!u || u.role !== 'student') return;
         const key = `${u.id}:${courseId}`;
+        const today = new Date().toISOString().slice(0, 10);
         set((s) => {
           const list = s.watched[key] ?? [];
           if (list.includes(exerciseId)) return {} as Partial<AuthState>;
-          return { watched: { ...s.watched, [key]: [...list, exerciseId] } };
+          const days = s.activityDays[u.id] ?? [];
+          const activityDays = days.includes(today) ? s.activityDays : { ...s.activityDays, [u.id]: [...days, today] };
+          return { watched: { ...s.watched, [key]: [...list, exerciseId] }, activityDays };
         });
       },
       completedForUser: (userId, courseId) => get().progress[`${userId}:${courseId}`] ?? [],
       watchedForUser: (userId, courseId) => get().watched[`${userId}:${courseId}`] ?? [],
+      activityFor: (userId) => get().activityDays[userId] ?? [],
 
       updateProfile: (patch) => {
         const u = get().user;
@@ -210,7 +225,7 @@ export const useAuth = create<AuthState>()(
       name: 'human-atlas-auth',
       version: VERSION,
       // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {} }) as Partial<AuthState>,
+      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {} }) as Partial<AuthState>,
     },
   ),
 );

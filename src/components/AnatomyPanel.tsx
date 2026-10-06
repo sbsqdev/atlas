@@ -7,6 +7,8 @@ import { MUSCLE_BY_ID } from '../data/muscles';
 import { useT } from '../i18n/useT';
 import type { MuscleId } from '../types';
 
+type Role = 'primary' | 'secondary' | 'stabilizer';
+
 interface Props {
   primary: MuscleId[];
   secondary: MuscleId[];
@@ -18,6 +20,8 @@ interface Props {
 
 type Label = { ru: string; en: string; tr: string };
 
+// Per-system presets. Default loads ONLY the muscular system (~8 MB) — the
+// optimized atlas fetches systems on demand, so this is fast.
 const PRESETS: { key: string; label: Label; systems: SystemId[] }[] = [
   { key: 'muscles', label: { ru: 'Мышцы', en: 'Muscles', tr: 'Kaslar' }, systems: ['muscular'] },
   { key: 'withBones', label: { ru: 'Мышцы + скелет', en: 'Muscles + bones', tr: 'Kaslar + kemik' }, systems: ['muscular', 'skeletal'] },
@@ -36,12 +40,6 @@ const VIEWS: { key: View; label: Label }[] = [
   { key: 'side', label: { ru: 'Сбоку', en: 'Side', tr: 'Yandan' } },
 ];
 
-function partsFor(muscles: MuscleId[]): string[] {
-  const out = new Set<string>();
-  for (const m of muscles) for (const id of MUSCLE_PARTS[m] ?? []) out.add(id);
-  return [...out];
-}
-
 export default function AnatomyPanel({ primary, secondary, extraParts, compact }: Props) {
   const { t, tr, lang } = useT();
   const { atlas, error } = useAtlas();
@@ -57,29 +55,30 @@ export default function AnatomyPanel({ primary, secondary, extraParts, compact }
   const [override, setOverride] = useState<string | null>(null);
   const [inspectedName, setInspectedName] = useState<string | null>(null);
 
-  const { exerciseSelected, exerciseSecondary } = useMemo(() => {
-    const prim = [...new Set([...partsFor(primary), ...(extraParts ?? [])])];
-    const primSet = new Set(prim);
-    const sec = partsFor(secondary).filter((id) => !primSet.has(id));
-    return { exerciseSelected: [...prim, ...sec], exerciseSecondary: sec };
+  // Build the activation map (part id -> role) the viewer highlights.
+  const activation = useMemo(() => {
+    const map: Record<string, Role> = {};
+    for (const m of secondary) for (const id of MUSCLE_PARTS[m] ?? []) map[id] = 'secondary';
+    for (const m of primary) for (const id of MUSCLE_PARTS[m] ?? []) map[id] = 'primary';
+    for (const id of extraParts ?? []) map[id] = 'primary';
+    return map;
   }, [primary, secondary, extraParts]);
 
   const state: SceneState = useMemo(() => {
     const systems = PRESETS.find((p) => p.key === preset)!.systems;
-    const selected = override ? [override] : exerciseSelected;
-    const secondaryIds = override ? [] : exerciseSecondary;
+    const activeIds = Object.keys(activation);
     return {
+      activation: override ? {} : activation,
       explode: compact ? 0 : explode,
       visible: compact ? ['muscular'] : systems,
-      selected,
-      secondary: secondaryIds,
+      selected: override ? [override] : isolate ? activeIds : [],
       isolate: compact ? false : isolate,
       view,
       rotate: compact ? false : rotate,
       reset,
       inspectorOpen: false,
     };
-  }, [compact, preset, override, exerciseSelected, exerciseSecondary, explode, isolate, view, rotate, reset]);
+  }, [compact, preset, override, activation, explode, isolate, view, rotate, reset]);
 
   const onSelect = (id: string) => {
     if (compact) return;
@@ -100,7 +99,6 @@ export default function AnatomyPanel({ primary, secondary, extraParts, compact }
     </div>
   );
 
-  // Compact preview (editor): viewer + view toggle only.
   if (compact) {
     return (
       <div className="muscle-panel editor-preview">
@@ -108,15 +106,11 @@ export default function AnatomyPanel({ primary, secondary, extraParts, compact }
         <div className="anatomy-controls">
           <div className="seg wrap">
             {VIEWS.map((v) => (
-              <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => setView(v.key)}>
-                {v.label[lang]}
-              </button>
+              <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => setView(v.key)}>{v.label[lang]}</button>
             ))}
           </div>
         </div>
-        <p className="hint">
-          {lang === 'ru' ? 'Так эти мышцы увидят ученики' : 'This is what students will see'}
-        </p>
+        <p className="hint">{lang === 'ru' ? 'Так эти мышцы увидят ученики' : lang === 'tr' ? 'Öğrenciler bu kasları böyle görecek' : 'This is what students will see'}</p>
       </div>
     );
   }
@@ -128,45 +122,27 @@ export default function AnatomyPanel({ primary, secondary, extraParts, compact }
       <div className="anatomy-controls">
         <div className="seg wrap">
           {PRESETS.map((p) => (
-            <button key={p.key} className={preset === p.key ? 'active' : ''} onClick={() => setPreset(p.key)}>
-              {p.label[lang]}
-            </button>
+            <button key={p.key} className={preset === p.key ? 'active' : ''} onClick={() => setPreset(p.key)}>{p.label[lang]}</button>
           ))}
         </div>
-
         <div className="seg wrap">
           {VIEWS.map((v) => (
-            <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => setView(v.key)}>
-              {v.label[lang]}
-            </button>
+            <button key={v.key} className={view === v.key ? 'active' : ''} onClick={() => setView(v.key)}>{v.label[lang]}</button>
           ))}
         </div>
-
         <div className="ctl-row">
           <label className="explode">
-            {lang === 'ru' ? 'Разложить' : 'Explode'}
+            {lang === 'ru' ? 'Разложить' : lang === 'tr' ? 'Patlat' : 'Explode'}
             <input type="range" min={0} max={1} step={0.01} value={explode} onChange={(e) => setExplode(parseFloat(e.target.value))} />
           </label>
-          <button className={`btn small ${rotate ? 'primary' : ''}`} onClick={() => setRotate((r) => !r)}>
-            ⟳ {lang === 'ru' ? 'Вращать' : 'Rotate'}
-          </button>
-          <button className={`btn small ${isolate ? 'primary' : ''}`} onClick={() => setIsolate((i) => !i)}>
-            ◎ {lang === 'ru' ? 'Изолировать' : 'Isolate'}
-          </button>
-          <button
-            className="btn small"
-            onClick={() => { setOverride(null); setInspectedName(null); setIsolate(false); setExplode(0); setReset((r) => r + 1); }}
-          >
-            ↺ {lang === 'ru' ? 'Сброс' : 'Reset'}
-          </button>
+          <button className={`btn small ${rotate ? 'primary' : ''}`} onClick={() => setRotate((r) => !r)}>⟳ {lang === 'ru' ? 'Вращать' : lang === 'tr' ? 'Döndür' : 'Rotate'}</button>
+          <button className={`btn small ${isolate ? 'primary' : ''}`} onClick={() => setIsolate((i) => !i)}>◎ {lang === 'ru' ? 'Изолировать' : lang === 'tr' ? 'İzole' : 'Isolate'}</button>
+          <button className="btn small" onClick={() => { setOverride(null); setInspectedName(null); setIsolate(false); setExplode(0); setReset((r) => r + 1); }}>↺ {lang === 'ru' ? 'Сброс' : lang === 'tr' ? 'Sıfırla' : 'Reset'}</button>
         </div>
-
         {override && inspectedName && (
           <div className="inspected">
             <span>{inspectedName}</span>
-            <button className="btn small" onClick={() => { setOverride(null); setInspectedName(null); }}>
-              ← {lang === 'ru' ? 'К мышцам упражнения' : 'Back to exercise'}
-            </button>
+            <button className="btn small" onClick={() => { setOverride(null); setInspectedName(null); }}>← {lang === 'ru' ? 'К мышцам упражнения' : lang === 'tr' ? 'Egzersiz kaslarına' : 'Back to exercise'}</button>
           </div>
         )}
       </div>
@@ -191,7 +167,9 @@ export default function AnatomyPanel({ primary, secondary, extraParts, compact }
         <p className="atlas-credit">
           {lang === 'ru'
             ? 'Модель: BodyParts3D 4.0 (CC BY 4.0). Нажмите на структуру, чтобы рассмотреть её.'
-            : 'Model: BodyParts3D 4.0 (CC BY 4.0). Tap a structure to inspect it.'}
+            : lang === 'tr'
+              ? 'Model: BodyParts3D 4.0 (CC BY 4.0). İncelemek için bir yapıya dokunun.'
+              : 'Model: BodyParts3D 4.0 (CC BY 4.0). Tap a structure to inspect it.'}
         </p>
       </div>
     </div>

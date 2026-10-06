@@ -19,6 +19,7 @@ function loadAtlas(): Promise<Atlas> {
       })
       .then((atlas: Atlas) => ({
         ...atlas,
+        // Keep every field (incl. per-system `system`) and resolve URLs to BASE_URL.
         chunks: atlas.chunks.map((c) => ({
           ...c,
           url: assetUrl(c.url),

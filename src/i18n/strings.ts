@@ -150,6 +150,29 @@ const dict = {
     tr: 'İlerleme öğrencinin tarayıcısında saklanır (demo). Cihazlar arası senkron için backend gerekir.',
   },
 
+  // discussion (telegram-style)
+  discussion: { ru: 'Обсуждение', en: 'Discussion', tr: 'Tartışma' },
+  writeMessage: { ru: 'Написать сообщение…', en: 'Write a message…', tr: 'Mesaj yaz…' },
+  send: { ru: 'Отправить', en: 'Send', tr: 'Gönder' },
+  reply: { ru: 'Ответить', en: 'Reply', tr: 'Yanıtla' },
+  noComments: { ru: 'Пока нет сообщений. Начните обсуждение!', en: 'No messages yet — start the discussion!', tr: 'Henüz mesaj yok — tartışmayı başlatın!' },
+  justNow: { ru: 'только что', en: 'now', tr: 'şimdi' },
+
+  // gamification
+  achievements: { ru: 'Достижения', en: 'Achievements', tr: 'Başarılar' },
+  streak: { ru: 'Серия', en: 'Streak', tr: 'Seri' },
+  days: { ru: 'дн.', en: 'days', tr: 'gün' },
+  xpToNext: { ru: 'XP до следующего уровня', en: 'XP to next level', tr: 'Sonraki seviyeye XP' },
+  dontBreakChain: { ru: 'Не разрывай цепочку', en: "Don't break the chain", tr: 'Zinciri kırma' },
+  rewards: { ru: 'Награды', en: 'Rewards', tr: 'Ödüller' },
+  workoutsDone: { ru: 'тренировок выполнено', en: 'workouts done', tr: 'antrenman tamam' },
+  videosWatched: { ru: 'видео просмотрено', en: 'videos watched', tr: 'video izlendi' },
+  identityLine: {
+    ru: 'Каждая тренировка — голос за того, кем ты становишься. 1% лучше каждый день.',
+    en: 'Every workout is a vote for who you are becoming. 1% better every day.',
+    tr: 'Her antrenman, olmak istediğin kişiye verilen bir oydur. Her gün %1 daha iyi.',
+  },
+
   // video
   videoDrive: { ru: 'Видео', en: 'Video', tr: 'Video' },
   openInDrive: { ru: 'Открыть в Google Drive', en: 'Open in Google Drive', tr: "Google Drive'da aç" },

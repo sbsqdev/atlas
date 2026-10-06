@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import StudentHome from './pages/StudentHome';
 import Calculators from './pages/Calculators';
+import Achievements from './pages/Achievements';
 import CourseView from './pages/CourseView';
 import WorkoutView from './pages/WorkoutView';
 import ExerciseView from './pages/ExerciseView';
@@ -51,6 +52,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
 
       <Route path="/home" element={<RequireAuth role="student">{page(<StudentHome />)}</RequireAuth>} />
+      <Route path="/achievements" element={<RequireAuth role="student">{page(<Achievements />)}</RequireAuth>} />
       <Route path="/calculators" element={<RequireAuth>{page(<Calculators />)}</RequireAuth>} />
 
       <Route path="/course/:courseId" element={<RequireCourseAccess>{page(<CourseView />)}</RequireCourseAccess>} />

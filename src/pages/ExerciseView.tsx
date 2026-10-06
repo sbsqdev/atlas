@@ -6,6 +6,7 @@ import { useT } from '../i18n/useT';
 import AnatomyPanel from '../components/AnatomyPanel';
 import { useBrandStyle } from '../components/useBrandStyle';
 import { toEmbed } from '../lib/video';
+import CommentThread from '../components/CommentThread';
 
 export default function ExerciseView() {
   const { courseId, workoutId, exerciseId } = useParams();
@@ -81,6 +82,8 @@ export default function ExerciseView() {
           })()}
         </div>
       </div>
+
+      <CommentThread threadKey={exercise.id} />
     </div>
   );
 }
