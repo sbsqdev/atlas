@@ -12,64 +12,6 @@ import type { Bi, Exercise, MuscleId, Workout } from '../types';
 let n = 0;
 const newId = (p: string) => `${p}-${Date.now().toString(36)}-${(n++).toString(36)}`;
 
-/** Coach grants/revokes course access by student email (e.g. after purchase). */
-function AccessByEmail({ courseId }: { courseId: string }) {
-  const { t } = useT();
-  const grantAccess = useAuth((s) => s.grantAccess);
-  const revokeAccess = useAuth((s) => s.revokeAccess);
-  const accounts = useAuth((s) => s.accounts);
-  const granted = useStore((s) => s.courses.find((c) => c.id === courseId)?.grantedEmails ?? []);
-  const [email, setEmail] = useState('');
-  const [err, setErr] = useState<string | null>(null);
-
-  const submit = () => {
-    const res = grantAccess(courseId, email);
-    if (res.ok) { setEmail(''); setErr(null); }
-    else setErr(res.error ? t(res.error) : t('fillFields'));
-  };
-
-  return (
-    <div className="card" style={{ marginBottom: 24 }}>
-      <h2 style={{ marginTop: 0 }}>{t('accessByEmail')}</h2>
-      <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 0 }}>{t('accessByEmailHint')}</p>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={t('studentEmail')}
-          style={{ flex: 1, minWidth: 220, background: 'var(--panel)', border: '1px solid var(--border-strong)', borderRadius: 11, padding: '11px 13px', color: 'var(--text)' }}
-          onKeyDown={(e) => e.key === 'Enter' && submit()}
-        />
-        <button className="btn primary" onClick={submit}>{t('grant')}</button>
-      </div>
-      {err && <p style={{ color: '#c2503f', fontSize: 13, margin: '8px 0 0' }}>{err}</p>}
-
-      <h4 style={{ margin: '18px 0 8px', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--muted)' }}>
-        {t('grantedStudents')}
-      </h4>
-      {granted.length === 0 ? (
-        <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>{t('noGranted')}</p>
-      ) : (
-        <div className="granted-list">
-          {granted.map((g) => {
-            const has = accounts.some((a) => a.email.toLowerCase() === g.toLowerCase() && a.role === 'student');
-            return (
-              <div key={g} className="granted-row">
-                <span className="granted-email">{g}</span>
-                <span className={`granted-status ${has ? 'ok' : 'pending'}`}>
-                  {has ? `● ${t('accessActive')}` : `○ ${t('accessPending')}`}
-                </span>
-                <button className="btn small ghost danger" onClick={() => revokeAccess(courseId, g)}>{t('revoke')}</button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const emptyExercise = (): Exercise => ({
   id: newId('exe'),
   name: { ru: '', en: '' },
@@ -409,7 +351,6 @@ export default function CourseEditor() {
         />
       </div>
 
-      <AccessByEmail courseId={course.id} />
       <CourseStudents courseId={course.id} />
 
       <div className="toolbar">

@@ -17,7 +17,7 @@ const dict = {
   logout: { ru: 'Выйти', en: 'Log out', tr: 'Çıkış' },
   name: { ru: 'Имя', en: 'Name', tr: 'İsim' },
   username: { ru: 'Имя пользователя (логин)', en: 'Username (login)', tr: 'Kullanıcı adı' },
-  loginField: { ru: 'Логин или e-mail', en: 'Login or email', tr: 'Giriş veya e-posta' },
+  loginField: { ru: 'Логин', en: 'Login', tr: 'Giriş' },
   emailOptional: { ru: 'E-mail (необязательно)', en: 'Email (optional)', tr: 'E-posta (isteğe bağlı)' },
   email: { ru: 'E-mail', en: 'Email', tr: 'E-posta' },
   consentText: {

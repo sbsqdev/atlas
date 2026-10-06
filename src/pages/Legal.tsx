@@ -24,12 +24,12 @@ function Contacts() {
     <div className="legal-section">
       <h2>Контакты</h2>
       <p><strong>{SELLER.entity}</strong></p>
-      <p>ИИН: {SELLER.iin}</p>
+      <p>ИИН/БИН: {SELLER.iin}</p>
+      <p>Банк: {SELLER.bank}</p>
       <p>Источник данных: {SELLER.taxAuthority}</p>
-      <p>E-mail: {SELLER.email}</p>
       <p>Телефон: {SELLER.phone}</p>
-      <p>Telegram: {SELLER.telegram}</p>
-      <p>Адрес: {SELLER.address}</p>
+      <p>Instagram: <a href={SELLER.instagramUrl} target="_blank" rel="noreferrer noopener">{SELLER.instagram}</a></p>
+      <p>Юридический адрес: {SELLER.address}</p>
     </div>
   );
 }

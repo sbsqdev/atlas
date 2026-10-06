@@ -20,7 +20,6 @@ export default function Login() {
   const [role, setRole] = useState<Role>('student');
   const [username, setUsername] = useState('');
   const [login, setLogin] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [consent, setConsent] = useState(false);
@@ -33,7 +32,7 @@ export default function Login() {
     const res =
       mode === 'in'
         ? signIn(login, password)
-        : signUp(username, password, role, { email: email || undefined, code: role === 'student' ? code : undefined, consent });
+        : signUp(username, password, role, { code: role === 'student' ? code : undefined, consent });
     if (!res.ok) {
       setError(res.error ? t(res.error) : t('fillFields'));
       return;
@@ -81,10 +80,6 @@ export default function Login() {
               <div className="field">
                 <label>{t('username')}</label>
                 <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t('username')} />
-              </div>
-              <div className="field">
-                <label>{t('emailOptional')}</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" type="email" />
               </div>
             </>
           )}
