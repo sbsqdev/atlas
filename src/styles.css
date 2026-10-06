@@ -300,6 +300,47 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .thread-input input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
 .thread-input .btn { border-radius: 999px; }
 
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .content { padding: 20px 16px 60px; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 18px; }
+
+  /* Two clean rows: [logo · lang · avatar · logout] then scrollable nav. */
+  .topbar { gap: 8px 10px; padding: 10px 14px; flex-wrap: wrap; }
+  .brand { font-size: 16px; gap: 8px; }
+  .brand > span:last-child { display: none; }      /* keep logo only */
+  .topbar .spacer { display: none; }
+  .lang-toggle { margin-left: auto; }
+  .lang-toggle button { padding: 6px 9px; }
+  .user-chip > span:not(.avatar) { display: none; } /* hide name/role */
+  .user-chip { gap: 6px; }
+  .navlinks { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; gap: 2px; }
+  .navlinks::-webkit-scrollbar { height: 0; }
+  .navlinks a { white-space: nowrap; padding: 7px 12px; }
+
+  /* 3D viewer: let the page scroll past it, size to the screen */
+  .muscle-panel { position: static; top: auto; }
+  .viewer.anatomy { height: 64vh; min-height: 320px; max-height: 480px; }
+  .anatomy-controls .seg.wrap { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+  .anatomy-controls .seg.wrap::-webkit-scrollbar { height: 0; }
+  .anatomy-controls .seg.wrap button { white-space: nowrap; flex: 0 0 auto; }
+  .ctl-row { gap: 7px; }
+  .ctl-row .explode { min-width: 100%; }
+
+  .split, .split.anatomy { gap: 16px; }
+  .editor-muscles { grid-template-columns: 1fr; }
+  .modal { padding: 18px; max-height: 94vh; }
+  .editor-preview .viewer.anatomy { height: 44vh; min-height: 260px; }
+
+  .bubble { max-width: 86%; }
+  .reply-list { padding-left: 24px; }
+  .thread-input.reply { margin-left: 24px; }
+
+  .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+  .game-banner { gap: 10px 14px; padding: 13px 16px; }
+}
+
 /* ---------- Forms ---------- */
 .field { margin-bottom: 15px; }
 .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }

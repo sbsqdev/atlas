@@ -49,15 +49,15 @@ export default function StudentHome() {
       <div className="card" style={{ marginBottom: 24, maxWidth: 560 }}>
         <h3 style={{ marginTop: 0 }}>{t('joinByCode')}</h3>
         <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 0 }}>{t('inviteCodeHint')}</p>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <input
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder="RAUANA"
-            style={{ flex: 1, background: 'var(--panel)', border: '1px solid var(--border-strong)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)' }}
+            style={{ flex: '1 1 180px', minWidth: 0, background: 'var(--panel)', border: '1px solid var(--border-strong)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)' }}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
           />
-          <button className="btn primary" onClick={submit}>{t('join')}</button>
+          <button className="btn primary" onClick={submit} style={{ flex: '0 0 auto' }}>{t('join')}</button>
         </div>
         {msg && (
           <p style={{ color: msg.ok ? 'var(--accent)' : '#b4544a', fontSize: 13, marginBottom: 0 }}>{msg.text}</p>
