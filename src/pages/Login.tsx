@@ -114,7 +114,7 @@ export default function Login() {
             </label>
           )}
 
-          {error && <p style={{ color: '#c2503f', fontSize: 13, margin: '4px 0 12px' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--danger)', fontSize: 13, margin: '4px 0 12px' }}>{error}</p>}
 
           <button className="btn primary" style={{ width: '100%', justifyContent: 'center' }} onClick={submit}>
             {mode === 'in' ? t('signIn') : t('createAccount')}

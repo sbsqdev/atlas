@@ -16,7 +16,7 @@ function CoachProfile() {
   const updateProfile = useAuth((s) => s.updateProfile);
   const [name, setName] = useState(account?.name ?? '');
   const [brandName, setBrandName] = useState(account?.brandName ?? '');
-  const [brandColor, setBrandColor] = useState(account?.brandColor ?? '#5e8a73');
+  const [brandColor, setBrandColor] = useState(account?.brandColor ?? '#8b5cf6');
   const [bio, setBio] = useState(account?.bio ?? '');
   const [saved, setSaved] = useState(false);
 

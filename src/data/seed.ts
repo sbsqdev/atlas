@@ -376,8 +376,8 @@ export const SEED_ACCOUNTS: Account[] = [
     role: 'trainer',
     bio: 'Персональный тренер. Силовые программы для девушек с акцентом на ягодицы, ноги и сильный кор. / Personal coach — strength programs focused on glutes, legs and a strong core.',
     brandName: 'Rauana Training',
-    brandColor: '#5e8a73',
-    avatarColor: '#5e8a73',
+    brandColor: '#8b5cf6',
+    avatarColor: '#8b5cf6',
   },
   {
     id: 'student-demo',
@@ -387,7 +387,7 @@ export const SEED_ACCOUNTS: Account[] = [
     passHash: hash('demo1234'),
     consentAt: Date.now(),
     role: 'student',
-    avatarColor: '#c08a5e',
+    avatarColor: '#f59e0b',
     enrolledCourseIds: ['course-glutes-legs'],
   },
 ];

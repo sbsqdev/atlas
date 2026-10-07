@@ -60,7 +60,7 @@ export default function StudentHome() {
           <button className="btn primary" onClick={submit} style={{ flex: '0 0 auto' }}>{t('join')}</button>
         </div>
         {msg && (
-          <p style={{ color: msg.ok ? 'var(--accent)' : '#b4544a', fontSize: 13, marginBottom: 0 }}>{msg.text}</p>
+          <p style={{ color: msg.ok ? 'var(--accent)' : 'var(--danger)', fontSize: 13, marginBottom: 0 }}>{msg.text}</p>
         )}
       </div>
 

@@ -98,8 +98,8 @@ export const useAuth = create<AuthState>()(
           consentAt: Date.now(),
           role,
           ...(role === 'trainer'
-            ? { brandName: u, brandColor: '#5e8a73', avatarColor: '#5e8a73', bio: '' }
-            : { avatarColor: '#c08a5e', enrolledCourseIds: granted }),
+            ? { brandName: u, brandColor: '#8b5cf6', avatarColor: '#8b5cf6', bio: '' }
+            : { avatarColor: '#f59e0b', enrolledCourseIds: granted }),
         };
         set((s) => ({ accounts: [...s.accounts, account], user: project(account) }));
         if (role === 'student' && extras.code && extras.code.trim()) get().joinByCode(extras.code);
