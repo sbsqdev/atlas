@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import StudentHome from './pages/StudentHome';
 import Calculators from './pages/Calculators';
 import Achievements from './pages/Achievements';
+import Profile from './pages/Profile';
 import Legal from './pages/Legal';
 import CourseView from './pages/CourseView';
 import WorkoutView from './pages/WorkoutView';
@@ -56,6 +57,7 @@ export default function App() {
 
       <Route path="/home" element={<RequireAuth role="student">{page(<StudentHome />)}</RequireAuth>} />
       <Route path="/achievements" element={<RequireAuth role="student">{page(<Achievements />)}</RequireAuth>} />
+      <Route path="/profile" element={<RequireAuth role="student">{page(<Profile />)}</RequireAuth>} />
       <Route path="/calculators" element={<RequireAuth>{page(<Calculators />)}</RequireAuth>} />
 
       <Route path="/course/:courseId" element={<RequireCourseAccess>{page(<CourseView />)}</RequireCourseAccess>} />

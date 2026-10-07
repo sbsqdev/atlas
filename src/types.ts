@@ -103,6 +103,33 @@ export interface Habit {
   checkIns: string[];
 }
 
+/** A motivating goal (Atomic Habits: tie the action to an identity, make the
+ *  progress visible, celebrate completion). Stored per student. */
+export interface Goal {
+  id: string;
+  /** The goal itself, e.g. "Тренироваться 12 раз". */
+  title: string;
+  /** The deeper WHY / identity that pulls you ("чтобы чувствовать себя сильной"). */
+  why?: string;
+  /** Target amount to reach. */
+  target: number;
+  /** What a unit is called ("тренировок", "раз", "дней"). */
+  unit?: string;
+  /** Where progress comes from: a manual counter, completed workouts, or a habit's check-ins. */
+  source: 'manual' | 'workouts' | 'habit';
+  /** When source === 'habit'. */
+  habitId?: string;
+  /** When source === 'manual'. */
+  manualCount?: number;
+  /** Optional target date (ISO yyyy-mm-dd). */
+  deadline?: string;
+  createdAt: number;
+  /** Set when the goal was completed. */
+  doneAt?: number;
+  /** True once the completion celebration has been shown (so it fires once). */
+  celebrated?: boolean;
+}
+
 /** A single exercise inside a workout. */
 export interface Exercise {
   id: string;

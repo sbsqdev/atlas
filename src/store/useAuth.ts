@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Account, Habit, Lang, Role, User } from '../types';
+import type { Account, Goal, Habit, Lang, Role, User } from '../types';
 import { SEED_ACCOUNTS } from '../data/seed';
 import { hash } from './hash';
 import { useStore } from './useStore';
@@ -35,6 +35,8 @@ interface AuthState {
   activityDays: Record<string, string[]>;
   /** userId -> list of psychology-based habits */
   habits: Record<string, Habit[]>;
+  /** userId -> list of motivating goals */
+  goals: Record<string, Goal[]>;
 
   signUp: (username: string, password: string, role: Role, extras: { email?: string; code?: string; consent: boolean }) => Result;
   signIn: (login: string, password: string) => Result;
@@ -58,6 +60,12 @@ interface AuthState {
   updateHabit: (id: string, patch: Partial<Habit>) => void;
   removeHabit: (id: string) => void;
   toggleHabitDone: (id: string, day?: string) => void;
+  // goals (motivating, celebrated on completion)
+  getGoals: () => Goal[];
+  addGoal: (partial: Partial<Goal> & { title: string; target: number }) => void;
+  updateGoal: (id: string, patch: Partial<Goal>) => void;
+  removeGoal: (id: string) => void;
+  incGoal: (id: string, by?: number) => void;
   // reminders (opt-in e-mail, collected only with consent)
   setReminderEmail: (email: string, consent: boolean) => Result;
   clearReminderEmail: () => void;
@@ -79,6 +87,7 @@ export const useAuth = create<AuthState>()(
       watched: {},
       activityDays: {},
       habits: {},
+      goals: {},
 
       signUp: (username, password, role, extras) => {
         const u = username.trim();
@@ -247,6 +256,56 @@ export const useAuth = create<AuthState>()(
           return { habits: { ...s.habits, [u.id]: next }, activityDays };
         });
       },
+      getGoals: () => {
+        const u = get().user;
+        return u ? get().goals[u.id] ?? [] : [];
+      },
+      addGoal: (partial) => {
+        const u = get().user;
+        if (!u) return;
+        const goal: Goal = {
+          id: `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+          source: 'manual',
+          manualCount: 0,
+          createdAt: Date.now(),
+          ...partial,
+          title: partial.title,
+          target: partial.target,
+        };
+        set((s) => ({ goals: { ...s.goals, [u.id]: [...(s.goals[u.id] ?? []), goal] } }));
+      },
+      updateGoal: (id, patch) => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({
+          goals: { ...s.goals, [u.id]: (s.goals[u.id] ?? []).map((g) => (g.id === id ? { ...g, ...patch } : g)) },
+        }));
+      },
+      removeGoal: (id) => {
+        const u = get().user;
+        if (!u) return;
+        set((s) => ({ goals: { ...s.goals, [u.id]: (s.goals[u.id] ?? []).filter((g) => g.id !== id) } }));
+      },
+      incGoal: (id, by = 1) => {
+        const u = get().user;
+        if (!u) return;
+        const today = todayKey();
+        set((s) => {
+          const list = s.goals[u.id] ?? [];
+          let counted = false;
+          const next = list.map((g) => {
+            if (g.id !== id || g.source !== 'manual') return g;
+            counted = true;
+            return { ...g, manualCount: Math.max(0, (g.manualCount ?? 0) + by) };
+          });
+          // Logging progress counts as activity for the streak.
+          const days = s.activityDays[u.id] ?? [];
+          const activityDays = counted && by > 0 && !days.includes(today)
+            ? { ...s.activityDays, [u.id]: [...days, today] }
+            : s.activityDays;
+          return { goals: { ...s.goals, [u.id]: next }, activityDays };
+        });
+      },
       setReminderEmail: (email, consent) => {
         const u = get().user;
         if (!u) return { ok: false, error: 'wrongCredentials' };
@@ -320,7 +379,7 @@ export const useAuth = create<AuthState>()(
       name: 'human-atlas-auth',
       version: VERSION,
       // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habits: {} }) as Partial<AuthState>,
+      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habits: {}, goals: {} }) as Partial<AuthState>,
     },
   ),
 );

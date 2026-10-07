@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { computeGamification, type CourseProgress } from '../lib/gamification';
 import { habitStreak, consistency, doneToday, habitTemplates } from '../lib/habits';
 import { notificationState, requestNotifyPermission } from '../lib/reminders';
-import type { Habit } from '../types';
+import Celebrate from '../components/Celebrate';
+import type { Goal, Habit } from '../types';
 
 export function useGamification() {
   const { lang } = useT();
@@ -196,6 +197,125 @@ function EmailReminders() {
   );
 }
 
+function GoalCard({ goal, workoutsDone, habits }: { goal: Goal; workoutsDone: number; habits: Habit[] }) {
+  const { t } = useT();
+  const incGoal = useAuth((s) => s.incGoal);
+  const removeGoal = useAuth((s) => s.removeGoal);
+  const updateGoal = useAuth((s) => s.updateGoal);
+  const [celebrate, setCelebrate] = useState(false);
+
+  const current = goal.source === 'manual'
+    ? goal.manualCount ?? 0
+    : goal.source === 'workouts'
+      ? workoutsDone
+      : habits.find((h) => h.id === goal.habitId)?.checkIns.length ?? 0;
+  const pct = Math.min(100, Math.round((current / Math.max(1, goal.target)) * 100));
+  const done = current >= goal.target;
+
+  useEffect(() => {
+    if (done && !goal.celebrated) {
+      setCelebrate(true);
+      updateGoal(goal.id, { celebrated: true, doneAt: goal.doneAt ?? Date.now() });
+    }
+  }, [done, goal.celebrated, goal.id, goal.doneAt, updateGoal]);
+
+  return (
+    <div className={`card goal-item${done ? ' done' : ''}`}>
+      <Celebrate show={celebrate} onClose={() => setCelebrate(false)} />
+      <div className="goal-head">
+        <div className="goal-main">
+          <div className="goal-title">{done ? '✅ ' : '🎯 '}{goal.title}</div>
+          {goal.why && <div className="goal-why">“{goal.why}”</div>}
+        </div>
+        <button className="btn ghost small danger" onClick={() => removeGoal(goal.id)} aria-label="delete">🗑</button>
+      </div>
+      <div className="goal-prog">
+        <div className="goal-track"><span style={{ width: `${pct}%` }} /></div>
+        <div className="goal-nums"><b>{current}</b> {t('goalProgressOf')} {goal.target} {goal.unit || ''} · {pct}%</div>
+      </div>
+      {goal.source === 'manual' && !done && (
+        <button className="btn primary small" onClick={() => incGoal(goal.id, 1)}>{t('logOne')}</button>
+      )}
+      {done && <div className="goal-done-badge">🎉 {t('goalDone')}</div>}
+    </div>
+  );
+}
+
+function Goals() {
+  const { t } = useT();
+  const g = useGamification();
+  const goals = useAuth((s) => (s.user ? s.goals[s.user.id] ?? [] : []));
+  const habits = useAuth((s) => (s.user ? s.habits[s.user.id] ?? [] : []));
+  const addGoal = useAuth((s) => s.addGoal);
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [why, setWhy] = useState('');
+  const [target, setTarget] = useState(12);
+  const [unit, setUnit] = useState('');
+  const [source, setSource] = useState<'manual' | 'workouts' | 'habit'>('workouts');
+  const [habitId, setHabitId] = useState('');
+
+  const submit = () => {
+    if (!title.trim()) return;
+    addGoal({
+      title: title.trim(),
+      why: why.trim() || undefined,
+      target: Math.max(1, Number(target) || 1),
+      unit: unit.trim() || undefined,
+      source,
+      habitId: source === 'habit' ? (habitId || habits[0]?.id) : undefined,
+    });
+    setTitle(''); setWhy(''); setTarget(12); setUnit(''); setOpen(false);
+  };
+
+  return (
+    <div className="goals-section" style={{ marginBottom: 26 }}>
+      <h2 style={{ marginBottom: 4 }}>🎯 {t('myGoals')}</h2>
+      <p className="sub" style={{ marginTop: 0 }}>{t('goalsHint')}</p>
+
+      {goals.length === 0 && <p className="placeholder" style={{ margin: '8px 0' }}>{t('noGoalsYet')}</p>}
+
+      <div className="goal-list">
+        {goals.map((goal) => <GoalCard key={goal.id} goal={goal} workoutsDone={g.totalDone} habits={habits} />)}
+      </div>
+
+      {!open ? (
+        <button className="btn primary" style={{ marginTop: 12 }} onClick={() => setOpen(true)}>+ {t('newGoal')}</button>
+      ) : (
+        <div className="card goal-form" style={{ marginTop: 12 }}>
+          <div className="field"><label>{t('newGoal')}</label>
+            <input value={title} placeholder={t('goalTitlePh')} onChange={(e) => setTitle(e.target.value)} /></div>
+          <div className="field"><label>{t('goalWhyLabel')}</label>
+            <input value={why} placeholder={t('goalWhyPh')} onChange={(e) => setWhy(e.target.value)} /></div>
+          <div className="field-row">
+            <div className="field"><label>{t('goalTargetLabel')}</label>
+              <input type="number" min={1} value={target} onChange={(e) => setTarget(Number(e.target.value))} /></div>
+            <div className="field"><label>{t('goalUnitPh')}</label>
+              <input value={unit} placeholder={t('goalUnitPh')} onChange={(e) => setUnit(e.target.value)} /></div>
+          </div>
+          <div className="field"><label>{t('goalSourceLabel')}</label>
+            <select value={source} onChange={(e) => setSource(e.target.value as typeof source)}>
+              <option value="workouts">{t('srcWorkouts')}</option>
+              <option value="manual">{t('srcManual')}</option>
+              {habits.length > 0 && <option value="habit">{t('srcHabit')}</option>}
+            </select></div>
+          {source === 'habit' && habits.length > 0 && (
+            <div className="field">
+              <select value={habitId} onChange={(e) => setHabitId(e.target.value)}>
+                {habits.map((h) => <option key={h.id} value={h.id}>{h.title}</option>)}
+              </select>
+            </div>
+          )}
+          <div className="row-actions">
+            <button className="btn primary" disabled={!title.trim()} onClick={submit}>{t('addGoalBtn')}</button>
+            <button className="btn ghost" onClick={() => setOpen(false)}>✕</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Habits() {
   const { t, lang } = useT();
   const habits = useAuth((s) => (s.user ? s.habits[s.user.id] ?? [] : []));
@@ -268,6 +388,8 @@ export default function Achievements() {
           <div className="game-sub" style={{ marginTop: 6 }}>{g.xp} XP</div>
         </div>
       </div>
+
+      <Goals />
 
       <Habits />
 

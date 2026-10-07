@@ -64,6 +64,37 @@ export function streakOf(activityDays: string[]): { streak: number; last7: boole
   return { streak, last7 };
 }
 
+/** Longest consecutive-day run ever recorded in the activity log. */
+export function bestStreakOf(activityDays: string[]): number {
+  if (!activityDays.length) return 0;
+  const days = [...new Set(activityDays)].sort();
+  let best = 1;
+  let run = 1;
+  for (let i = 1; i < days.length; i++) {
+    const prev = new Date(days[i - 1]);
+    const cur = new Date(days[i]);
+    const diff = Math.round((cur.getTime() - prev.getTime()) / 86400000);
+    run = diff === 1 ? run + 1 : 1;
+    if (run > best) best = run;
+  }
+  return best;
+}
+
+/** A map of the last `weeks`×7 days (oldest→today) marking active days — for a
+ *  GitHub-style contribution heatmap on the profile. */
+export function activityHeatmap(activityDays: string[], weeks = 20): boolean[] {
+  const set = new Set(activityDays);
+  const today = new Date();
+  const total = weeks * 7;
+  const out: boolean[] = [];
+  for (let i = total - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    out.push(set.has(dayKey(d)));
+  }
+  return out;
+}
+
 export function computeGamification(
   perCourse: CourseProgress[],
   activityDays: string[],
