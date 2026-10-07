@@ -14,6 +14,9 @@ export default function Footer({ compact }: { compact?: boolean }) {
       <div className="foot-legal">
         {SELLER.entity} · ИИН {SELLER.iin}
       </div>
+      <div className="foot-legal">
+        <a href={SELLER.siteUrl} target="_blank" rel="noreferrer noopener">{SELLER.site}</a>
+      </div>
     </footer>
   );
 }

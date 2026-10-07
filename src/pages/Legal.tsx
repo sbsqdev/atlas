@@ -29,6 +29,7 @@ function Contacts() {
       <p>Источник данных: {SELLER.taxAuthority}</p>
       <p>Телефон: {SELLER.phone}</p>
       <p>Instagram: <a href={SELLER.instagramUrl} target="_blank" rel="noreferrer noopener">{SELLER.instagram}</a></p>
+      <p>Сайт: <a href={SELLER.siteUrl} target="_blank" rel="noreferrer noopener">{SELLER.site}</a></p>
       <p>Юридический адрес: {SELLER.address}</p>
     </div>
   );

@@ -10,6 +10,8 @@ export const SELLER = {
   phone: '+7 (776) 096-82-36',
   instagram: '@kuangaliyevar',
   instagramUrl: 'https://www.instagram.com/kuangaliyevar',
+  site: 'www.fab3d-scan.com',
+  siteUrl: 'https://www.fab3d-scan.com',
   address: 'Республика Казахстан, Западно-Казахстанская обл., г. Уральск, Проспект Абая, дом 200',
   updated: '2026-10-06',
 };
@@ -78,6 +80,7 @@ export const OFFER: Section[] = [
       `Банк: ${SELLER.bank}`,
       `Юридический адрес: ${SELLER.address}`,
       `Телефон: ${SELLER.phone} · Instagram: ${SELLER.instagram}`,
+      `Сайт: ${SELLER.site}`,
     ],
   },
 ];
@@ -130,6 +133,7 @@ export const PRIVACY: Section[] = [
       `${SELLER.entity}, ИИН ${SELLER.iin}`,
       `Юридический адрес: ${SELLER.address}`,
       `Телефон: ${SELLER.phone} · Instagram: ${SELLER.instagram}`,
+      `Сайт: ${SELLER.site}`,
     ],
   },
 ];
