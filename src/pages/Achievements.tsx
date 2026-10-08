@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
@@ -197,6 +198,52 @@ function EmailReminders() {
   );
 }
 
+/** The "Today" focus card — the engine that makes you act right now:
+ *  shows today's unchecked habits with one-tap done, and warns when the
+ *  streak is about to break. */
+function TodayCard() {
+  const { t } = useT();
+  const navigate = useNavigate();
+  const habits = useAuth((s) => (s.user ? s.habits[s.user.id] ?? [] : []));
+  const toggleHabitDone = useAuth((s) => s.toggleHabitDone);
+  const g = useGamification();
+  const todo = habits.filter((h) => !doneToday(h));
+  const activeToday = g.last7[g.last7.length - 1];
+  const atRisk = g.streak > 0 && !activeToday;
+
+  return (
+    <div className="card today-card">
+      <div className="today-head">
+        <h2 style={{ margin: 0 }}>☀️ {t('todayTitle')}</h2>
+        <span className="today-streak">🔥 {g.streak}</span>
+      </div>
+      <p className="today-sub">{t('todaySub')}</p>
+
+      {atRisk && (
+        <div className="risk-banner">⚠️ {t('streakAtRisk')} <b>{g.streak}</b> 🔥</div>
+      )}
+
+      {habits.length === 0 ? (
+        <p className="muted-sm">{t('todayNoHabits')}</p>
+      ) : todo.length === 0 ? (
+        <div className="today-done">✅ {t('todayAllDone')}</div>
+      ) : (
+        <div className="today-list">
+          {todo.map((h) => (
+            <button key={h.id} className="today-item" onClick={() => toggleHabitDone(h.id)}>
+              <span className="today-check" />
+              <span className="today-name">{h.title}{h.time ? ` · ⏰ ${h.time}` : ''}</span>
+              <span className="today-go">{t('todayDoOne')} ✓</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <button className="btn ghost small" style={{ marginTop: 10 }} onClick={() => navigate('/home')}>{t('todayOpenTraining')}</button>
+    </div>
+  );
+}
+
 function GoalCard({ goal, workoutsDone, habits }: { goal: Goal; workoutsDone: number; habits: Habit[] }) {
   const { t } = useT();
   const incGoal = useAuth((s) => s.incGoal);
@@ -367,7 +414,9 @@ export default function Achievements() {
       <h1>🏅 {t('achievements')}</h1>
       <p className="sub">{t('identityLine')}</p>
 
-      <div className="grid cols-3" style={{ marginBottom: 20 }}>
+      <TodayCard />
+
+      <div className="grid cols-3" style={{ marginBottom: 20, marginTop: 20 }}>
         <div className="card game-stat">
           <div className="game-big">⭐ {t('level')} <b>{g.level}</b></div>
           <div className="level-bar"><span style={{ width: `${(g.intoLevel / g.span) * 100}%` }} /></div>

@@ -375,6 +375,7 @@ const dict = {
   landCodeSub: { ru: 'Введи код, который дал тренер — и попадёшь в его курс. Как в Google Classroom.', en: 'Enter the code your coach gave you to join their course. Like Google Classroom.', tr: 'Antrenörün verdiği kodu gir ve kursuna katıl. Google Classroom gibi.' },
   landCodeGo: { ru: 'Войти в курс', en: 'Join course', tr: 'Kursa katıl' },
   landSignIn: { ru: 'Войти', en: 'Sign in', tr: 'Giriş' },
+  codePh: { ru: 'КОД', en: 'CODE', tr: 'KOD' },
   landTrainerCta: { ru: 'Я тренер — публиковать курсы', en: 'I am a coach — publish courses', tr: 'Antrenörüm — kurs yayınla' },
   landF1t: { ru: '3D-карта мышц', en: '3D muscle map', tr: '3B kas haritası' },
   landF1d: { ru: 'Видно, какие мышцы работают в каждом упражнении — на реальной 3D-модели.', en: 'See which muscles each exercise works — on a real 3D model.', tr: 'Her egzersizin hangi kası çalıştırdığını gerçek 3B modelde gör.' },
@@ -387,6 +388,16 @@ const dict = {
   landStep2: { ru: 'Войди и открой курс', en: 'Sign in and open the course', tr: 'Giriş yap ve kursu aç' },
   landStep3: { ru: 'Тренируйся и держи серию', en: 'Train and keep your streak', tr: 'Antren yap ve seriyi koru' },
   landPrivacyNote: { ru: 'Мы храним только логин и прогресс. Курсы открываются только по коду тренера.', en: 'We store only your login and progress. Courses open only with a trainer code.', tr: 'Yalnızca kullanıcı adını ve ilerlemeyi saklarız. Kurslar yalnızca kodla açılır.' },
+
+  // ---------- Today focus (habit engine) ----------
+  todayTitle: { ru: 'Сегодня', en: 'Today', tr: 'Bugün' },
+  todaySub: { ru: 'Одно маленькое дело сейчас — и день пошёл. Правило 2 минут.', en: 'One small thing now and the day is rolling. The 2-minute rule.', tr: 'Şimdi küçük bir şey — ve gün başladı. 2 dakika kuralı.' },
+  todayAllDone: { ru: 'Всё на сегодня сделано — ты красавчик! Держи серию 🔥', en: 'All done for today — awesome! Keep the streak 🔥', tr: 'Bugünlük bitti — harika! Seriyi koru 🔥' },
+  streakAtRisk: { ru: 'Серия под угрозой! Сделай одно дело, чтобы не потерять', en: 'Streak at risk! Do one thing so you don’t lose', tr: 'Seri risk altında! Kaybetmemek için bir şey yap' },
+  todayDoOne: { ru: 'Готово', en: 'Done', tr: 'Tamam' },
+  todayNoHabits: { ru: 'Добавь привычку ниже — и начни цепочку сегодня.', en: 'Add a habit below and start the chain today.', tr: 'Aşağıdan bir alışkanlık ekle ve zinciri bugün başlat.' },
+  todayOpenTraining: { ru: '🦾 Открыть тренировку', en: '🦾 Open a training', tr: '🦾 Antrenman aç' },
+  momentumLine: { ru: 'Каждый день — голос за того, кем ты становишься.', en: 'Every day is a vote for who you are becoming.', tr: 'Her gün, olmak istediğin kişiye bir oy.' },
 
   // ---------- Friends (local) ----------
   friends: { ru: 'Друзья', en: 'Friends', tr: 'Arkadaşlar' },
@@ -401,6 +412,25 @@ const dict = {
   cheer: { ru: 'Поддержать', en: 'Cheer', tr: 'Destekle' },
   cheered: { ru: 'Поддержано', en: 'Cheered', tr: 'Desteklendi' },
   localDemoNote: { ru: 'Демо: друзья и активность хранятся на этом устройстве. Синхронизация между людьми появится с общей базой.', en: 'Demo: friends and activity are stored on this device. Cross-person sync comes with the shared backend.', tr: 'Demo: arkadaşlar ve aktivite bu cihazda saklanır. Kişiler arası senkron ortak sunucuyla gelir.' },
+
+  // ---------- Clans ----------
+  clans: { ru: 'Кланы', en: 'Clans', tr: 'Klanlar' },
+  myClan: { ru: 'Мой клан', en: 'My clan', tr: 'Klanım' },
+  clanHint: { ru: 'Клан — твоя команда. Вместе копите очки, держите общую серию и поднимаетесь в таблице кланов.', en: 'A clan is your team. Earn points together, hold a shared streak and climb the clan board.', tr: 'Klan senin takımın. Birlikte puan topla, ortak seri tut ve klan tablosunda yüksel.' },
+  createClan: { ru: 'Создать клан', en: 'Create a clan', tr: 'Klan oluştur' },
+  clanNamePh: { ru: 'Название клана, напр. «Железные»', en: 'Clan name, e.g. “Iron Squad”', tr: 'Klan adı, ör. “Demir Takım”' },
+  clanMembers: { ru: 'Участники', en: 'Members', tr: 'Üyeler' },
+  clanScore: { ru: 'Очки клана', en: 'Clan points', tr: 'Klan puanı' },
+  clanBoard: { ru: 'Таблица кланов', en: 'Clan board', tr: 'Klan tablosu' },
+  leaveClan: { ru: 'Покинуть клан', en: 'Leave clan', tr: 'Klandan ayrıl' },
+  addMembers: { ru: 'Добавь друзей в клан', en: 'Add friends to the clan', tr: 'Arkadaş ekle' },
+  clanGoalLine: { ru: 'Цель недели клана', en: 'Clan weekly goal', tr: 'Klan haftalık hedefi' },
+
+  // ---------- Trainer terms (per-course) ----------
+  trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
+  trainerTermsHint: { ru: 'Стоимость, срок доступа, возвраты и контакты определяет тренер этого курса. Платформа предоставляет только сервис — см. Оферту и Политику платформы в футере.', en: 'Price, access length, refunds and contacts are set by this course’s trainer. The platform provides the service only — see the platform Offer & Policy in the footer.', tr: 'Fiyat, erişim süresi, iadeler ve iletişim bu kursun antrenörü tarafından belirlenir. Platform yalnızca hizmet sağlar.' },
+  trainerTermsEdit: { ru: 'Условия курса (твоя оферта)', en: 'Course terms (your offer)', tr: 'Kurs koşulları (teklifin)' },
+  trainerTermsPh: { ru: 'Напр.: Стоимость 15 000 ₸. Доступ 8 недель. Оплата Kaspi. Возврат до старта курса. Контакт: @...', en: 'e.g.: Price $X. Access 8 weeks. Payment via … Refund before start. Contact: @…', tr: 'ör.: Fiyat … Erişim 8 hafta. Ödeme … İade başlangıçtan önce. İletişim: @…' },
 
   // ---------- Chat / video circles ----------
   trainingChat: { ru: 'Чат тренировки', en: 'Training chat', tr: 'Antrenman sohbeti' },

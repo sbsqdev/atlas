@@ -170,6 +170,9 @@ export interface Course {
   /** Emails the coach granted access to (e.g. after purchase). A matching
    *  account is auto-enrolled; an email granted before signup enrols on signup. */
   grantedEmails?: string[];
+  /** The trainer's OWN terms for this course (price, access length, refunds,
+   *  contacts). Each trainer sets their own; separate from the platform policy. */
+  terms?: string;
   workouts: Workout[];
 }
 

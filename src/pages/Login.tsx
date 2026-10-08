@@ -101,7 +101,7 @@ export default function Login() {
           {mode === 'up' && role === 'student' && (
             <div className="field">
               <label>{t('inviteCode')}</label>
-              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="RAUANA" />
+              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder={t('codePh')} />
               <p className="hint" style={{ marginTop: 6 }}>{t('inviteCodeHint')}</p>
             </div>
           )}

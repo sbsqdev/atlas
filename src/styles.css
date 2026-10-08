@@ -655,3 +655,37 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .circle-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .circle-denied { padding: 30px 10px; color: var(--muted); }
 .circle-msg { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin: 2px 0 6px; background: #000; display: block; }
+
+/* ---------- Today focus card ---------- */
+.today-card { background: linear-gradient(135deg, var(--accent-dim), var(--panel)); border-color: var(--accent); margin-bottom: 4px; }
+.today-head { display: flex; align-items: center; justify-content: space-between; }
+.today-streak { font-size: 15px; font-weight: 800; color: var(--sand); background: rgba(245,158,11,0.14); padding: 4px 12px; border-radius: 999px; }
+.today-sub { color: var(--muted); font-size: 14px; margin: 4px 0 14px; }
+.risk-banner { background: rgba(248,113,113,0.14); border: 1px solid rgba(248,113,113,0.4); color: #ffb4b4; font-size: 13.5px; font-weight: 600; padding: 9px 13px; border-radius: var(--radius-sm); margin-bottom: 12px; }
+.today-done { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; text-align: center; font-weight: 600; color: var(--accent-2); }
+.today-list { display: flex; flex-direction: column; gap: 9px; }
+.today-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text); transition: all 0.12s; }
+.today-item:hover { border-color: var(--accent); transform: translateX(2px); }
+.today-check { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-strong); }
+.today-item:hover .today-check { border-color: var(--accent); background: var(--accent-dim); }
+.today-name { flex: 1; font-weight: 600; font-size: 14.5px; }
+.today-go { font-size: 12.5px; font-weight: 700; color: var(--accent-2); }
+
+/* ---------- Clans ---------- */
+.emoji-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.emoji-opt { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--panel); font-size: 20px; cursor: pointer; }
+.emoji-opt.on { border-color: var(--accent); background: var(--accent-dim); box-shadow: var(--ring); }
+.clan-head { display: flex; align-items: center; gap: 12px; }
+.clan-emoji { font-size: 34px; }
+.clan-name { font-weight: 800; font-family: var(--font-display); font-size: 19px; }
+.clan-score-box { margin: 14px 0; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 15px; }
+.clan-score { font-size: 15px; } .clan-score b { font-size: 26px; font-family: var(--font-display); color: var(--accent-2); }
+.clan-score span { color: var(--muted); font-size: 13px; }
+.clan-members { display: flex; gap: 8px; flex-wrap: wrap; }
+.clan-chip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border-strong); background: var(--panel); border-radius: 999px; padding: 4px 11px 4px 4px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.clan-chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent-2); }
+
+/* ---------- Trainer terms ---------- */
+.terms-card { margin-top: 20px; }
+.terms-card h2 { font-size: 17px; }
+.terms-text { white-space: pre-wrap; line-height: 1.6; color: var(--text); margin: 0 0 12px; }

@@ -54,7 +54,7 @@ export default function Landing() {
             <h2>🎟️ {t('landCodeTitle')}</h2>
             <p className="muted-sm" style={{ marginBottom: 14 }}>{t('landCodeSub')}</p>
             <div className="code-join">
-              <input value={code} placeholder="RAUANA" onChange={(e) => setCode(e.target.value.toUpperCase())}
+              <input value={code} placeholder={t('codePh')} onChange={(e) => setCode(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && code.trim() && joinWithCode()} />
               <button className="btn primary" disabled={!code.trim()} onClick={joinWithCode}>{t('landCodeGo')} →</button>
             </div>

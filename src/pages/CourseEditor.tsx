@@ -349,6 +349,14 @@ export default function CourseEditor() {
           onChange={(summary) => updateCourse(course.id, { summary })}
           textarea
         />
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>{t('trainerTermsEdit')}</label>
+          <textarea
+            defaultValue={course.terms ?? ''}
+            placeholder={t('trainerTermsPh')}
+            onBlur={(e) => updateCourse(course.id, { terms: e.target.value })}
+          />
+        </div>
       </div>
 
       <CourseStudents courseId={course.id} />

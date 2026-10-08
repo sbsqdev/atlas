@@ -58,6 +58,14 @@ export default function CourseView() {
           );
         })}
       </div>
+
+      {course.terms && (
+        <div className="card terms-card">
+          <h2>📜 {t('trainerTerms')}</h2>
+          <p className="terms-text">{course.terms}</p>
+          <p className="muted-sm">{t('trainerTermsHint')}</p>
+        </div>
+      )}
     </div>
   );
 }

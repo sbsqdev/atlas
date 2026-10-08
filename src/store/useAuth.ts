@@ -378,8 +378,27 @@ export const useAuth = create<AuthState>()(
     {
       name: 'human-atlas-auth',
       version: VERSION,
-      // On a version bump, keep sessions out but refresh seed accounts.
-      migrate: () => ({ accounts: SEED_ACCOUNTS, user: null, lang: 'ru', progress: {}, watched: {}, activityDays: {}, habits: {}, goals: {} }) as Partial<AuthState>,
+      // PRESERVE user data across version bumps: keep every persisted account,
+      // course progress, habit and goal; only add seed accounts that are missing.
+      // (Never wipe — returning users must keep their history.)
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Partial<AuthState>;
+        const existing = p.accounts ?? [];
+        const ids = new Set(existing.map((a) => a.id));
+        const accounts = existing.length
+          ? [...existing, ...SEED_ACCOUNTS.filter((a) => !ids.has(a.id))]
+          : SEED_ACCOUNTS;
+        return {
+          accounts,
+          user: p.user ?? null,
+          lang: p.lang ?? 'ru',
+          progress: p.progress ?? {},
+          watched: p.watched ?? {},
+          activityDays: p.activityDays ?? {},
+          habits: p.habits ?? {},
+          goals: p.goals ?? {},
+        } as Partial<AuthState>;
+      },
     },
   ),
 );

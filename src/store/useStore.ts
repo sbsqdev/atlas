@@ -104,8 +104,17 @@ export const useStore = create<DataState>()(
     {
       name: 'human-atlas-data',
       version: VERSION,
-      // On a version bump, drop stale persisted content and fall back to seed.
-      migrate: () => ({ courses: COURSES }) as Partial<DataState>,
+      // PRESERVE trainer-created courses and edits across version bumps:
+      // keep every persisted course, only add seed courses that are missing.
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Partial<DataState>;
+        const existing = p.courses ?? [];
+        const ids = new Set(existing.map((c) => c.id));
+        const courses = existing.length
+          ? [...existing, ...COURSES.filter((c) => !ids.has(c.id))]
+          : COURSES;
+        return { courses } as Partial<DataState>;
+      },
     },
   ),
 );
