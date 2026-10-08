@@ -5,6 +5,7 @@ import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
+import CommentThread from '../components/CommentThread';
 import { useBrandStyle } from '../components/useBrandStyle';
 import type { MuscleId } from '../types';
 
@@ -107,6 +108,8 @@ export default function WorkoutView() {
           </div>
         </div>
       </div>
+
+      <CommentThread threadKey={`workout:${workout.id}`} title={t('trainingChat')} />
     </div>
   );
 }

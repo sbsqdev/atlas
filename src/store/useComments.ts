@@ -10,6 +10,8 @@ export interface Comment {
   authorName: string;
   role: Role;
   text: string;
+  /** Optional short "video circle" (Telegram-style) as a data URL. */
+  circle?: string;
   parentId?: string;
   createdAt: number;
   reactions: Record<string, string[]>; // emoji -> userIds
@@ -41,7 +43,7 @@ const SEED_COMMENTS: Comment[] = [
 
 interface CommentsState {
   comments: Comment[];
-  add: (threadKey: string, author: { id: string; name: string; role: Role }, text: string, parentId?: string) => void;
+  add: (threadKey: string, author: { id: string; name: string; role: Role }, text: string, parentId?: string, circle?: string) => void;
   remove: (id: string) => void;
   react: (id: string, emoji: string, userId: string) => void;
   forThread: (threadKey: string) => Comment[];
@@ -51,12 +53,12 @@ export const useComments = create<CommentsState>()(
   persist(
     (set, get) => ({
       comments: SEED_COMMENTS,
-      add: (threadKey, author, text, parentId) => {
+      add: (threadKey, author, text, parentId, circle) => {
         const t = text.trim();
-        if (!t) return;
+        if (!t && !circle) return;
         const comment: Comment = {
           id: cid(), threadKey, authorId: author.id, authorName: author.name, role: author.role,
-          text: t, parentId, createdAt: Date.now(), reactions: {},
+          text: t, circle, parentId, createdAt: Date.now(), reactions: {},
         };
         set((s) => ({ comments: [...s.comments, comment] }));
       },

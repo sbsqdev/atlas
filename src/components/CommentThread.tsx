@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useComments, type Comment } from '../store/useComments';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
+import CircleRecorder from './CircleRecorder';
 
 const REACTIONS = ['👍', '🔥', '❤️', '💪'];
 
@@ -36,7 +37,8 @@ function Bubble({ c, onReply }: { c: Comment; onReply: (id: string) => void }) {
           {c.role === 'trainer' && <span className="role-badge">{t('trainer')}</span>}
           <span className="bubble-time">{timeAgo(c.createdAt, lang, t('justNow'))}</span>
         </div>
-        <div className="bubble-text">{c.text}</div>
+        {c.circle && <video className="circle-msg" src={c.circle} controls loop playsInline preload="metadata" />}
+        {c.text && <div className="bubble-text">{c.text}</div>}
         <div className="bubble-actions">
           {REACTIONS.map((e) => {
             const users = c.reactions[e] ?? [];
@@ -55,7 +57,7 @@ function Bubble({ c, onReply }: { c: Comment; onReply: (id: string) => void }) {
   );
 }
 
-export default function CommentThread({ threadKey }: { threadKey: string }) {
+export default function CommentThread({ threadKey, title }: { threadKey: string; title?: string }) {
   const { t } = useT();
   const user = useAuth((s) => s.user);
   const comments = useComments((s) => s.comments.filter((c) => c.threadKey === threadKey));
@@ -64,6 +66,7 @@ export default function CommentThread({ threadKey }: { threadKey: string }) {
   const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [recording, setRecording] = useState(false);
 
   const roots = comments.filter((c) => !c.parentId).sort((a, b) => a.createdAt - b.createdAt);
   const repliesOf = (id: string) => comments.filter((c) => c.parentId === id).sort((a, b) => a.createdAt - b.createdAt);
@@ -80,9 +83,14 @@ export default function CommentThread({ threadKey }: { threadKey: string }) {
     setReplyTo(null);
   };
 
+  const sendCircle = (dataUrl: string) => {
+    if (user) add(threadKey, user, '', undefined, dataUrl);
+    setRecording(false);
+  };
+
   return (
     <div className="thread">
-      <h2>💬 {t('discussion')}</h2>
+      <h2>💬 {title ?? t('discussion')}</h2>
       <div className="thread-list">
         {roots.length === 0 && <p className="placeholder" style={{ padding: 24 }}>{t('noComments')}</p>}
         {roots.map((c) => (
@@ -106,7 +114,16 @@ export default function CommentThread({ threadKey }: { threadKey: string }) {
         ))}
       </div>
 
+      {recording && user && (
+        <div className="modal-backdrop" onClick={() => setRecording(false)}>
+          <div className="modal circle-modal" onClick={(e) => e.stopPropagation()}>
+            <CircleRecorder onSend={sendCircle} onCancel={() => setRecording(false)} />
+          </div>
+        </div>
+      )}
+
       <div className="thread-input">
+        <button className="btn circle-btn" title={t('recordCircle')} onClick={() => setRecording(true)} disabled={!user}>🎥</button>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t('writeMessage')} onKeyDown={(e) => e.key === 'Enter' && post()} />
         <button className="btn primary" onClick={post}>{t('send')}</button>
       </div>

@@ -361,6 +361,56 @@ const dict = {
   estimated1RM: { ru: 'Расчётный 1ПМ', en: 'Estimated 1RM', tr: 'Tahmini 1TM' },
   bmiCalc: { ru: 'Индекс массы тела (ИМТ)', en: 'Body mass index (BMI)', tr: 'Vücut kitle indeksi (VKİ)' },
   bmiResult: { ru: 'Ваш ИМТ', en: 'Your BMI', tr: 'VKİ değeriniz' },
+
+  // ---------- Landing (public) ----------
+  landHeroTitle: { ru: 'Тренируйся осознанно. Доходи до цели.', en: 'Train with awareness. Reach your goal.', tr: 'Bilinçli antren. Hedefe ulaş.' },
+  landHeroSub: {
+    ru: 'Платформа тренировок с 3D-картой мышц, привычками по психологии и поддержкой друзей. Тренер даёт код — ты занимаешься по программе и видишь прогресс.',
+    en: 'A training platform with a 3D muscle map, psychology-based habits and friend support. Your coach gives you a code — you follow the program and see progress.',
+    tr: '3B kas haritası, psikolojiye dayalı alışkanlıklar ve arkadaş desteğiyle antrenman platformu. Antrenör kod verir — programı takip eder, ilerlemeni görürsün.',
+  },
+  landStart: { ru: 'Начать', en: 'Get started', tr: 'Başla' },
+  landHaveCode: { ru: 'У меня есть код тренера', en: 'I have a trainer code', tr: 'Antrenör kodum var' },
+  landCodeTitle: { ru: 'Вход по коду тренера', en: 'Join with a trainer code', tr: 'Antrenör koduyla katıl' },
+  landCodeSub: { ru: 'Введи код, который дал тренер — и попадёшь в его курс. Как в Google Classroom.', en: 'Enter the code your coach gave you to join their course. Like Google Classroom.', tr: 'Antrenörün verdiği kodu gir ve kursuna katıl. Google Classroom gibi.' },
+  landCodeGo: { ru: 'Войти в курс', en: 'Join course', tr: 'Kursa katıl' },
+  landSignIn: { ru: 'Войти', en: 'Sign in', tr: 'Giriş' },
+  landTrainerCta: { ru: 'Я тренер — публиковать курсы', en: 'I am a coach — publish courses', tr: 'Antrenörüm — kurs yayınla' },
+  landF1t: { ru: '3D-карта мышц', en: '3D muscle map', tr: '3B kas haritası' },
+  landF1d: { ru: 'Видно, какие мышцы работают в каждом упражнении — на реальной 3D-модели.', en: 'See which muscles each exercise works — on a real 3D model.', tr: 'Her egzersizin hangi kası çalıştırdığını gerçek 3B modelde gör.' },
+  landF2t: { ru: 'Цели и привычки', en: 'Goals & habits', tr: 'Hedefler & alışkanlıklar' },
+  landF2d: { ru: 'Atomic Habits: ставь цель, держи серию и доходи до результата.', en: 'Atomic Habits: set a goal, keep the streak, reach the result.', tr: 'Atomic Habits: hedef koy, seriyi koru, sonuca ulaş.' },
+  landF3t: { ru: 'Друзья и поддержка', en: 'Friends & support', tr: 'Arkadaşlar & destek' },
+  landF3d: { ru: 'Рядом с друзьями ты перформишь лучше — видно их серии, чат и видео-кружочки.', en: 'You perform better with friends — see their streaks, chat and video circles.', tr: 'Arkadaşlarla daha iyi performans — serileri, sohbet ve video daireleri.' },
+  landHowTitle: { ru: 'Как это работает', en: 'How it works', tr: 'Nasıl çalışır' },
+  landStep1: { ru: 'Получи код от тренера', en: 'Get a code from your coach', tr: 'Antrenörden kod al' },
+  landStep2: { ru: 'Войди и открой курс', en: 'Sign in and open the course', tr: 'Giriş yap ve kursu aç' },
+  landStep3: { ru: 'Тренируйся и держи серию', en: 'Train and keep your streak', tr: 'Antren yap ve seriyi koru' },
+  landPrivacyNote: { ru: 'Мы храним только логин и прогресс. Курсы открываются только по коду тренера.', en: 'We store only your login and progress. Courses open only with a trainer code.', tr: 'Yalnızca kullanıcı adını ve ilerlemeyi saklarız. Kurslar yalnızca kodla açılır.' },
+
+  // ---------- Friends (local) ----------
+  friends: { ru: 'Друзья', en: 'Friends', tr: 'Arkadaşlar' },
+  friendsTagline: { ru: 'Рядом с кем-то ты перформишь лучше. Соревнуйся сериями и поддерживай друг друга.', en: 'You perform better alongside others. Compete on streaks and cheer each other on.', tr: 'Başkalarıyla daha iyi performans. Serilerde yarış ve birbirinizi destekleyin.' },
+  friendsLeaderboard: { ru: 'Таблица недели', en: "This week's board", tr: 'Bu haftanın tablosu' },
+  friendsYou: { ru: 'Ты', en: 'You', tr: 'Sen' },
+  friendsAdd: { ru: 'Добавить друга', en: 'Add friend', tr: 'Arkadaş ekle' },
+  friendNamePh: { ru: 'Имя друга / @логин', en: 'Friend name / @username', tr: 'Arkadaş adı / @kullanıcı' },
+  friendsEmpty: { ru: 'Пока никого. Добавь друга — и держите серию вместе.', en: 'No one yet. Add a friend and keep the streak together.', tr: 'Henüz kimse yok. Arkadaş ekle ve seriyi birlikte koruyun.' },
+  togetherEffect: { ru: 'Эффект «рядом»', en: '“Together” effect', tr: '“Birlikte” etkisi' },
+  togetherEffectDesc: { ru: 'активных друзей на этой неделе — держитесь вместе 💪', en: 'active friends this week — keep it up together 💪', tr: 'bu hafta aktif arkadaş — birlikte devam 💪' },
+  cheer: { ru: 'Поддержать', en: 'Cheer', tr: 'Destekle' },
+  cheered: { ru: 'Поддержано', en: 'Cheered', tr: 'Desteklendi' },
+  localDemoNote: { ru: 'Демо: друзья и активность хранятся на этом устройстве. Синхронизация между людьми появится с общей базой.', en: 'Demo: friends and activity are stored on this device. Cross-person sync comes with the shared backend.', tr: 'Demo: arkadaşlar ve aktivite bu cihazda saklanır. Kişiler arası senkron ortak sunucuyla gelir.' },
+
+  // ---------- Chat / video circles ----------
+  trainingChat: { ru: 'Чат тренировки', en: 'Training chat', tr: 'Antrenman sohbeti' },
+  recordCircle: { ru: 'Записать кружочек', en: 'Record a circle', tr: 'Daire kaydet' },
+  recording: { ru: 'Запись…', en: 'Recording…', tr: 'Kaydediliyor…' },
+  stopRec: { ru: 'Стоп', en: 'Stop', tr: 'Dur' },
+  sendCircle: { ru: 'Отправить', en: 'Send', tr: 'Gönder' },
+  cancelRec: { ru: 'Отмена', en: 'Cancel', tr: 'İptal' },
+  circleHint: { ru: 'Короткое видео о тренировке — как в Telegram', en: 'A short training video — like in Telegram', tr: 'Kısa antrenman videosu — Telegram gibi' },
+  cameraDenied: { ru: 'Нет доступа к камере', en: 'No camera access', tr: 'Kamera erişimi yok' },
 } as const;
 
 export type StringKey = keyof typeof dict;

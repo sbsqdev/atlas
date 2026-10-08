@@ -3,10 +3,12 @@ import { useAuth } from './store/useAuth';
 import { useStore } from './store/useStore';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import Landing from './pages/Landing';
 import StudentHome from './pages/StudentHome';
 import Calculators from './pages/Calculators';
 import Achievements from './pages/Achievements';
 import Profile from './pages/Profile';
+import Friends from './pages/Friends';
 import Legal from './pages/Legal';
 import CourseView from './pages/CourseView';
 import WorkoutView from './pages/WorkoutView';
@@ -39,7 +41,8 @@ function RequireCourseAccess({ children }: { children: ReactNode }) {
 
 function Home() {
   const user = useAuth((s) => s.user);
-  if (!user) return <Navigate to="/login" replace />;
+  // Logged-out visitors get the public marketing landing page (no personal data).
+  if (!user) return <Landing />;
   return <Navigate to={user.role === 'trainer' ? '/dashboard' : '/home'} replace />;
 }
 
@@ -58,6 +61,7 @@ export default function App() {
       <Route path="/home" element={<RequireAuth role="student">{page(<StudentHome />)}</RequireAuth>} />
       <Route path="/achievements" element={<RequireAuth role="student">{page(<Achievements />)}</RequireAuth>} />
       <Route path="/profile" element={<RequireAuth role="student">{page(<Profile />)}</RequireAuth>} />
+      <Route path="/friends" element={<RequireAuth role="student">{page(<Friends />)}</RequireAuth>} />
       <Route path="/calculators" element={<RequireAuth>{page(<Calculators />)}</RequireAuth>} />
 
       <Route path="/course/:courseId" element={<RequireCourseAccess>{page(<CourseView />)}</RequireCourseAccess>} />

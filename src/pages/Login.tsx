@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { DEMO_COACH, DEMO_STUDENT } from '../data/seed';
@@ -15,13 +15,14 @@ export default function Login() {
   const lang = useAuth((s) => s.lang);
   const setLang = useAuth((s) => s.setLang);
   const navigate = useNavigate();
+  const nav = (useLocation().state ?? {}) as { mode?: Mode; role?: Role; code?: string };
 
-  const [mode, setMode] = useState<Mode>('in');
-  const [role, setRole] = useState<Role>('student');
+  const [mode, setMode] = useState<Mode>(nav.mode ?? 'in');
+  const [role, setRole] = useState<Role>(nav.role ?? 'student');
   const [username, setUsername] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(nav.code ?? '');
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
