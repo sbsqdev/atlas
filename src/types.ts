@@ -158,10 +158,36 @@ export interface Workout {
   exercises: Exercise[];
 }
 
+/** How the course is delivered. Offline/hybrid trainers (e.g. a Pilates studio
+ *  teaching in person) use the same tools — courses, 3D atlas, and especially
+ *  post-session surveys — without needing videos. */
+export type CourseFormat = 'online' | 'offline' | 'hybrid';
+
+/** A participant's answers to the post-session survey. Lets an in-person
+ *  trainer (or a whole gym) understand how the group felt after a live class. */
+export interface SurveyResponse {
+  id: string;
+  workoutId: string;
+  courseId: string;
+  userId: string;
+  userName: string;
+  /** Perceived exertion / difficulty, 1 (easy) … 10 (max). */
+  rpe: number;
+  /** Mood / how they felt, 1 (bad) … 5 (great). */
+  mood: number;
+  /** Muscles the participant marked as worked / sore, picked on the body atlas. */
+  soreMuscles: MuscleId[];
+  /** Free note to the trainer. */
+  note?: string;
+  createdAt: number;
+}
+
 /** A course = a trainer's program made of workouts. */
 export interface Course {
   id: string;
   trainerId: string;
+  /** Delivery format; defaults to 'online' when unset. */
+  format?: CourseFormat;
   title: Bi;
   summary: Bi;
   level: Bi;

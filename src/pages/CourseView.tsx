@@ -28,7 +28,7 @@ export default function CourseView() {
         <span>{tr(course.title)}</span>
       </div>
 
-      <h1>{tr(course.title)}</h1>
+      <h1>{tr(course.title)} {(course.format === 'offline' || course.format === 'hybrid') && <span className="live-badge">{t('liveBadge')}</span>}</h1>
       {coach && (
         <p style={{ margin: '0 0 6px', color: 'var(--muted)' }}>
           {t('by')}: <strong style={{ color: coach.brandColor || 'var(--accent)' }}>{coach.brandName || coach.name}</strong>

@@ -342,6 +342,14 @@ export default function CourseEditor() {
 
       <div className="card" style={{ marginBottom: 24 }}>
         <BiField label={t('title')} value={course.title} onChange={(title) => updateCourse(course.id, { title })} />
+        <div className="field">
+          <label>{t('formatLabel')}</label>
+          <select value={course.format ?? 'online'} onChange={(e) => updateCourse(course.id, { format: e.target.value as 'online' | 'offline' | 'hybrid' })}>
+            <option value="online">{t('formatOnline')}</option>
+            <option value="offline">{t('formatOffline')}</option>
+            <option value="hybrid">{t('formatHybrid')}</option>
+          </select>
+        </div>
         <BiField label={t('level')} value={course.level} onChange={(level) => updateCourse(course.id, { level })} />
         <BiField
           label={t('summary')}

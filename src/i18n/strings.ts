@@ -426,6 +426,33 @@ const dict = {
   addMembers: { ru: 'Добавь друзей в клан', en: 'Add friends to the clan', tr: 'Arkadaş ekle' },
   clanGoalLine: { ru: 'Цель недели клана', en: 'Clan weekly goal', tr: 'Klan haftalık hedefi' },
 
+  // ---------- Course format (online / offline / gym) ----------
+  formatLabel: { ru: 'Формат курса', en: 'Course format', tr: 'Kurs biçimi' },
+  formatOnline: { ru: 'Онлайн', en: 'Online', tr: 'Çevrimiçi' },
+  formatOffline: { ru: 'Вживую (офлайн)', en: 'In person (offline)', tr: 'Yüz yüze (çevrimdışı)' },
+  formatHybrid: { ru: 'Онлайн + вживую', en: 'Online + in person', tr: 'Çevrimiçi + yüz yüze' },
+  liveBadge: { ru: '📍 Вживую', en: '📍 In person', tr: '📍 Yüz yüze' },
+
+  // ---------- Post-session survey (анкета) ----------
+  survey: { ru: 'Анкета после тренировки', en: 'Post-session survey', tr: 'Antrenman sonrası anket' },
+  surveyHint: { ru: 'Расскажи тренеру, как прошло — отметь самочувствие, сложность и где была нагрузка на теле.', en: 'Tell your trainer how it went — mark how you felt, the difficulty and where you felt the load on your body.', tr: 'Antrenörüne nasıl geçtiğini anlat — nasıl hissettiğini, zorluğu ve vücudunda yükü nerede hissettiğini işaretle.' },
+  surveyMood: { ru: 'Как самочувствие?', en: 'How do you feel?', tr: 'Nasıl hissediyorsun?' },
+  surveyRpe: { ru: 'Насколько было тяжело? (1–10)', en: 'How hard was it? (1–10)', tr: 'Ne kadar zordu? (1–10)' },
+  surveySore: { ru: 'Где была нагрузка / что болит? Отметь на теле', en: 'Where did you feel it / what is sore? Mark it on the body', tr: 'Nerede hissettin / neresi ağrıyor? Vücutta işaretle' },
+  surveyNote: { ru: 'Комментарий тренеру', en: 'Note to the trainer', tr: 'Antrenöre not' },
+  surveyNotePh: { ru: 'напр. поясница немного тянет, колено ок', en: 'e.g. lower back a bit tight, knee ok', tr: 'ör. bel biraz gergin, diz iyi' },
+  surveySubmit: { ru: 'Отправить анкету', en: 'Submit survey', tr: 'Anketi gönder' },
+  surveyThanks: { ru: 'Спасибо! Твой ответ отправлен тренеру ✅', en: 'Thanks! Your answer was sent to the trainer ✅', tr: 'Teşekkürler! Yanıtın antrenöre gönderildi ✅' },
+  surveyEdit: { ru: 'Изменить ответ', en: 'Edit answer', tr: 'Yanıtı düzenle' },
+  // trainer summary
+  surveyResults: { ru: 'Ответы участников', en: 'Participant responses', tr: 'Katılımcı yanıtları' },
+  surveyCount: { ru: 'ответов', en: 'responses', tr: 'yanıt' },
+  surveyAvgRpe: { ru: 'Средняя сложность', en: 'Avg difficulty', tr: 'Ort. zorluk' },
+  surveyAvgMood: { ru: 'Средн. самочувствие', en: 'Avg mood', tr: 'Ort. ruh hali' },
+  surveyTopSore: { ru: 'Чаще всего нагружено', en: 'Most-loaded areas', tr: 'En çok yüklenen bölgeler' },
+  surveyNoResponses: { ru: 'Пока нет ответов. Попроси участников пройти анкету после тренировки.', en: 'No responses yet. Ask participants to fill the survey after the session.', tr: 'Henüz yanıt yok. Katılımcılardan antrenman sonrası anketi doldurmalarını iste.' },
+  surveyComments: { ru: 'Комментарии', en: 'Comments', tr: 'Yorumlar' },
+
   // ---------- Trainer terms (per-course) ----------
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
   trainerTermsHint: { ru: 'Стоимость, срок доступа, возвраты и контакты определяет тренер этого курса. Платформа предоставляет только сервис — см. Оферту и Политику платформы в футере.', en: 'Price, access length, refunds and contacts are set by this course’s trainer. The platform provides the service only — see the platform Offer & Policy in the footer.', tr: 'Fiyat, erişim süresi, iadeler ve iletişim bu kursun antrenörü tarafından belirlenir. Platform yalnızca hizmet sağlar.' },

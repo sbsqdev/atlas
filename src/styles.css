@@ -689,3 +689,20 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .terms-card { margin-top: 20px; }
 .terms-card h2 { font-size: 17px; }
 .terms-text { white-space: pre-wrap; line-height: 1.6; color: var(--text); margin: 0 0 12px; }
+
+/* ---------- Course format / survey ---------- */
+.live-badge { font-size: 13px; font-weight: 700; color: var(--sand); background: rgba(245,158,11,0.16); padding: 3px 11px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+.survey-block { margin-top: 30px; max-width: 760px; }
+.survey-field { margin: 16px 0; }
+.survey-field > label { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.mood-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mood-btn { width: 52px; height: 52px; border-radius: 14px; border: 1px solid var(--border-strong); background: var(--panel); font-size: 26px; cursor: pointer; transition: all 0.12s; }
+.mood-btn.on { border-color: var(--accent); background: var(--accent-dim); box-shadow: var(--ring); transform: translateY(-2px); }
+.rpe-range { width: 100%; accent-color: var(--accent); }
+.survey-atlas { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
+.survey-atlas .viewer.anatomy { height: 360px; }
+.survey-done { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 16px; font-weight: 600; color: var(--accent-2); }
+.survey-comments { display: flex; flex-direction: column; gap: 9px; }
+.survey-comment { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 13px; font-size: 14px; }
+.survey-comment b { color: var(--text); }
+@media (max-width: 760px) { .survey-atlas { grid-template-columns: 1fr; } .survey-atlas .viewer.anatomy { height: 300px; } }

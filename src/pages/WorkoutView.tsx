@@ -6,6 +6,7 @@ import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
 import CommentThread from '../components/CommentThread';
+import SurveyBlock from '../components/SurveyBlock';
 import { useBrandStyle } from '../components/useBrandStyle';
 import type { MuscleId } from '../types';
 
@@ -38,6 +39,8 @@ export default function WorkoutView() {
 
   const selectedExercise = workout.exercises.find((e) => e.id === selected);
   const isDone = completedFor(course.id).includes(workout.id);
+  const isOwner = user?.role === 'trainer' && course.trainerId === user.id;
+  const isLive = course.format === 'offline' || course.format === 'hybrid';
 
   return (
     <div style={brand}>
@@ -49,7 +52,7 @@ export default function WorkoutView() {
 
       <div className="toolbar">
         <div>
-          <h1 style={{ margin: 0 }}>{tr(workout.title)}</h1>
+          <h1 style={{ margin: 0 }}>{tr(workout.title)} {isLive && <span className="live-badge">{t('liveBadge')}</span>}</h1>
           <p className="sub" style={{ margin: '4px 0 0' }}>
             {isAggregate ? t('workoutMuscleMap') : tr(selectedExercise?.name)}
           </p>
@@ -108,6 +111,8 @@ export default function WorkoutView() {
           </div>
         </div>
       </div>
+
+      <SurveyBlock courseId={course.id} workoutId={workout.id} isOwner={!!isOwner} />
 
       <CommentThread threadKey={`workout:${workout.id}`} title={t('trainingChat')} />
     </div>
