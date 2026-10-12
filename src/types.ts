@@ -193,6 +193,9 @@ export interface Review {
   /** 1…5 stars. */
   rating: number;
   text: string;
+  /** Questionnaire answers (used for per-workout reviews). */
+  recommend?: boolean;
+  difficultyFit?: 'easy' | 'ok' | 'hard';
   createdAt: number;
 }
 

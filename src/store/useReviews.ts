@@ -6,7 +6,7 @@ import type { Review } from '../types';
  *  every visitor sees them). One review per student per course, editable. */
 interface ReviewsState {
   reviews: Review[];
-  submit: (r: { courseId: string; workoutId?: string; userId: string; userName: string; rating: number; text: string }) => void;
+  submit: (r: { courseId: string; workoutId?: string; userId: string; userName: string; rating: number; text: string; recommend?: boolean; difficultyFit?: 'easy' | 'ok' | 'hard' }) => void;
   remove: (id: string) => void;
   forScope: (courseId: string, workoutId?: string) => Review[];
   mine: (courseId: string, userId: string, workoutId?: string) => Review | undefined;
@@ -23,8 +23,8 @@ export const useReviews = create<ReviewsState>()(
     (set, get) => ({
       reviews: SEED,
       submit: (r) => {
+        if (r.rating < 1) return;
         const text = r.text.trim();
-        if (!text || r.rating < 1) return;
         const review: Review = { id: `rv-${Date.now().toString(36)}`, createdAt: Date.now(), ...r, text };
         set((s) => ({
           reviews: [...s.reviews.filter((x) => !(x.courseId === r.courseId && x.workoutId === r.workoutId && x.userId === r.userId)), review],

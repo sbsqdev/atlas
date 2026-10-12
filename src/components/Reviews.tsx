@@ -30,8 +30,12 @@ export default function Reviews({ courseId, workoutId, canReview, title }: { cou
   const remove = useReviews((s) => s.remove);
   const mine = user ? reviews.find((r) => r.userId === user.id) : undefined;
 
+  // Per-workout reviews are a short questionnaire (rating + quick questions).
+  const questionnaire = !!workoutId;
   const [rating, setRating] = useState(mine?.rating ?? 5);
   const [text, setText] = useState(mine?.text ?? '');
+  const [recommend, setRecommend] = useState<boolean | undefined>(mine?.recommend);
+  const [difficulty, setDifficulty] = useState<'easy' | 'ok' | 'hard' | undefined>(mine?.difficultyFit);
   const [editing, setEditing] = useState(false);
 
   const { avg, count } = useMemo(() => {
@@ -41,10 +45,12 @@ export default function Reviews({ courseId, workoutId, canReview, title }: { cou
   }, [reviews]);
 
   const send = () => {
-    if (!user || !text.trim()) return;
-    submit({ courseId, workoutId, userId: user.id, userName: user.name, rating, text });
+    if (!user) return;
+    if (!questionnaire && !text.trim()) return; // course review needs text
+    submit({ courseId, workoutId, userId: user.id, userName: user.name, rating, text, recommend, difficultyFit: difficulty });
     setEditing(false);
   };
+  const DIFF_LABEL = { easy: t('diffEasy'), ok: t('diffOk'), hard: t('diffHard') };
 
   return (
     <div className="card reviews-card">
@@ -69,7 +75,14 @@ export default function Reviews({ courseId, workoutId, canReview, title }: { cou
               <span className="review-time">{timeAgo(r.createdAt)}</span>
               {user?.id === r.userId && <button className="btn ghost small" onClick={() => remove(r.id)}>🗑</button>}
             </div>
-            <div className="review-text">{r.text}</div>
+            {(r.recommend !== undefined || r.difficultyFit) && (
+              <div className="review-tags">
+                {r.recommend === true && <span className="rtag ok">{t('recommendBadge')}</span>}
+                {r.recommend === false && <span className="rtag no">{t('qNo')}</span>}
+                {r.difficultyFit && <span className="rtag">💪 {DIFF_LABEL[r.difficultyFit]}</span>}
+              </div>
+            )}
+            {r.text && <div className="review-text">{r.text}</div>}
           </div>
         ))}
       </div>
@@ -86,10 +99,31 @@ export default function Reviews({ courseId, workoutId, canReview, title }: { cou
               <label>{t('reviewRating')}</label>
               <Stars value={rating} onPick={setRating} />
             </div>
+
+            {questionnaire && (
+              <>
+                <div className="field" style={{ marginBottom: 10 }}>
+                  <label>{t('qRecommend')}</label>
+                  <div className="pick-row">
+                    <button className={`pick-btn${recommend === true ? ' on' : ''}`} onClick={() => setRecommend(true)}>{t('qYes')}</button>
+                    <button className={`pick-btn${recommend === false ? ' on' : ''}`} onClick={() => setRecommend(false)}>{t('qNo')}</button>
+                  </div>
+                </div>
+                <div className="field" style={{ marginBottom: 10 }}>
+                  <label>{t('qDifficulty')}</label>
+                  <div className="pick-row">
+                    {(['easy', 'ok', 'hard'] as const).map((d) => (
+                      <button key={d} className={`pick-btn${difficulty === d ? ' on' : ''}`} onClick={() => setDifficulty(d)}>{DIFF_LABEL[d]}</button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
             <div className="field">
-              <textarea value={text} placeholder={t('reviewTextPh')} onChange={(e) => setText(e.target.value)} />
+              <textarea value={text} placeholder={questionnaire ? t('workoutReviewPh') : t('reviewTextPh')} onChange={(e) => setText(e.target.value)} />
             </div>
-            <button className="btn primary" disabled={!text.trim()} onClick={send}>{t('reviewSubmit')}</button>
+            <button className="btn primary" disabled={!questionnaire && !text.trim()} onClick={send}>{t('reviewSubmit')}</button>
           </div>
         )
       )}

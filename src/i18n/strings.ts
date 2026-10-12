@@ -467,6 +467,14 @@ const dict = {
   reviewCount: { ru: 'отзывов', en: 'reviews', tr: 'yorum' },
   workoutReviews: { ru: 'Отзывы о тренировке', en: 'Reviews of this training', tr: 'Bu antrenman yorumları' },
   workoutReviewPh: { ru: 'Как зашла тренировка? Что было тяжело/классно?', en: 'How was this training? What was hard / great?', tr: 'Bu antrenman nasıldı? Ne zordu / harikaydı?' },
+  qRecommend: { ru: 'Порекомендуешь эту тренировку?', en: 'Would you recommend this training?', tr: 'Bu antrenmanı önerir misin?' },
+  qYes: { ru: 'Да 👍', en: 'Yes 👍', tr: 'Evet 👍' },
+  qNo: { ru: 'Нет 👎', en: 'No 👎', tr: 'Hayır 👎' },
+  qDifficulty: { ru: 'Как сложность?', en: 'How was the difficulty?', tr: 'Zorluk nasıldı?' },
+  diffEasy: { ru: 'Легко', en: 'Easy', tr: 'Kolay' },
+  diffOk: { ru: 'В самый раз', en: 'Just right', tr: 'Tam kıvamında' },
+  diffHard: { ru: 'Тяжело', en: 'Hard', tr: 'Zor' },
+  recommendBadge: { ru: '👍 рекомендует', en: '👍 recommends', tr: '👍 öneriyor' },
 
   // ---------- Trainer terms (per-course) ----------
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
