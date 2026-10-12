@@ -7,6 +7,7 @@ import { MUSCLE_BY_ID } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
 import CommentThread from '../components/CommentThread';
 import SurveyBlock from '../components/SurveyBlock';
+import Reviews from '../components/Reviews';
 import { useBrandStyle } from '../components/useBrandStyle';
 import type { MuscleId } from '../types';
 
@@ -113,6 +114,8 @@ export default function WorkoutView() {
       </div>
 
       <SurveyBlock courseId={course.id} workoutId={workout.id} isOwner={!!isOwner} />
+
+      <Reviews courseId={course.id} workoutId={workout.id} canReview={user?.role === 'student'} title={t('workoutReviews')} />
 
       <CommentThread threadKey={`workout:${workout.id}`} title={t('trainingChat')} />
     </div>

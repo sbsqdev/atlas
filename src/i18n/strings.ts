@@ -465,6 +465,8 @@ const dict = {
   reviewThanks: { ru: 'Спасибо за отзыв! 💜', en: 'Thanks for your review! 💜', tr: 'Yorumun için teşekkürler! 💜' },
   reviewOutOf: { ru: 'из 5', en: 'out of 5', tr: '/ 5' },
   reviewCount: { ru: 'отзывов', en: 'reviews', tr: 'yorum' },
+  workoutReviews: { ru: 'Отзывы о тренировке', en: 'Reviews of this training', tr: 'Bu antrenman yorumları' },
+  workoutReviewPh: { ru: 'Как зашла тренировка? Что было тяжело/классно?', en: 'How was this training? What was hard / great?', tr: 'Bu antrenman nasıldı? Ne zordu / harikaydı?' },
 
   // ---------- Trainer terms (per-course) ----------
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },

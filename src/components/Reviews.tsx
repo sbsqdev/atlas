@@ -22,10 +22,10 @@ function timeAgo(ts: number): string {
 
 /** Public course reviews with an average rating and a leave-review form for
  *  enrolled students (the owning trainer only reads them). */
-export default function Reviews({ courseId, canReview }: { courseId: string; canReview: boolean }) {
+export default function Reviews({ courseId, workoutId, canReview, title }: { courseId: string; workoutId?: string; canReview: boolean; title?: string }) {
   const { t } = useT();
   const user = useAuth((s) => s.user);
-  const reviews = useReviews((s) => s.reviews.filter((r) => r.courseId === courseId));
+  const reviews = useReviews((s) => s.reviews.filter((r) => r.courseId === courseId && r.workoutId === workoutId));
   const submit = useReviews((s) => s.submit);
   const remove = useReviews((s) => s.remove);
   const mine = user ? reviews.find((r) => r.userId === user.id) : undefined;
@@ -42,14 +42,14 @@ export default function Reviews({ courseId, canReview }: { courseId: string; can
 
   const send = () => {
     if (!user || !text.trim()) return;
-    submit({ courseId, userId: user.id, userName: user.name, rating, text });
+    submit({ courseId, workoutId, userId: user.id, userName: user.name, rating, text });
     setEditing(false);
   };
 
   return (
     <div className="card reviews-card">
       <div className="reviews-head">
-        <h2 style={{ margin: 0 }}>💬 {t('reviews')}</h2>
+        <h2 style={{ margin: 0 }}>💬 {title ?? t('reviews')}</h2>
         {count > 0 && (
           <div className="reviews-avg">
             <Stars value={Math.round(avg)} />

@@ -186,6 +186,8 @@ export interface SurveyResponse {
 export interface Review {
   id: string;
   courseId: string;
+  /** Set for a review of ONE workout; empty for a whole-course review. */
+  workoutId?: string;
   userId: string;
   userName: string;
   /** 1…5 stars. */
