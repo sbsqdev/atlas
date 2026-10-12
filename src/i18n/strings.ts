@@ -453,6 +453,19 @@ const dict = {
   surveyNoResponses: { ru: 'Пока нет ответов. Попроси участников пройти анкету после тренировки.', en: 'No responses yet. Ask participants to fill the survey after the session.', tr: 'Henüz yanıt yok. Katılımcılardan antrenman sonrası anketi doldurmalarını iste.' },
   surveyComments: { ru: 'Комментарии', en: 'Comments', tr: 'Yorumlar' },
 
+  // ---------- Reviews (public course testimonials) ----------
+  reviews: { ru: 'Отзывы', en: 'Reviews', tr: 'Yorumlar' },
+  reviewsNone: { ru: 'Пока нет отзывов. Стань первым!', en: 'No reviews yet. Be the first!', tr: 'Henüz yorum yok. İlk sen ol!' },
+  reviewLeave: { ru: 'Оставить отзыв', en: 'Leave a review', tr: 'Yorum bırak' },
+  reviewYours: { ru: 'Твой отзыв', en: 'Your review', tr: 'Senin yorumun' },
+  reviewRating: { ru: 'Оценка', en: 'Rating', tr: 'Puan' },
+  reviewTextPh: { ru: 'Что понравилось, что изменилось? Помоги другим выбрать 🙌', en: 'What did you like, what changed? Help others choose 🙌', tr: 'Neyi beğendin, ne değişti? Başkalarına yardım et 🙌' },
+  reviewSubmit: { ru: 'Опубликовать', en: 'Publish', tr: 'Yayınla' },
+  reviewEdit: { ru: 'Изменить', en: 'Edit', tr: 'Düzenle' },
+  reviewThanks: { ru: 'Спасибо за отзыв! 💜', en: 'Thanks for your review! 💜', tr: 'Yorumun için teşekkürler! 💜' },
+  reviewOutOf: { ru: 'из 5', en: 'out of 5', tr: '/ 5' },
+  reviewCount: { ru: 'отзывов', en: 'reviews', tr: 'yorum' },
+
   // ---------- Trainer terms (per-course) ----------
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
   trainerTermsHint: { ru: 'Стоимость, срок доступа, возвраты и контакты определяет тренер этого курса. Платформа предоставляет только сервис — см. Оферту и Политику платформы в футере.', en: 'Price, access length, refunds and contacts are set by this course’s trainer. The platform provides the service only — see the platform Offer & Policy in the footer.', tr: 'Fiyat, erişim süresi, iadeler ve iletişim bu kursun antrenörü tarafından belirlenir. Platform yalnızca hizmet sağlar.' },

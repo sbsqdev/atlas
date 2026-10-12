@@ -182,6 +182,18 @@ export interface SurveyResponse {
   createdAt: number;
 }
 
+/** A public review / testimonial a student leaves on a course (social proof). */
+export interface Review {
+  id: string;
+  courseId: string;
+  userId: string;
+  userName: string;
+  /** 1…5 stars. */
+  rating: number;
+  text: string;
+  createdAt: number;
+}
+
 /** A course = a trainer's program made of workouts. */
 export interface Course {
   id: string;

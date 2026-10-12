@@ -4,6 +4,7 @@ import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
 import { useBrandStyle } from '../components/useBrandStyle';
+import Reviews from '../components/Reviews';
 import type { MuscleId } from '../types';
 
 export default function CourseView() {
@@ -66,6 +67,8 @@ export default function CourseView() {
           <p className="muted-sm">{t('trainerTermsHint')}</p>
         </div>
       )}
+
+      <Reviews courseId={course.id} canReview={user?.role === 'student'} />
     </div>
   );
 }
