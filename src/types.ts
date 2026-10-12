@@ -158,6 +158,27 @@ export interface Workout {
   exercises: Exercise[];
 }
 
+/** A question in a trainer-authored feedback form. */
+export type QuestionType = 'text' | 'rating' | 'yesno' | 'choice';
+export interface SurveyQuestion {
+  id: string;
+  text: string;
+  type: QuestionType;
+  /** Options for a 'choice' question. */
+  options?: string[];
+}
+
+/** One participant's answers to a course's feedback form. */
+export interface FeedbackResponse {
+  id: string;
+  courseId: string;
+  userId: string;
+  userName: string;
+  /** questionId -> answer (text, star number, yes/no, or chosen option). */
+  answers: Record<string, string | number | boolean>;
+  createdAt: number;
+}
+
 /** How the course is delivered. Offline/hybrid trainers (e.g. a Pilates studio
  *  teaching in person) use the same tools — courses, 3D atlas, and especially
  *  post-session surveys — without needing videos. */
@@ -216,6 +237,8 @@ export interface Course {
   /** The trainer's OWN terms for this course (price, access length, refunds,
    *  contacts). Each trainer sets their own; separate from the platform policy. */
   terms?: string;
+  /** Trainer-authored feedback questionnaire (list of questions) students fill. */
+  feedbackForm?: SurveyQuestion[];
   workouts: Workout[];
 }
 

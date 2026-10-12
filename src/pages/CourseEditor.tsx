@@ -5,6 +5,7 @@ import { useAuth } from '../store/useAuth';
 import { useT } from '../i18n/useT';
 import { MUSCLES } from '../data/muscles';
 import AnatomyPanel from '../components/AnatomyPanel';
+import { FeedbackBuilder } from '../components/FeedbackForm';
 import { useAtlas } from '../anatomy/useAtlas';
 import { inferMuscles } from '../lib/inferMuscles';
 import type { Bi, Exercise, MuscleId, Workout } from '../types';
@@ -368,6 +369,8 @@ export default function CourseEditor() {
       </div>
 
       <CourseStudents courseId={course.id} />
+
+      <FeedbackBuilder courseId={course.id} />
 
       <div className="toolbar">
         <h2 style={{ margin: 0 }}>{t('workoutsTitle')}</h2>

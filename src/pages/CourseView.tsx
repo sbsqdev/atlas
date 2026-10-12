@@ -5,6 +5,7 @@ import { useT } from '../i18n/useT';
 import { MUSCLE_BY_ID } from '../data/muscles';
 import { useBrandStyle } from '../components/useBrandStyle';
 import Reviews from '../components/Reviews';
+import { FeedbackSection } from '../components/FeedbackForm';
 import type { MuscleId } from '../types';
 
 export default function CourseView() {
@@ -67,6 +68,8 @@ export default function CourseView() {
           <p className="muted-sm">{t('trainerTermsHint')}</p>
         </div>
       )}
+
+      <FeedbackSection courseId={course.id} isOwner={user?.role === 'trainer' && course.trainerId === user.id} />
 
       <Reviews courseId={course.id} canReview={user?.role === 'student'} />
     </div>

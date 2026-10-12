@@ -476,6 +476,24 @@ const dict = {
   diffHard: { ru: 'Тяжело', en: 'Hard', tr: 'Zor' },
   recommendBadge: { ru: '👍 рекомендует', en: '👍 recommends', tr: '👍 öneriyor' },
 
+  // ---------- Trainer feedback form (question builder) ----------
+  feedbackForm: { ru: 'Анкета от тренера', en: 'Trainer feedback form', tr: 'Antrenör anketi' },
+  feedbackBuilder: { ru: 'Анкета для сбора отзывов', en: 'Feedback questionnaire', tr: 'Geri bildirim anketi' },
+  feedbackBuilderHint: { ru: 'Составь список вопросов — ученики ответят, а ты увидишь все ответы.', en: 'Build a list of questions — students answer and you see all responses.', tr: 'Soru listesi oluştur — öğrenciler yanıtlar, sen tüm yanıtları görürsün.' },
+  addQuestion: { ru: 'Добавить вопрос', en: 'Add question', tr: 'Soru ekle' },
+  questionTextPh: { ru: 'Текст вопроса, напр. «Что улучшить?»', en: 'Question text, e.g. “What to improve?”', tr: 'Soru metni, ör. “Ne geliştirilmeli?”' },
+  qTypeText: { ru: 'Текст', en: 'Text', tr: 'Metin' },
+  qTypeRating: { ru: 'Оценка ★', en: 'Rating ★', tr: 'Puan ★' },
+  qTypeYesno: { ru: 'Да / Нет', en: 'Yes / No', tr: 'Evet / Hayır' },
+  qTypeChoice: { ru: 'Выбор', en: 'Choice', tr: 'Seçim' },
+  optionsPh: { ru: 'Варианты через запятую', en: 'Options, comma-separated', tr: 'Seçenekler, virgülle' },
+  feedbackFill: { ru: 'Пройти анкету тренера', en: 'Fill the trainer’s form', tr: 'Antrenör anketini doldur' },
+  feedbackSubmit: { ru: 'Отправить ответы', en: 'Submit answers', tr: 'Yanıtları gönder' },
+  feedbackThanks: { ru: 'Спасибо! Ответы отправлены тренеру ✅', en: 'Thanks! Answers sent to the trainer ✅', tr: 'Teşekkürler! Yanıtlar antrenöre gönderildi ✅' },
+  feedbackResponses: { ru: 'Ответы на анкету', en: 'Form responses', tr: 'Anket yanıtları' },
+  feedbackNoForm: { ru: 'Тренер ещё не создал анкету.', en: 'The trainer has not created a form yet.', tr: 'Antrenör henüz anket oluşturmadı.' },
+  feedbackNoResp: { ru: 'Пока нет ответов на анкету.', en: 'No form responses yet.', tr: 'Henüz anket yanıtı yok.' },
+
   // ---------- Trainer terms (per-course) ----------
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
   trainerTermsHint: { ru: 'Стоимость, срок доступа, возвраты и контакты определяет тренер этого курса. Платформа предоставляет только сервис — см. Оферту и Политику платформы в футере.', en: 'Price, access length, refunds and contacts are set by this course’s trainer. The platform provides the service only — see the platform Offer & Policy in the footer.', tr: 'Fiyat, erişim süresi, iadeler ve iletişim bu kursun antrenörü tarafından belirlenir. Platform yalnızca hizmet sağlar.' },
