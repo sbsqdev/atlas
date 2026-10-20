@@ -155,6 +155,12 @@ const demoCourse: Course = {
     tr: 'Platformu keşfetmek için örnek program: temel hareketlerle 3 tam vücut antrenmanı.',
   },
   level: { ru: 'Начальный', en: 'Beginner', tr: 'Başlangıç' },
+  terms: 'Демо-условия: это пример курса. Стоимость, срок доступа и оплату тренер указывает здесь. Контакт: @demo',
+  feedbackForm: [
+    { id: 'q1', text: 'Что понравилось в курсе?', type: 'text' },
+    { id: 'q2', text: 'Оцени программу', type: 'rating' },
+    { id: 'q3', text: 'Удобный формат занятий?', type: 'choice', options: ['Онлайн', 'Вживую', 'Смешанный'] },
+  ],
   workouts: [
     {
       id: uid('wk'),
@@ -191,6 +197,11 @@ const demoCourse: Course = {
 };
 
 export const COURSES: Course[] = [demoCourse];
+
+// Stable ids other seed data (surveys, feedback) reference.
+export const DEMO_COURSE_ID = demoCourse.id;
+export const DEMO_TRAINER_ID = 'trainer-demo';
+export const DEMO_WORKOUT_ID = demoCourse.workouts[0].id;
 
 // ---------------------------------------------------------------------------
 // Seed accounts — a neutral demo coach (owns the demo course) and a demo
