@@ -6,7 +6,10 @@ import { hash } from './hash';
 import { useStore } from './useStore';
 import { todayKey } from '../lib/habits';
 
-const VERSION = 4;
+const VERSION = 5;
+
+/** Old seed account ids to retire on migration (e.g. the removed demo trainer). */
+const OLD_SEED_ACCOUNT_IDS = ['trainer-rauana'];
 
 type Result = { ok: boolean; error?: 'emailTaken' | 'usernameTaken' | 'wrongCredentials' | 'fillFields' | 'codeInvalid' | 'alreadyEnrolled' | 'consentRequired' };
 
@@ -378,19 +381,21 @@ export const useAuth = create<AuthState>()(
     {
       name: 'human-atlas-auth',
       version: VERSION,
-      // PRESERVE user data across version bumps: keep every persisted account,
-      // course progress, habit and goal; only add seed accounts that are missing.
-      // (Never wipe — returning users must keep their history.)
+      // Keep every USER-created account and all progress, but refresh the demo
+      // accounts to the current seed (so a renamed/removed demo trainer updates
+      // for returning users). User history (progress/habits/goals) is preserved.
       migrate: (persisted) => {
         const p = (persisted ?? {}) as Partial<AuthState>;
-        const existing = p.accounts ?? [];
-        const ids = new Set(existing.map((a) => a.id));
-        const accounts = existing.length
-          ? [...existing, ...SEED_ACCOUNTS.filter((a) => !ids.has(a.id))]
-          : SEED_ACCOUNTS;
+        const seedIds = new Set(SEED_ACCOUNTS.map((a) => a.id));
+        const drop = new Set([...OLD_SEED_ACCOUNT_IDS, ...seedIds]);
+        const userAccounts = (p.accounts ?? []).filter((a) => !drop.has(a.id));
+        const accounts = [...SEED_ACCOUNTS, ...userAccounts];
+        // If the person was signed in as a retired demo account, sign them out.
+        let user = p.user ?? null;
+        if (user && drop.has(user.id) && !userAccounts.some((a) => a.id === user!.id)) user = null;
         return {
           accounts,
-          user: p.user ?? null,
+          user,
           lang: p.lang ?? 'ru',
           progress: p.progress ?? {},
           watched: p.watched ?? {},

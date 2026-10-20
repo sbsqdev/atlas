@@ -3,7 +3,10 @@ import { persist } from 'zustand/middleware';
 import type { Course, Exercise, Workout } from '../types';
 import { COURSES } from '../data/seed';
 
-const VERSION = 3;
+const VERSION = 4;
+
+/** Old seed course ids to retire on migration (the removed demo program). */
+const OLD_SEED_COURSE_IDS = ['course-glutes-legs'];
 
 interface DataState {
   courses: Course[];
@@ -104,16 +107,14 @@ export const useStore = create<DataState>()(
     {
       name: 'human-atlas-data',
       version: VERSION,
-      // PRESERVE trainer-created courses and edits across version bumps:
-      // keep every persisted course, only add seed courses that are missing.
+      // Keep trainer-CREATED courses, but retire old demo content (Rauana's
+      // program) and refresh the demo course to the current seed.
       migrate: (persisted) => {
         const p = (persisted ?? {}) as Partial<DataState>;
-        const existing = p.courses ?? [];
-        const ids = new Set(existing.map((c) => c.id));
-        const courses = existing.length
-          ? [...existing, ...COURSES.filter((c) => !ids.has(c.id))]
-          : COURSES;
-        return { courses } as Partial<DataState>;
+        const seedIds = new Set(COURSES.map((c) => c.id));
+        const drop = new Set([...OLD_SEED_COURSE_IDS, ...seedIds]);
+        const userCourses = (p.courses ?? []).filter((c) => !drop.has(c.id));
+        return { courses: [...COURSES, ...userCourses] } as Partial<DataState>;
       },
     },
   ),
