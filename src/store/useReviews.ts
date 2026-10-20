@@ -14,8 +14,8 @@ interface ReviewsState {
 
 // A couple of seed testimonials so the section doesn't look empty on day one.
 const SEED: Review[] = [
-  { id: 'rv-seed-1', courseId: 'course-glutes-legs', userId: 'seed-a', userName: 'Аружан', rating: 5, text: 'За 6 недель реально видно ягодицы 🍑 3D-карта помогает чувствовать нужные мышцы!', createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5 },
-  { id: 'rv-seed-2', courseId: 'course-glutes-legs', userId: 'seed-b', userName: 'Камила', rating: 5, text: 'Очень удобно, что видно какие мышцы работают. Тренер отвечает в чате быстро.', createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2 },
+  { id: 'rv-seed-1', courseId: 'course-demo', userId: 'seed-a', userName: 'Аружан', rating: 5, text: 'Удобно, что на 3D-карте видно, какие мышцы работают. Втянулась за первую неделю!', createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5 },
+  { id: 'rv-seed-2', courseId: 'course-demo', userId: 'seed-b', userName: 'Камила', rating: 5, text: 'Понятная программа, тренер быстро отвечает в чате. Рекомендую 👍', createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2 },
 ];
 
 export const useReviews = create<ReviewsState>()(

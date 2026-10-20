@@ -220,6 +220,26 @@ export interface Review {
   createdAt: number;
 }
 
+/** CRM: a trainer's client / lead moving through the sales funnel and then
+ *  being coached. Stages: lead → contacted → trial → sold → active (+lost). */
+export type ClientStage = 'lead' | 'contacted' | 'trial' | 'sold' | 'active' | 'lost';
+export interface Client {
+  id: string;
+  trainerId: string;
+  name: string;
+  /** Free contact label (@telegram / phone / note) — trainer's own CRM. */
+  contact?: string;
+  stage: ClientStage;
+  /** Expected / actual deal value. */
+  value?: number;
+  /** Working note about the client. */
+  note?: string;
+  /** Next action to move them forward ("написать завтра", "позвать на пробное"). */
+  nextAction?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 /** A course = a trainer's program made of workouts. */
 export interface Course {
   id: string;

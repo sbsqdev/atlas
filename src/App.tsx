@@ -9,6 +9,7 @@ import Calculators from './pages/Calculators';
 import Achievements from './pages/Achievements';
 import Profile from './pages/Profile';
 import Friends from './pages/Friends';
+import Clients from './pages/Clients';
 import Legal from './pages/Legal';
 import CourseView from './pages/CourseView';
 import WorkoutView from './pages/WorkoutView';
@@ -69,6 +70,7 @@ export default function App() {
       <Route path="/course/:courseId/workout/:workoutId/exercise/:exerciseId" element={<RequireCourseAccess>{page(<ExerciseView />)}</RequireCourseAccess>} />
 
       <Route path="/dashboard" element={<RequireAuth role="trainer">{page(<TrainerDashboard />)}</RequireAuth>} />
+      <Route path="/clients" element={<RequireAuth role="trainer">{page(<Clients />)}</RequireAuth>} />
       <Route path="/dashboard/course/:courseId" element={<RequireAuth role="trainer">{page(<CourseEditor />)}</RequireAuth>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />

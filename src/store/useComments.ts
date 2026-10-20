@@ -25,18 +25,18 @@ const firstExerciseId = COURSES[0]?.workouts[0]?.exercises[0]?.id ?? 'exe-seed';
 const now = Date.now();
 const SEED_COMMENTS: Comment[] = [
   {
-    id: 'seed-1', threadKey: firstExerciseId, authorId: 'trainer-rauana', authorName: 'Rauana Kuangaliyeva', role: 'trainer',
-    text: 'Держим спину прямой и чувствуем растяжение задней поверхности бедра. Как ощущения? 🙌',
+    id: 'seed-1', threadKey: firstExerciseId, authorId: 'trainer-demo', authorName: 'Demo Coach', role: 'trainer',
+    text: 'Держим корпус ровно и дышим спокойно. Как ощущения? 🙌',
     createdAt: now - 1000 * 60 * 60 * 5, reactions: { '🔥': ['student-demo'] },
   },
   {
     id: 'seed-2', threadKey: firstExerciseId, authorId: 'student-demo', authorName: 'Demo Student', role: 'student',
-    text: 'Сделала 4 подхода! Немного тянет бицепс бедра, вес ок 👍', parentId: 'seed-1',
-    createdAt: now - 1000 * 60 * 60 * 4, reactions: { '❤️': ['trainer-rauana'] },
+    text: 'Сделал 3 подхода, всё ок 👍', parentId: 'seed-1',
+    createdAt: now - 1000 * 60 * 60 * 4, reactions: { '❤️': ['trainer-demo'] },
   },
   {
-    id: 'seed-3', threadKey: firstExerciseId, authorId: 'trainer-rauana', authorName: 'Rauana Kuangaliyeva', role: 'trainer',
-    text: 'Отлично! На следующей добавим +2 кг 💪', parentId: 'seed-1',
+    id: 'seed-3', threadKey: firstExerciseId, authorId: 'trainer-demo', authorName: 'Demo Coach', role: 'trainer',
+    text: 'Отлично! В следующий раз добавим повтор 💪', parentId: 'seed-1',
     createdAt: now - 1000 * 60 * 60 * 3, reactions: {},
   },
 ];

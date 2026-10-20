@@ -476,6 +476,28 @@ const dict = {
   diffHard: { ru: 'Тяжело', en: 'Hard', tr: 'Zor' },
   recommendBadge: { ru: '👍 рекомендует', en: '👍 recommends', tr: '👍 öneriyor' },
 
+  // ---------- CRM (client management + sales funnel) ----------
+  clients: { ru: 'Клиенты', en: 'Clients', tr: 'Müşteriler' },
+  crmTagline: { ru: 'Веди клиентов от первого контакта до продажи и дальше — по воронке.', en: 'Take clients from first contact to sale and beyond — along the funnel.', tr: 'Müşterileri ilk temastan satışa ve sonrasına taşı.' },
+  crmAdd: { ru: 'Добавить клиента', en: 'Add client', tr: 'Müşteri ekle' },
+  crmNamePh: { ru: 'Имя клиента', en: 'Client name', tr: 'Müşteri adı' },
+  crmContactPh: { ru: '@telegram / телефон', en: '@telegram / phone', tr: '@telegram / telefon' },
+  crmEmpty: { ru: 'Пока нет клиентов. Добавь первого лида 👇', en: 'No clients yet. Add your first lead 👇', tr: 'Henüz müşteri yok. İlk lead’i ekle 👇' },
+  stageLead: { ru: 'Новый лид', en: 'New lead', tr: 'Yeni lead' },
+  stageContacted: { ru: 'На связи', en: 'Contacted', tr: 'İletişimde' },
+  stageTrial: { ru: 'Пробное', en: 'Trial', tr: 'Deneme' },
+  stageSold: { ru: 'Оплатил ✅', en: 'Paid ✅', tr: 'Ödedi ✅' },
+  stageActive: { ru: 'Веду', en: 'Coaching', tr: 'Takipte' },
+  stageLost: { ru: 'Отвалился', en: 'Lost', tr: 'Kayıp' },
+  crmNextAction: { ru: 'Следующий шаг', en: 'Next action', tr: 'Sonraki adım' },
+  crmNextPh: { ru: 'напр. написать завтра, позвать на пробное', en: 'e.g. message tomorrow, invite to a trial', tr: 'ör. yarın yaz, denemeye çağır' },
+  crmNotePh: { ru: 'Заметка о клиенте', en: 'Note about the client', tr: 'Müşteri notu' },
+  crmValuePh: { ru: 'Сумма ₸', en: 'Value', tr: 'Tutar' },
+  crmMarkLost: { ru: 'Отвалился', en: 'Mark lost', tr: 'Kayıp işaretle' },
+  crmFunnel: { ru: 'Воронка', en: 'Funnel', tr: 'Huni' },
+  crmRevenue: { ru: 'Выручка (оплатили)', en: 'Revenue (paid)', tr: 'Gelir (ödeyen)' },
+  crmLocalNote: { ru: 'Демо: клиенты хранятся на этом устройстве. Синхронизация — с общей базой.', en: 'Demo: clients are stored on this device. Sync comes with the backend.', tr: 'Demo: müşteriler bu cihazda saklanır.' },
+
   // ---------- Trainer feedback form (question builder) ----------
   feedbackForm: { ru: 'Анкета от тренера', en: 'Trainer feedback form', tr: 'Antrenör anketi' },
   feedbackBuilder: { ru: 'Анкета для сбора отзывов', en: 'Feedback questionnaire', tr: 'Geri bildirim anketi' },
@@ -498,7 +520,7 @@ const dict = {
   trainerTerms: { ru: 'Условия от тренера', en: 'Terms from the trainer', tr: 'Antrenör koşulları' },
   trainerTermsHint: { ru: 'Стоимость, срок доступа, возвраты и контакты определяет тренер этого курса. Платформа предоставляет только сервис — см. Оферту и Политику платформы в футере.', en: 'Price, access length, refunds and contacts are set by this course’s trainer. The platform provides the service only — see the platform Offer & Policy in the footer.', tr: 'Fiyat, erişim süresi, iadeler ve iletişim bu kursun antrenörü tarafından belirlenir. Platform yalnızca hizmet sağlar.' },
   trainerTermsEdit: { ru: 'Условия курса (твоя оферта)', en: 'Course terms (your offer)', tr: 'Kurs koşulları (teklifin)' },
-  trainerTermsPh: { ru: 'Напр.: Стоимость 15 000 ₸. Доступ 8 недель. Оплата Kaspi. Возврат до старта курса. Контакт: @...', en: 'e.g.: Price $X. Access 8 weeks. Payment via … Refund before start. Contact: @…', tr: 'ör.: Fiyat … Erişim 8 hafta. Ödeme … İade başlangıçtan önce. İletişim: @…' },
+  trainerTermsPh: { ru: 'Напр.: Стоимость 15 000 ₸. Доступ 8 недель. Оплата переводом. Возврат до старта курса. Контакт: @...', en: 'e.g.: Price $X. Access 8 weeks. Payment by transfer. Refund before start. Contact: @…', tr: 'ör.: Fiyat … Erişim 8 hafta. Ödeme havale. İade başlangıçtan önce. İletişim: @…' },
 
   // ---------- Chat / video circles ----------
   trainingChat: { ru: 'Чат тренировки', en: 'Training chat', tr: 'Antrenman sohbeti' },

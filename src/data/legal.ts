@@ -1,19 +1,21 @@
 // Legal content for the platform (Kazakhstan). Edit SELLER contacts below.
 // Written in Russian (authoritative).
 
+// NOTE: Placeholder platform details. Fill in the real operator's data before
+// going live. No individual trainer's personal data is stored here.
 export const SELLER = {
-  entity: 'ИП Куангалиева (Куангалиева Рауана Батыргалиевна)',
-  short: 'ИП Куангалиева Р.Б.',
-  iin: '030419651116',
+  entity: 'ИП «Название компании»',
+  short: 'ИП «Название компании»',
+  iin: '000000000000',
   taxAuthority: 'Налоговый комитет Министерства Финансов Республики Казахстан',
-  bank: 'АО «Kaspi Bank», БИК: CASPKZKA',
-  phone: '+7 (776) 096-82-36',
-  instagram: '@kuangaliyevar',
-  instagramUrl: 'https://www.instagram.com/kuangaliyevar',
+  bank: 'Укажите банк и реквизиты',
+  phone: '+7 (___) ___-__-__',
+  instagram: '@your_handle',
+  instagramUrl: 'https://www.instagram.com/',
   site: 'www.fab3d-scan.com',
   siteUrl: 'https://www.fab3d-scan.com',
-  address: 'Республика Казахстан, Западно-Казахстанская обл., г. Уральск, Проспект Абая, дом 200',
-  updated: '2026-10-06',
+  address: 'Республика Казахстан, укажите адрес',
+  updated: '2026-10-20',
 };
 
 export interface Section {

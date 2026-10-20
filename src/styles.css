@@ -751,3 +751,34 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12p
 .fb-qa { display: flex; gap: 10px; justify-content: space-between; padding: 5px 0; border-top: 1px solid var(--border); font-size: 14px; }
 .fb-q { color: var(--muted); }
 .fb-a { font-weight: 600; text-align: right; }
+
+/* ---------- CRM / sales funnel ---------- */
+.funnel-card { margin-bottom: 16px; }
+.funnel-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.funnel-step { flex: 1; min-width: 92px; text-align: center; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 8px; position: relative; }
+.funnel-n { font-size: 24px; font-weight: 800; font-family: var(--font-display); color: var(--accent-2); }
+.funnel-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.funnel-rev { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.funnel-rev b { color: var(--text); font-family: var(--font-display); font-size: 17px; }
+
+.add-client { display: flex; gap: 9px; flex-wrap: wrap; }
+.add-client input { flex: 1 1 160px; min-width: 0; background: var(--panel-2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text); padding: 11px 13px; font: inherit; }
+.add-client input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+
+.crm-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; align-items: start; }
+.crm-column { background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; }
+.crm-col-head { display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 13px; padding: 4px 8px 10px; border-bottom: 2px solid var(--accent); margin-bottom: 10px; }
+.crm-col-head span { background: var(--accent-dim); color: var(--accent-2); border-radius: 999px; padding: 1px 9px; font-size: 12px; }
+.crm-col-head.stage-sold { border-color: #34d399; } .crm-col-head.stage-sold span { background: rgba(52,211,153,0.16); color: #34d399; }
+.crm-col-head.stage-active { border-color: var(--sand); } .crm-col-head.stage-active span { background: rgba(245,158,11,0.16); color: var(--sand); }
+.crm-col-head.stage-lost { border-color: var(--danger); } .crm-col-head.stage-lost span { background: rgba(248,113,113,0.14); color: #ffb4b4; }
+.crm-col-list { display: flex; flex-direction: column; gap: 10px; }
+.client-card { padding: 13px 14px; }
+.client-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.client-name { font-weight: 700; font-size: 15px; }
+.client-contact { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.client-fields { display: flex; flex-direction: column; gap: 7px; margin: 10px 0; }
+.client-fields input { width: 100%; background: var(--panel-2); border: 1px solid var(--border); border-radius: 9px; color: var(--text); padding: 8px 10px; font: inherit; font-size: 13px; }
+.client-row2 { display: flex; gap: 7px; }
+.client-row2 input:last-child { flex: 0 0 90px; }
+.client-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }

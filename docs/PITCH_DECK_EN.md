@@ -57,7 +57,7 @@ keeps them coming back. Trilingual (RU/EN/TR). Live demo: www.fab3d-scan.com
 ## Slide 9 — Traction / status
 - **Live MVP shipped** (www.fab3d-scan.com): 3D atlas, courses, goals, habits,
   profile, friends, clans, chat, video circles — trilingual, dark sporty UI.
-- First trainer onboarded (Rauana Training, glutes & legs program).
+- First trainer(s) onboarding with their own programs.
 - *(Fill in:* users, active trainers, D7/D30 retention, streak rates.*)*
 
 ## Slide 10 — Competition / moat

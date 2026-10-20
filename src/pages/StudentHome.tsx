@@ -53,7 +53,7 @@ export default function StudentHome() {
           <input
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="RAUANA"
+            placeholder={t('codePh')}
             style={{ flex: '1 1 180px', minWidth: 0, background: 'var(--panel)', border: '1px solid var(--border-strong)', borderRadius: 10, padding: '10px 12px', color: 'var(--text)' }}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
           />
