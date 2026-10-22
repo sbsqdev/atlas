@@ -63,11 +63,9 @@ PGHOST=/var/run/postgresql PGUSER=postgres npm run test:rls
 
 ## Деплой (Vercel)
 
-Приложение — статический SPA (Vite). В репозитории он лежит рядом с Human Atlas, поэтому деплоится **отдельным проектом Vercel**:
+**Основной вариант — вместе с Human Atlas.** Корневой `npm run build` собирает Human Atlas, затем `npm run build:academy` собирает это приложение с `VITE_BASE=/academy/` и копирует его в `dist/academy`. Корневой `vercel.json` переписывает `/academy/*` на `/academy/index.html`. После пуша в production-ветку платформа доступна по адресу `https://<домен Human Atlas>/academy`. Отдельный проект Vercel не нужен.
 
-1. Vercel → Add New Project → тот же репозиторий.
-2. **Root Directory:** `rehab-academy`. Framework: Vite (настройки уже в `vercel.json`).
-3. Build: `npm run build`, Output: `dist`.
+**Отдельный проект (по желанию):** Vercel → Add New Project → тот же репозиторий, **Root Directory:** `rehab-academy`, Framework: Vite. Сборка `npm run build`, папка `dist`; приложение будет в корне домена.
 
 Переменные окружения для демо-режима не нужны.
 

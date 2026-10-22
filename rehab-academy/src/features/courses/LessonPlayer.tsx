@@ -170,7 +170,7 @@ function LessonBody({ lesson }: { lesson: Lesson }) {
       return (
         <>
           {body}
-          {lesson.fileUrl && <a href={lesson.fileUrl} download className={buttonVariants({ variant: 'outline', className: 'mt-4' })}><Download className="h-4 w-4" /> {t('courses.download')}</a>}
+          {lesson.fileUrl && <a href={lesson.fileUrl.startsWith('/') ? import.meta.env.BASE_URL + lesson.fileUrl.slice(1) : lesson.fileUrl} download className={buttonVariants({ variant: 'outline', className: 'mt-4' })}><Download className="h-4 w-4" /> {t('courses.download')}</a>}
         </>
       );
     default:

@@ -7,7 +7,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 /* Licensed knee model (BodyParts3D, CC BY 4.0) rendered with React Three
    Fiber. Mesh names in knee.glb are the structure ids used in content. */
 
-export const MODEL_URL = '/models/knee.glb';
+export const MODEL_URL = `${import.meta.env.BASE_URL}models/knee.glb`;
 const TARGET = new Vector3(0, 0.03, 0);
 const HOME = new Vector3(0.32, 0.18, 0.95);
 

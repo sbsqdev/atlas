@@ -7,6 +7,8 @@ const mod = await import(process.env.PW_MODULE ?? 'playwright');
 const pw = mod.chromium ? mod : mod.default;
 const BASE = process.env.BASE_URL ?? 'http://localhost:4173';
 const SHOTS = process.env.SHOTS;
+// Home is BASE or BASE/ (an app served under a sub-path drops the trailing slash).
+const HOME = new RegExp(`^${BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/?$`);
 if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 
 const browser = await pw.chromium.launch({ executablePath: process.env.CHROMIUM, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -33,7 +35,7 @@ const text = (s) => page.getByText(s, { exact: false }).first();
 async function login(role) {
   await page.goto(`${BASE}/login`);
   await page.getByTestId(`demo-${role}`).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(HOME);
 }
 async function logout() {
   await page.evaluate(() => localStorage.removeItem('ra-session'));
@@ -59,7 +61,7 @@ await check('wrong password is rejected', async () => {
 await check('student signs in with email + password', async () => {
   await page.fill('input[name=password]', 'demo1234');
   await page.getByRole('button', { name: 'Войти' }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(HOME);
   await text('Добро пожаловать').waitFor();
   await text('Ближайшие задания').waitFor();
   await shot('02-student-dashboard');
@@ -295,7 +297,7 @@ await check('self-registration: new student has no simulation entitlement; can r
   await text('Необходимо согласие').waitFor();
   await page.check('input[name=consent]');
   await page.getByRole('button', { name: 'Создать аккаунт' }).click();
-  await page.waitForURL(`${BASE}/`);
+  await page.waitForURL(HOME);
   await page.goto(`${BASE}/simulations`);
   await text('не входит в ваш тариф').waitFor();
   await page.goto(`${BASE}/courses`);
