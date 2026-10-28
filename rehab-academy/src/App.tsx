@@ -33,11 +33,13 @@ const ClassDetail = lazy(() => import('@/pages/ClassDetail'));
 const OrgAdmin = lazy(() => import('@/pages/OrgAdmin'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const Review = lazy(() => import('@/pages/Review'));
+const Landing = lazy(() => import('@/pages/Landing'));
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const u = useMe();
   const loc = useLocation();
-  if (!u) return <Navigate to="/login" replace state={{ from: loc.pathname }} />;
+  // Signed-out visitors see the public course page at the root.
+  if (!u) return loc.pathname === '/' ? <Landing /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />;
   return <>{children}</>;
 }
 function RequirePerm({ p, children }: { p: Permission; children: ReactNode }) {

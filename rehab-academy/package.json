@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "build:knee": "node scripts/build-knee-glb.mjs",
+    "build:models": "node scripts/build-models.mjs",
     "gen:seed": "node --experimental-strip-types scripts/gen-seed.mjs",
     "test:e2e": "node e2e/e2e.mjs",
     "test:rls": "bash supabase/tests/rls_smoke.sh"

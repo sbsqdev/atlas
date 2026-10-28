@@ -42,12 +42,16 @@ export const EMPTY: Tables = {
   subscriptions: [], reviews: [], audit: [], notifications: [], anatomyViews: [], activity: [],
 };
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 interface DbState extends Tables { seededVersion: number }
 
 export const useDb = create<DbState>()(
-  persist(() => ({ ...EMPTY, seededVersion: 0 }), { name: 'ra-db', version: SCHEMA_VERSION }),
+  persist(() => ({ ...EMPTY, seededVersion: 0 }), {
+    name: 'ra-db', version: SCHEMA_VERSION,
+    // Demo data: on a schema change start over and let ensureSeeded() reseed.
+    migrate: () => ({ ...EMPTY, seededVersion: 0 }),
+  }),
 );
 
 export const useSession = create<{ userId: string | null }>()(persist((): { userId: string | null } => ({ userId: null }), { name: 'ra-session' }));

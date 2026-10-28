@@ -44,6 +44,32 @@ async function logout() {
 await page.goto(BASE);
 await page.evaluate(() => localStorage.clear());
 
+await check('public course page: program, price, sign-up and demo entry', async () => {
+  await page.goto(`${BASE}/`);
+  await page.getByTestId('landing').waitFor();
+  await text('Колени, стопы').waitFor();
+  const price = await page.getByTestId('landing-price').innerText();
+  if (!/50\s000\s₸/.test(price.replace(/\u00a0|\u202f/g, ' '))) throw new Error(`price: ${price}`);
+  const href = await page.getByTestId('landing-signup').first().getAttribute('href');
+  if (!href.startsWith('https://wa.me/')) throw new Error(`sign-up link: ${href}`);
+  await shot('00-landing');
+  await page.getByTestId('landing-demo').first().click();
+  await page.waitForURL(/courses\/c-run$/);
+  await text('Колени, стопы и восстановление: курс для бегунов').waitFor();
+});
+
+await check('runners course: chat lesson and foot 3D model', async () => {
+  await page.goto(`${BASE}/courses/c-run/lessons/l-r3`);
+  await page.getByTestId('lesson-cta').waitFor();
+  await page.goto(`${BASE}/anatomy?m=foot`);
+  await page.locator('[data-testid=anatomy-viewer][data-model=foot] canvas').waitFor();
+  await page.getByTestId('struct-calcaneal_tendon').click();
+  await page.getByTestId('structure-info').getByText('Пяточное (ахиллово) сухожилие').waitFor();
+  await page.getByRole('button', { name: 'Коленный сустав (правый)' }).click();
+  await page.locator('[data-testid=anatomy-viewer][data-model=knee]').waitFor();
+});
+await logout();
+
 await check('login page renders with demo accounts', async () => {
   await page.goto(`${BASE}/login`);
   await text('Анатомия, симуляции и курсы').waitFor();
@@ -84,7 +110,7 @@ await check('lesson player: mark lesson done updates progress (autosaved)', asyn
   await page.goto(`${BASE}/courses/c-knee`);
   await page.getByTestId('course-continue').click();
   await page.waitForURL(/lessons\/l-k4/);
-  await page.locator('[data-testid=knee-viewer] canvas').waitFor();
+  await page.locator('[data-testid=anatomy-viewer] canvas').waitFor();
   await page.waitForTimeout(1500);
   await shot('04-lesson-anatomy');
   await page.getByTestId('lesson-done').click();
@@ -95,7 +121,7 @@ await check('lesson player: mark lesson done updates progress (autosaved)', asyn
 
 await check('3D anatomy lab: select structure, info panel, quiz', async () => {
   await page.goto(`${BASE}/anatomy`);
-  await page.locator('[data-testid=knee-viewer] canvas').waitFor();
+  await page.locator('[data-testid=anatomy-viewer] canvas').waitFor();
   await page.waitForFunction(() => !document.body.innerText.includes('Загрузка…'), null, { timeout: 15000 });
   await page.getByTestId('struct-patella').click();
   await page.getByTestId('structure-info').getByText('Сесамовидная кость').waitFor();
@@ -109,7 +135,7 @@ await check('3D anatomy lab: select structure, info panel, quiz', async () => {
   await page.getByRole('button', { name: 'Анатомический квиз' }).click();
   await page.getByTestId('anat-quiz').getByText('Найдите на модели').waitFor();
   // Click the centre of the viewport: whichever structure is hit is graded.
-  const box = await page.locator('[data-testid=knee-viewer] canvas').boundingBox();
+  const box = await page.locator('[data-testid=anatomy-viewer] canvas').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await page.getByTestId('anat-quiz').getByText(/Верно|Неверно/).waitFor({ timeout: 5000 });
   await shot('06-anatomy-quiz');
@@ -119,7 +145,7 @@ await check('simulation: full 6-step knee scenario is scored and saved', async (
   await page.goto(`${BASE}/simulations/sim-knee`);
   await page.getByTestId('sim-start').click();
   // Explore: click the canvas until something is picked, then reveal the rest.
-  await page.locator('[data-testid=knee-viewer] canvas').waitFor();
+  await page.locator('[data-testid=anatomy-viewer] canvas').waitFor();
   await page.waitForTimeout(1500);
   await page.getByRole('button', { name: 'Показать ответ' }).click();
   await page.getByTestId('sim-next').click();

@@ -6,9 +6,9 @@ import {
   addModule, allowedMoves, createAssessment, deleteLesson, deleteModule, deleteQuestion, moveLesson, renameModule, saveLesson, saveQuestion,
   transitionCourse, updateAssessment, updateCourse, useMe,
 } from '@/data/api';
-import { MODEL_STRUCTURES } from '@/data/content/anatomy';
+import { ANATOMY_MODELS, MODEL_IDS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { SIMULATIONS } from '@/data/content/simulations';
-import type { Assessment, ContentStatus, Course, Lesson, LessonType, Level, Question, QuestionType } from '@/data/types';
+import type { Assessment, ContentStatus, Course, Lesson, LessonType, Level, ModelId, Question, QuestionType } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { errorKey } from '@/lib/errors';
 import { fmtDateTime } from '@/lib/format';
@@ -164,9 +164,15 @@ function LessonDialog({ c, initial, onClose, guard }: { c: Course; initial: Part
           </Field>
         )}
         {l.type === 'anatomy' && (
+          <>
+          <Field label={t('builder.model')}>
+            <Select value={l.anatomyModel ?? 'knee'} onChange={(e) => setL({ ...l, anatomyModel: e.target.value as ModelId, anatomyFocus: [] })}>
+              {MODEL_IDS.map((m) => <option key={m} value={m}>{t(m === 'knee' ? 'anat.knee' : 'anat.foot')}</option>)}
+            </Select>
+          </Field>
           <Field label={t('builder.anatomyFocus')}>
             <div className="grid grid-cols-2 gap-1.5 md:grid-cols-3">
-              {MODEL_STRUCTURES.map((s) => (
+              {ANATOMY_MODELS[l.anatomyModel ?? 'knee'].ids.map((id) => STRUCTURE_BY_ID[id]).map((s) => (
                 <label key={s.id} className="flex items-center gap-2 text-[13px]">
                   <input type="checkbox" className="accent-teal" checked={l.anatomyFocus?.includes(s.id) ?? false} onChange={(e) => setL({ ...l, anatomyFocus: e.target.checked ? [...(l.anatomyFocus ?? []), s.id] : (l.anatomyFocus ?? []).filter((x) => x !== s.id) })} />
                   {s.name}
@@ -174,6 +180,7 @@ function LessonDialog({ c, initial, onClose, guard }: { c: Course; initial: Part
               ))}
             </div>
           </Field>
+          </>
         )}
       </div>
     </Dialog>
@@ -288,6 +295,7 @@ function QuestionDialog({ initial, onClose, guard }: { initial: Partial<Question
     const clean: Omit<Question, 'id'> & { id?: string } = {
       id: q.id, assessmentId: q.assessmentId, type, prompt: (q.prompt ?? '').trim(), explanation: (q.explanation ?? '').trim(), points: q.points ?? 1,
       caseText: type === 'case' ? q.caseText : undefined, structureId: type === 'identify' ? q.structureId : undefined,
+      model: type === 'identify' ? q.model : undefined,
       options: hasOptions ? opts.filter((o) => o.text.trim()) : undefined,
       pairs: type === 'match' ? (q.pairs ?? []).filter((p) => p.left.trim() && p.right.trim()) : undefined,
       sequence: type === 'sequence' ? (q.sequence ?? []).filter((s) => s.trim()) : undefined,
@@ -310,12 +318,19 @@ function QuestionDialog({ initial, onClose, guard }: { initial: Partial<Question
         </div>
         {type === 'case' && <Field label={t('tests.case')}><Textarea value={q.caseText ?? ''} onChange={(e) => setQ({ ...q, caseText: e.target.value })} /></Field>}
         {type === 'identify' && (
-          <Field label={t('builder.structure')}>
-            <Select value={q.structureId ?? ''} onChange={(e) => setQ({ ...q, structureId: e.target.value })}>
-              <option value="">—</option>
-              {MODEL_STRUCTURES.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </Select>
-          </Field>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Field label={t('builder.model')}>
+              <Select value={q.model ?? 'knee'} onChange={(e) => setQ({ ...q, model: e.target.value as ModelId, structureId: '' })}>
+                {MODEL_IDS.map((m) => <option key={m} value={m}>{t(m === 'knee' ? 'anat.knee' : 'anat.foot')}</option>)}
+              </Select>
+            </Field>
+            <Field label={t('builder.structure')}>
+              <Select value={q.structureId ?? ''} onChange={(e) => setQ({ ...q, structureId: e.target.value })}>
+                <option value="">—</option>
+                {ANATOMY_MODELS[q.model ?? 'knee'].ids.map((id) => <option key={id} value={id}>{STRUCTURE_BY_ID[id].name}</option>)}
+              </Select>
+            </Field>
+          </div>
         )}
         {hasOptions && (
           <div className="space-y-2">

@@ -51,7 +51,10 @@ function useNav() {
   if (can(u, 'platform.admin')) admin.push({ to: '/admin', key: 'nav.admin', icon: <ShieldCheck />, end: true });
   if (can(u, 'course.review')) admin.push({ to: '/admin/review', key: 'nav.review', icon: <ClipboardCheck /> });
   if (admin.length) sections.push({ title: 'nav.admin', items: admin });
-  sections.push({ title: 'nav.settings', items: [{ to: '/pricing', key: 'nav.pricing', icon: <Tag /> }, { to: '/settings', key: 'nav.settings', icon: <Settings /> }] });
+  // Learners buy a course directly; plans and pilots are for organizations.
+  const settings: Item[] = [{ to: '/settings', key: 'nav.settings', icon: <Settings /> }];
+  if (u && u.role !== 'student') settings.unshift({ to: '/pricing', key: 'nav.pricing', icon: <Tag /> });
+  sections.push({ title: 'nav.settings', items: settings });
   return sections;
 }
 

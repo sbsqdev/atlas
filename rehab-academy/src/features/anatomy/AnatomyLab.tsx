@@ -3,13 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle, BookMarked, Eye, EyeOff, Focus, Layers, Maximize2, Minimize2, Minus, Plus, RotateCcw, Rotate3d, Search, Target, Trophy, X,
 } from 'lucide-react';
-import { STRUCTURES, STRUCTURE_BY_ID } from '@/data/content/anatomy';
+import { ANATOMY_MODELS, MODEL_IDS, STRUCTURE_BY_ID, structuresOf } from '@/data/content/anatomy';
 import { logAnatomyView } from '@/data/api';
-import type { AnatomyStructure } from '@/data/types';
+import type { AnatomyStructure, ModelId } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { cn } from '@/lib/cn';
-import { Badge, Button, Card, EduNotice, PageHeader } from '@/components/ui';
-import { KneeViewer, type ViewerHandle } from './KneeViewer';
+import { Badge, Button, Card, EduNotice, PageHeader, Tabs } from '@/components/ui';
+import { AnatomyViewer, type ViewerHandle } from './AnatomyViewer';
 
 const GROUPS: { id: AnatomyStructure['group']; key: I18nKey }[] = [
   { id: 'bone', key: 'anat.bones' },
@@ -18,13 +18,25 @@ const GROUPS: { id: AnatomyStructure['group']; key: I18nKey }[] = [
   { id: 'ligament', key: 'anat.ligaments' },
 ];
 const QUIZ_LEN = 5;
+const MODEL_LABEL: Record<ModelId, I18nKey> = { knee: 'anat.knee', foot: 'anat.foot' };
+
+/** Region from ?m=, else the first model that shows the ?s= structure. */
+function initialModel(params: URLSearchParams): ModelId {
+  const m = params.get('m');
+  if (m && (MODEL_IDS as string[]).includes(m)) return m as ModelId;
+  const s = params.get('s');
+  return MODEL_IDS.find((id) => s && [...ANATOMY_MODELS[id].ids, ...ANATOMY_MODELS[id].textOnly].includes(s)) ?? 'knee';
+}
 
 export default function AnatomyLab() {
   const { t } = useT();
   const [params, setParams] = useSearchParams();
+  const [model, setModel] = useState<ModelId>(() => initialModel(params));
+  const STRUCTURES = useMemo(() => structuresOf(model), [model]);
+  const inModel = (id: string) => ANATOMY_MODELS[model].ids.includes(id);
   const focus = useMemo(() => params.get('focus')?.split(',').filter((id) => STRUCTURE_BY_ID[id]) ?? null, [params]);
   const [selected, setSelected] = useState<string | null>(params.get('s'));
-  const [hidden, setHidden] = useState<Set<string>>(() => new Set(focus ? STRUCTURES.filter((s) => !focus.includes(s.id)).map((s) => s.id) : []));
+  const [hidden, setHidden] = useState<Set<string>>(() => new Set(focus ? ANATOMY_MODELS[model].ids.filter((id) => !focus.includes(id)) : []));
   const [isolated, setIsolated] = useState<string | null>(null);
   const [ghost, setGhost] = useState(false);
   const [rotate, setRotate] = useState(false);
@@ -41,11 +53,21 @@ export default function AnatomyLab() {
     return () => document.removeEventListener('fullscreenchange', onFs);
   }, []);
 
+  function switchModel(m: ModelId) {
+    setModel(m);
+    setSelected(null);
+    setHidden(new Set());
+    setIsolated(null);
+    setQuiz(null);
+    setParams(new URLSearchParams({ m }), { replace: true });
+  }
+
   function select(id: string) {
     setSelected(id);
     logAnatomyView(id);
     const next = new URLSearchParams(params);
     next.set('s', id);
+    next.set('m', model);
     setParams(next, { replace: true });
   }
 
@@ -60,7 +82,7 @@ export default function AnatomyLab() {
   }
 
   function startQuiz() {
-    const pool = STRUCTURES.filter((s) => s.hasModel && !hidden.has(s.id)).map((s) => s.id);
+    const pool = ANATOMY_MODELS[model].ids.filter((id) => !hidden.has(id));
     const queue = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(QUIZ_LEN, pool.length));
     setIsolated(null);
     setSelected(null);
@@ -80,7 +102,10 @@ export default function AnatomyLab() {
 
   return (
     <div className="animate-fade-up">
-      <PageHeader eyebrow={`${t('anat.lowerLimb')} · ${t('anat.knee')}`} title={t('anat.title')} />
+      <PageHeader
+        eyebrow={`${t('anat.lowerLimb')} · ${t(MODEL_LABEL[model])}`} title={t('anat.title')}
+        actions={<Tabs value={model} onChange={switchModel} items={MODEL_IDS.map((m) => ({ value: m, label: t(MODEL_LABEL[m]) }))} />}
+      />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[280px_1fr_340px]">
         {/* Left: systems, structures */}
         <Card className="flex max-h-[720px] flex-col overflow-hidden">
@@ -111,10 +136,10 @@ export default function AnatomyLab() {
                   <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-navy-300">{t(g.key)}</div>
                   {items.map((s) => (
                     <div key={s.id} className={cn('group flex items-center gap-1 rounded-lg pr-1', selected === s.id ? 'bg-teal-50' : 'hover:bg-bg')}>
-                      <button onClick={() => select(s.id)} className={cn('min-w-0 flex-1 truncate px-2 py-1.5 text-left text-[13px]', selected === s.id ? 'font-semibold text-teal' : 'text-navy', hidden.has(s.id) && s.hasModel && 'opacity-45')} data-testid={`struct-${s.id}`}>
+                      <button onClick={() => select(s.id)} className={cn('min-w-0 flex-1 truncate px-2 py-1.5 text-left text-[13px]', selected === s.id ? 'font-semibold text-teal' : 'text-navy', hidden.has(s.id) && inModel(s.id) && 'opacity-45')} data-testid={`struct-${s.id}`}>
                         {s.name}
                       </button>
-                      {s.hasModel ? (
+                      {inModel(s.id) ? (
                         <button onClick={() => toggleHidden(s.id)} className="rounded p-1 text-navy-300 hover:text-navy" aria-label={t('anat.hide')}>
                           {hidden.has(s.id) ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                         </button>
@@ -129,8 +154,8 @@ export default function AnatomyLab() {
 
         {/* Center: viewport */}
         <div ref={stage} className={cn('relative flex min-h-[460px] flex-col overflow-hidden rounded-2xl border border-line bg-[radial-gradient(ellipse_at_center,#ffffff_0%,#E8EEF4_70%,#DCE5EE_100%)]', full ? 'h-screen' : 'h-[560px] xl:h-[720px]')}>
-          <KneeViewer
-            ref={viewer} className="flex-1" selected={quiz ? null : selected} hidden={hidden} isolated={isolated} ghost={ghost} autoRotate={rotate}
+          <AnatomyViewer
+            ref={viewer} className="flex-1" model={model} selected={quiz ? null : selected} hidden={hidden} isolated={isolated} ghost={ghost} autoRotate={rotate}
             flash={quiz?.flash ?? null} onPick={pick} onHover={setHover} errorText={t('anat.loadError')} loadingText={t('common.loading')}
           />
           {hover && STRUCTURE_BY_ID[hover] && !quiz && (
@@ -163,8 +188,8 @@ export default function AnatomyLab() {
             <Tool icon={<Minus />} label={t('anat.zoomOut')} onClick={() => viewer.current?.zoom(1.25)} />
             <Tool icon={<RotateCcw />} label={t('anat.reset')} onClick={() => viewer.current?.reset()} />
             <span className="mx-1 h-6 w-px bg-line" />
-            <Tool icon={<Focus />} label={t('anat.isolate')} active={!!isolated} disabled={!sel?.hasModel && !isolated} onClick={() => setIsolated(isolated ? null : selected)} />
-            <Tool icon={<EyeOff />} label={t('anat.hide')} disabled={!sel?.hasModel} onClick={() => selected && toggleHidden(selected)} />
+            <Tool icon={<Focus />} label={t('anat.isolate')} active={!!isolated} disabled={!(sel && inModel(sel.id)) && !isolated} onClick={() => setIsolated(isolated ? null : selected)} />
+            <Tool icon={<EyeOff />} label={t('anat.hide')} disabled={!(sel && inModel(sel.id))} onClick={() => selected && toggleHidden(selected)} />
             <Tool icon={<Eye />} label={t('anat.showAll')} onClick={() => { setHidden(new Set()); setIsolated(null); }} />
             <Tool icon={<Layers />} label={t('anat.transparency')} active={ghost} onClick={() => setGhost((v) => !v)} />
             <span className="mx-1 h-6 w-px bg-line" />

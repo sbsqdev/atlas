@@ -5,6 +5,8 @@ export type Role = 'student' | 'instructor' | 'uni_admin' | 'clinic_admin' | 'su
 export type OrgType = 'university' | 'clinic' | 'platform';
 export type ContentStatus = 'draft' | 'medical_review' | 'approved' | 'published' | 'archived';
 export type Level = 'beginner' | 'intermediate' | 'advanced';
+/** A regional 3D model in public/models (see ANATOMY_MODELS). */
+export type ModelId = 'knee' | 'foot';
 
 export interface User {
   id: string;
@@ -67,6 +69,10 @@ export interface Lesson {
   simulationId?: string;
   assessmentId?: string;
   anatomyFocus?: string[];
+  anatomyModel?: ModelId;
+  /** Optional call-to-action shown under the lesson (e.g. a course chat link). */
+  ctaLabel?: string;
+  ctaUrl?: string;
   durationMin: number;
   order: number;
 }
@@ -103,6 +109,7 @@ export interface Question {
   caseText?: string;
   /** identify: structure highlighted on the 3D model. */
   structureId?: string;
+  model?: ModelId;
   options?: { id: string; text: string; correct: boolean }[];
   pairs?: { left: string; right: string }[];
   sequence?: string[];

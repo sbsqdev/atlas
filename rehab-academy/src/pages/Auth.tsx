@@ -78,6 +78,7 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
                 <button key={l.id} onClick={() => setLocale(l.id)} className={cn('rounded-lg px-2.5 py-1 text-[12px] font-semibold', locale === l.id ? 'bg-navy text-white' : 'text-navy-500 hover:bg-white')}>{l.label}</button>
               ))}
             </div>
+            <Link to="/" className="mb-3 inline-block text-[13px] font-semibold text-teal">← {t('auth.toCourse')}</Link>
             <h2 className="text-[26px] font-bold tracking-tight">{t(mode === 'in' ? 'auth.signIn' : 'auth.signUp')}</h2>
             <p className="mt-1 text-sm text-navy-500">{t('app.tagline')}</p>
 

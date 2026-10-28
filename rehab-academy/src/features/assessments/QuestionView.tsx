@@ -6,7 +6,7 @@ import { useT, type I18nKey } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { Select } from '@/components/ui';
 import { shuffle } from '@/lib/shuffle';
-import { KneeViewer } from '@/features/anatomy/KneeViewer';
+import { AnatomyViewer } from '@/features/anatomy/AnatomyViewer';
 
 const HINT: Record<Question['type'], I18nKey> = {
   single: 'tests.chooseOne', multi: 'tests.chooseMany', match: 'tests.match', sequence: 'tests.sequence', identify: 'tests.identify', case: 'tests.case',
@@ -26,7 +26,7 @@ export function QuestionView({ q, value, onChange, reveal, index }: { q: Questio
       <h2 className="mt-3 text-lg font-semibold leading-snug">{q.prompt}</h2>
       {q.type === 'identify' && q.structureId && (
         <div className="mt-3 h-72 overflow-hidden rounded-2xl border border-line bg-[radial-gradient(ellipse_at_center,#ffffff_0%,#E8EEF4_75%)]">
-          <KneeViewer className="h-full" selected={q.structureId} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
+          <AnatomyViewer className="h-full" model={q.model} selected={q.structureId} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
         </div>
       )}
 

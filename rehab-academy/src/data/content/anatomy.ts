@@ -1,4 +1,4 @@
-import type { AnatomyStructure, Reference } from '../types';
+import type { AnatomyStructure, ModelId, Reference } from '../types';
 
 /* Knee-region structures. Text is drafted from standard anatomy references
    and MUST be reviewed by a medical expert before official use (verified:false).
@@ -257,5 +257,213 @@ export const STRUCTURES: AnatomyStructure[] = [
   },
 ];
 
+/* ---------- Foot and ankle (foot.glb) ---------- */
+const MCKEON: Reference = { title: 'The foot core system: a new paradigm for understanding intrinsic foot muscle function', source: 'McKeon P.O. et al. Br J Sports Med, 2015;49(5):290', url: 'https://doi.org/10.1136/bjsports-2013-092690' };
+const foot = { verified: false, region: 'Стопа и голеностоп' };
+
+STRUCTURES.push(
+  {
+    ...foot, id: 'talus', name: 'Таранная кость', latin: 'Talus', group: 'bone', hasModel: true,
+    classification: 'Кость предплюсны',
+    function: 'Передаёт нагрузку от голени на стопу.',
+    biomech: 'Образует голеностопный сустав с большеберцовой и малоберцовой костями и подтаранный сустав с пяточной; мышцы к ней не прикрепляются.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'calcaneus', name: 'Пяточная кость', latin: 'Calcaneus', group: 'bone', hasModel: true,
+    classification: 'Кость предплюсны (самая крупная кость стопы)',
+    function: 'Задняя опора стопы; рычаг для трёхглавой мышцы голени.',
+    biomech: 'К бугру пяточной кости прикрепляется пяточное (ахиллово) сухожилие; от медиального отростка бугра начинаются подошвенный апоневроз и короткие мышцы стопы.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'navicular', name: 'Ладьевидная кость', latin: 'Os naviculare', group: 'bone', hasModel: true,
+    classification: 'Кость предплюсны',
+    function: 'Вершина медиального продольного свода стопы.',
+    biomech: 'К бугристости ладьевидной кости прикрепляется задняя большеберцовая мышца — главный динамический «подъёмник» свода.',
+    references: [GRAY, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'cuboid', name: 'Кубовидная кость', latin: 'Os cuboideum', group: 'bone', hasModel: true,
+    classification: 'Кость предплюсны',
+    function: 'Опора латерального края стопы.',
+    biomech: 'По её борозде проходит сухожилие длинной малоберцовой мышцы на подошву.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'cuneiforms', name: 'Клиновидные кости', latin: 'Ossa cuneiformia', group: 'bone', hasModel: true,
+    classification: 'Три кости предплюсны: медиальная, промежуточная, латеральная',
+    function: 'Формируют поперечный свод стопы.',
+    biomech: 'К медиальной клиновидной кости прикрепляются передняя большеберцовая и длинная малоберцовая мышцы.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'metatarsals', name: 'Плюсневые кости', latin: 'Ossa metatarsi', group: 'bone', hasModel: true,
+    classification: 'Пять трубчатых костей плюсны',
+    function: 'Передняя опора стопы при отталкивании.',
+    biomech: 'Головки плюсневых костей принимают нагрузку в фазе переката; при резком росте беговой нагрузки здесь возможны стресс-реакции.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'phalanges', name: 'Фаланги пальцев стопы', latin: 'Phalanges digitorum pedis', group: 'bone', hasModel: true,
+    classification: '14 фаланг: у большого пальца две, у остальных по три',
+    function: 'Участвуют в отталкивании и балансе.',
+    biomech: 'Разгибание пальцев при отталкивании натягивает подошвенный апоневроз и поднимает свод (механизм «лебёдки»).',
+    references: [GRAY, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'soleus', name: 'Камбаловидная мышца', latin: 'M. soleus', group: 'muscle', hasModel: true,
+    classification: 'Мышца задней группы голени; часть трёхглавой мышцы голени; односуставная',
+    origin: 'Головка и верхняя треть задней поверхности малоберцовой кости, линия камбаловидной мышцы большеберцовой кости.',
+    insertion: 'Через пяточное сухожилие — бугор пяточной кости.',
+    innervation: 'Большеберцовый нерв (S1–S2).',
+    function: 'Подошвенное сгибание стопы; удерживает голень над стопой в опоре.',
+    biomech: 'Работает и при согнутом колене, поэтому её тренируют подъёмами на носки с согнутыми коленями.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'calcaneal_tendon', name: 'Пяточное (ахиллово) сухожилие', latin: 'Tendo calcaneus', group: 'ligament', hasModel: true,
+    classification: 'Общее сухожилие икроножной и камбаловидной мышц',
+    insertion: 'Бугор пяточной кости.',
+    function: 'Передаёт усилие трёхглавой мышцы голени при отталкивании.',
+    biomech: 'Самое крупное сухожилие тела. Хорошо адаптируется к постепенно растущей нагрузке; резкий рост объёма или скоростной работы — частый фактор перегрузки.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'tibialis_anterior', name: 'Передняя большеберцовая мышца', latin: 'M. tibialis anterior', group: 'muscle', hasModel: true,
+    classification: 'Мышца передней группы голени',
+    origin: 'Латеральный мыщелок и верхние 2/3 латеральной поверхности большеберцовой кости, межкостная перепонка.',
+    insertion: 'Медиальная клиновидная кость и основание I плюсневой кости.',
+    innervation: 'Глубокий малоберцовый нерв (L4–L5).',
+    function: 'Тыльное сгибание и инверсия стопы.',
+    biomech: 'Контролирует опускание стопы после касания пяткой; при перегрузке даёт боль по передней поверхности голени.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'tibialis_posterior', name: 'Задняя большеберцовая мышца', latin: 'M. tibialis posterior', group: 'muscle', hasModel: true,
+    classification: 'Глубокая мышца задней группы голени',
+    origin: 'Межкостная перепонка, задние поверхности большеберцовой и малоберцовой костей.',
+    insertion: 'Бугристость ладьевидной кости; клиновидные и кубовидная кости, основания II–IV плюсневых.',
+    innervation: 'Большеберцовый нерв (L4–L5).',
+    function: 'Подошвенное сгибание и инверсия стопы.',
+    biomech: 'Главный динамический стабилизатор медиального продольного свода.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'fibularis_longus', name: 'Длинная малоберцовая мышца', latin: 'M. fibularis (peroneus) longus', group: 'muscle', hasModel: true,
+    classification: 'Мышца латеральной группы голени',
+    origin: 'Головка и верхние 2/3 латеральной поверхности малоберцовой кости.',
+    insertion: 'Медиальная клиновидная кость и основание I плюсневой кости (сухожилие проходит по подошве).',
+    innervation: 'Поверхностный малоберцовый нерв (L5–S1).',
+    function: 'Эверсия и подошвенное сгибание стопы.',
+    biomech: 'Вместе с передней большеберцовой образует «стремя» под стопой; поддерживает поперечный свод и латеральную стабильность голеностопа.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'fibularis_brevis', name: 'Короткая малоберцовая мышца', latin: 'M. fibularis (peroneus) brevis', group: 'muscle', hasModel: true,
+    classification: 'Мышца латеральной группы голени',
+    origin: 'Нижние 2/3 латеральной поверхности малоберцовой кости.',
+    insertion: 'Бугристость V плюсневой кости.',
+    innervation: 'Поверхностный малоберцовый нерв (L5–S1).',
+    function: 'Эверсия стопы.',
+    biomech: 'Противостоит подворачиванию стопы внутрь — важна для бега по неровному покрытию.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'extensor_digitorum_longus', name: 'Длинный разгибатель пальцев', latin: 'M. extensor digitorum longus', group: 'muscle', hasModel: true,
+    classification: 'Мышца передней группы голени',
+    origin: 'Латеральный мыщелок большеберцовой кости, верхние 3/4 малоберцовой кости, межкостная перепонка.',
+    insertion: 'Средние и дистальные фаланги II–V пальцев.',
+    innervation: 'Глубокий малоберцовый нерв (L5–S1).',
+    function: 'Разгибание II–V пальцев, тыльное сгибание стопы.',
+    biomech: 'Поднимает пальцы в фазе переноса, чтобы стопа не цеплялась за покрытие.',
+    references: [MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'extensor_hallucis_longus', name: 'Длинный разгибатель большого пальца', latin: 'M. extensor hallucis longus', group: 'muscle', hasModel: true,
+    classification: 'Мышца передней группы голени',
+    origin: 'Средняя часть медиальной поверхности малоберцовой кости, межкостная перепонка.',
+    insertion: 'Основание дистальной фаланги большого пальца.',
+    innervation: 'Глубокий малоберцовый нерв (L5).',
+    function: 'Разгибание большого пальца, тыльное сгибание стопы.',
+    biomech: 'Работает в паре с передней большеберцовой в фазе переноса.',
+    references: [MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'flexor_digitorum_longus', name: 'Длинный сгибатель пальцев', latin: 'M. flexor digitorum longus', group: 'muscle', hasModel: true,
+    classification: 'Глубокая мышца задней группы голени',
+    origin: 'Задняя поверхность большеберцовой кости ниже линии камбаловидной мышцы.',
+    insertion: 'Основания дистальных фаланг II–V пальцев.',
+    innervation: 'Большеберцовый нерв (S2–S3).',
+    function: 'Сгибание II–V пальцев, подошвенное сгибание стопы.',
+    biomech: 'Помогает удерживать продольный свод и давить пальцами в опору при отталкивании.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'flexor_hallucis_longus', name: 'Длинный сгибатель большого пальца', latin: 'M. flexor hallucis longus', group: 'muscle', hasModel: true,
+    classification: 'Глубокая мышца задней группы голени',
+    origin: 'Нижние 2/3 задней поверхности малоберцовой кости, межкостная перепонка.',
+    insertion: 'Основание дистальной фаланги большого пальца.',
+    innervation: 'Большеберцовый нерв (S2–S3).',
+    function: 'Сгибание большого пальца, подошвенное сгибание стопы.',
+    biomech: 'Важен для мощного отталкивания через большой палец; поддерживает медиальный свод.',
+    references: [MOORE, NEUMANN, BP3D],
+  },
+  {
+    ...foot, id: 'abductor_hallucis', name: 'Мышца, отводящая большой палец стопы', latin: 'M. abductor hallucis', group: 'muscle', hasModel: true,
+    classification: 'Собственная мышца стопы (подошвенная, медиальная группа)',
+    origin: 'Медиальный отросток бугра пяточной кости, удерживатель сгибателей, подошвенный апоневроз.',
+    insertion: 'Медиальная сторона основания проксимальной фаланги большого пальца.',
+    innervation: 'Медиальный подошвенный нерв (S2–S3).',
+    function: 'Отведение и сгибание большого пальца.',
+    biomech: 'Активно работает в упражнении «короткая стопа»; поддерживает медиальный свод — часть «кора стопы».',
+    references: [MOORE, MCKEON, BP3D],
+  },
+  {
+    ...foot, id: 'flexor_digitorum_brevis', name: 'Короткий сгибатель пальцев', latin: 'M. flexor digitorum brevis', group: 'muscle', hasModel: true,
+    classification: 'Собственная мышца стопы (подошвенная, средняя группа)',
+    origin: 'Медиальный отросток бугра пяточной кости, подошвенный апоневроз.',
+    insertion: 'Средние фаланги II–V пальцев.',
+    innervation: 'Медиальный подошвенный нерв (S2–S3).',
+    function: 'Сгибание II–V пальцев.',
+    biomech: 'Вместе с другими собственными мышцами стопы стабилизирует свод при нагрузке.',
+    references: [MOORE, MCKEON, BP3D],
+  },
+  {
+    ...foot, id: 'long_plantar_ligament', name: 'Длинная подошвенная связка', latin: 'Lig. plantare longum', group: 'ligament', hasModel: true,
+    classification: 'Связка подошвы',
+    origin: 'Подошвенная поверхность пяточной кости.',
+    insertion: 'Кубовидная кость и основания плюсневых костей.',
+    function: 'Пассивная поддержка латерального продольного свода.',
+    biomech: 'Самая длинная связка стопы; работает вместе с подошвенным апоневрозом и мышцами свода.',
+    references: [GRAY, MOORE, BP3D],
+  },
+  {
+    ...foot, id: 'plantar_fascia', name: 'Подошвенный апоневроз (фасция)', latin: 'Aponeurosis plantaris', group: 'ligament', hasModel: false,
+    classification: 'Плотная соединительнотканная пластина подошвы',
+    origin: 'Медиальный отросток бугра пяточной кости.',
+    insertion: 'Основания проксимальных фаланг пальцев.',
+    function: 'Поддерживает продольный свод; при разгибании пальцев натягивается и поднимает свод (механизм «лебёдки»).',
+    biomech: 'Перегрузка проявляется болью в пятке, особенно при первых шагах утром.',
+    references: [GRAY, NEUMANN],
+  },
+);
+
 export const STRUCTURE_BY_ID: Record<string, AnatomyStructure> = Object.fromEntries(STRUCTURES.map((s) => [s.id, s]));
 export const MODEL_STRUCTURES = STRUCTURES.filter((s) => s.hasModel);
+
+/** 3D models and the structures each one shows. Node names in the .glb are the ids. */
+export const ANATOMY_MODELS: Record<ModelId, { file: string; target: [number, number, number]; home: [number, number, number]; ids: string[]; textOnly: string[] }> = {
+  knee: {
+    file: 'models/knee.glb', target: [0, 0.03, 0], home: [0.32, 0.18, 0.95],
+    ids: ['femur', 'patella', 'tibia', 'fibula', 'rectus_femoris', 'vastus_lateralis', 'vastus_medialis', 'vastus_intermedius', 'biceps_femoris_long', 'biceps_femoris_short', 'semitendinosus', 'semimembranosus', 'gastrocnemius_medial', 'gastrocnemius_lateral', 'popliteus', 'sartorius', 'gracilis', 'iliotibial_tract'],
+    textOnly: ['acl', 'pcl', 'mcl', 'lcl', 'patellar_ligament', 'quadriceps_tendon', 'medial_meniscus', 'lateral_meniscus'],
+  },
+  foot: {
+    file: 'models/foot.glb', target: [0, 0.1, 0.02], home: [0.62, 0.32, 0.7],
+    ids: ['tibia', 'fibula', 'talus', 'calcaneus', 'navicular', 'cuboid', 'cuneiforms', 'metatarsals', 'phalanges', 'gastrocnemius_medial', 'gastrocnemius_lateral', 'soleus', 'calcaneal_tendon', 'tibialis_anterior', 'tibialis_posterior', 'fibularis_longus', 'fibularis_brevis', 'extensor_digitorum_longus', 'extensor_hallucis_longus', 'flexor_digitorum_longus', 'flexor_hallucis_longus', 'abductor_hallucis', 'flexor_digitorum_brevis', 'long_plantar_ligament'],
+    textOnly: ['plantar_fascia'],
+  },
+};
+export const MODEL_IDS = Object.keys(ANATOMY_MODELS) as ModelId[];
+export const structuresOf = (m: ModelId) => [...ANATOMY_MODELS[m].ids, ...ANATOMY_MODELS[m].textOnly].map((id) => STRUCTURE_BY_ID[id]);

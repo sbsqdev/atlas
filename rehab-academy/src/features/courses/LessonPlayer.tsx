@@ -5,13 +5,13 @@ import { useDb } from '@/data/db';
 import { completeLesson, courseStatus, touchLesson, useMe } from '@/data/api';
 import { canSeeCourse } from '@/data/rbac';
 import { SIM_BY_ID } from '@/data/content/simulations';
-import { STRUCTURES, STRUCTURE_BY_ID } from '@/data/content/anatomy';
+import { ANATOMY_MODELS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import type { Lesson } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { Badge, Button, buttonVariants, Card, EduNotice } from '@/components/ui';
 import { Markdown } from '@/components/Markdown';
-import { KneeViewer } from '@/features/anatomy/KneeViewer';
+import { AnatomyViewer } from '@/features/anatomy/AnatomyViewer';
 import { NotFound } from '@/pages/Status';
 import { LESSON_ICON } from './CourseDetail';
 
@@ -82,6 +82,11 @@ export default function LessonPlayer() {
           </div>
           <h1 className="mt-3 text-[24px] font-bold tracking-tight">{lesson.title}</h1>
           <div className="mt-2"><LessonBody lesson={lesson} /></div>
+          {lesson.ctaLabel && (
+            lesson.ctaUrl
+              ? <a href={lesson.ctaUrl} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg', className: 'mt-5' })} data-testid="lesson-cta"><ExternalLink className="h-4 w-4" /> {lesson.ctaLabel}</a>
+              : <p className="mt-5 rounded-xl border border-dashed border-line bg-bg px-4 py-3 text-sm text-navy-500" data-testid="lesson-cta">{t('lesson.ctaPending')}</p>
+          )}
           <EduNotice className="mt-6" />
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
             {prev ? <Link to={`/courses/${id}/lessons/${prev.id}`} className={buttonVariants({ variant: 'ghost' })}><ArrowLeft className="h-4 w-4" /> {t('courses.prevLesson')}</Link> : <span />}
@@ -122,15 +127,16 @@ function LessonBody({ lesson }: { lesson: Lesson }) {
     }
     case 'anatomy': {
       const focus = lesson.anatomyFocus ?? [];
-      const hidden = new Set(STRUCTURES.filter((s) => !focus.includes(s.id)).map((s) => s.id));
+      const model = lesson.anatomyModel ?? 'knee';
+      const hidden = new Set(ANATOMY_MODELS[model].ids.filter((id) => !focus.includes(id)));
       return (
         <>
           {body}
           <div className="my-4 h-[420px] overflow-hidden rounded-2xl border border-line bg-[radial-gradient(ellipse_at_center,#ffffff_0%,#E8EEF4_75%)]">
-            <KneeViewer className="h-full" hidden={hidden} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
+            <AnatomyViewer className="h-full" model={model} hidden={hidden} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
           </div>
           <div className="flex flex-wrap gap-2">{focus.map((s) => <Badge key={s} tone="teal">{STRUCTURE_BY_ID[s]?.name}</Badge>)}</div>
-          <Link to={`/anatomy?focus=${focus.join(',')}`} className={buttonVariants({ variant: 'outline', className: 'mt-4' })}><ExternalLink className="h-4 w-4" /> {t('courses.openAnatomy')}</Link>
+          <Link to={`/anatomy?m=${model}&focus=${focus.join(',')}`} className={buttonVariants({ variant: 'outline', className: 'mt-4' })}><ExternalLink className="h-4 w-4" /> {t('courses.openAnatomy')}</Link>
         </>
       );
     }

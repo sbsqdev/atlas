@@ -12,7 +12,7 @@ import { cn } from '@/lib/cn';
 import { fmtDateTime } from '@/lib/format';
 import { Badge, Button, buttonVariants, Card, CardBody, CardHeader, EduNotice, PageHeader, Progress } from '@/components/ui';
 import { NotFound } from '@/pages/Status';
-import { KneeViewer } from '@/features/anatomy/KneeViewer';
+import { AnatomyViewer } from '@/features/anatomy/AnatomyViewer';
 import { MovementSchematic } from './MovementSchematic';
 import { LockedNotice } from './SimLibrary';
 
@@ -152,7 +152,7 @@ function ExploreNode({ node, onDone, answered }: { node: Extract<SimNode, { kind
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_340px]">
       <div className="h-[460px] overflow-hidden rounded-2xl border border-line bg-[radial-gradient(ellipse_at_center,#ffffff_0%,#E8EEF4_75%)]">
-        <KneeViewer className="h-full" found={found} flash={flash} onPick={pick} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
+        <AnatomyViewer className="h-full" found={found} flash={flash} onPick={pick} errorText={t('anat.loadError')} loadingText={t('common.loading')} />
       </div>
       <Card>
         <CardHeader title={node.title} subtitle={t('sim.identifyTask')} />

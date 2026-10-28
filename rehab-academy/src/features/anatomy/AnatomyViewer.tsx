@@ -3,13 +3,13 @@ import { Canvas, useThree, type ThreeEvent } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useProgress } from '@react-three/drei';
 import { Color, type Mesh, type MeshStandardMaterial, Vector3 } from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { ANATOMY_MODELS } from '@/data/content/anatomy';
+import type { ModelId } from '@/data/types';
 
-/* Licensed knee model (BodyParts3D, CC BY 4.0) rendered with React Three
-   Fiber. Mesh names in knee.glb are the structure ids used in content. */
+/* Licensed regional models (BodyParts3D, CC BY 4.0) rendered with React Three
+   Fiber. Mesh names in each .glb are the structure ids used in content. */
 
-export const MODEL_URL = `${import.meta.env.BASE_URL}models/knee.glb`;
-const TARGET = new Vector3(0, 0.03, 0);
-const HOME = new Vector3(0.32, 0.18, 0.95);
+const modelUrl = (m: ModelId) => `${import.meta.env.BASE_URL}${ANATOMY_MODELS[m].file}`;
 
 const BASE: Record<string, Color> = {
   bone: new Color('#E6DCC3'),
@@ -32,10 +32,12 @@ export interface ViewerProps {
   onPick?: (id: string) => void;
   onHover?: (id: string | null) => void;
   className?: string;
+  /** Which regional model to show (default: knee). */
+  model?: ModelId;
 }
 
-function Model({ selected, found = [], flash, hidden, isolated, ghost, onPick, onHover }: ViewerProps) {
-  const { scene } = useGLTF(MODEL_URL);
+function Model({ model = 'knee', selected, found = [], flash, hidden, isolated, ghost, onPick, onHover }: ViewerProps) {
+  const { scene } = useGLTF(modelUrl(model));
   const meshes = useMemo(() => {
     const root = scene.clone(true);
     const list: Mesh[] = [];
@@ -82,9 +84,11 @@ function Model({ selected, found = [], flash, hidden, isolated, ghost, onPick, o
   );
 }
 
-const Controls = forwardRef<ViewerHandle, { autoRotate?: boolean }>(({ autoRotate }, ref) => {
+const Controls = forwardRef<ViewerHandle, { autoRotate?: boolean; model: ModelId }>(({ autoRotate, model }, ref) => {
   const controls = useRef<OrbitControlsImpl>(null);
   const camera = useThree((s) => s.camera);
+  const TARGET = useMemo(() => new Vector3(...ANATOMY_MODELS[model].target), [model]);
+  const HOME = useMemo(() => new Vector3(...ANATOMY_MODELS[model].home), [model]);
   useImperativeHandle(ref, () => ({
     zoom(factor) {
       const c = controls.current;
@@ -99,7 +103,7 @@ const Controls = forwardRef<ViewerHandle, { autoRotate?: boolean }>(({ autoRotat
       controls.current?.target.copy(TARGET);
       controls.current?.update();
     },
-  }), [camera]);
+  }), [camera, TARGET, HOME]);
   return <OrbitControls ref={controls} makeDefault target={TARGET} enableDamping dampingFactor={0.12} minDistance={0.25} maxDistance={3} autoRotate={autoRotate} autoRotateSpeed={1.2} />;
 });
 Controls.displayName = 'Controls';
@@ -116,19 +120,19 @@ function Loading({ text }: { text: string }) {
   return <div className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-navy-500">{text} {Math.round(progress)}%</div>;
 }
 
-export const KneeViewer = forwardRef<ViewerHandle, ViewerProps & { errorText: string; loadingText: string }>(
-  ({ className, autoRotate, errorText, loadingText, ...props }, ref) => (
-    <div className={className} data-testid="knee-viewer">
+export const AnatomyViewer = forwardRef<ViewerHandle, ViewerProps & { errorText: string; loadingText: string }>(
+  ({ className, autoRotate, errorText, loadingText, model = 'knee', ...props }, ref) => (
+    <div className={className} data-testid="anatomy-viewer" data-model={model}>
       <LoadBoundary fallback={<div className="grid h-full place-items-center p-6 text-center text-sm text-error">{errorText}</div>}>
         <div className="relative h-full w-full">
-          <Canvas camera={{ position: HOME.toArray(), fov: 35, near: 0.01, far: 20 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}>
+          <Canvas key={model} camera={{ position: ANATOMY_MODELS[model].home, fov: 35, near: 0.01, far: 20 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}>
             <hemisphereLight args={['#ffffff', '#8aa1b4', 1.1]} />
             <directionalLight position={[1.5, 2, 2]} intensity={1.6} />
             <directionalLight position={[-2, 1, -1.5]} intensity={0.6} />
             <Suspense fallback={null}>
-              <Model {...props} />
+              <Model model={model} {...props} />
             </Suspense>
-            <Controls ref={ref} autoRotate={autoRotate} />
+            <Controls ref={ref} autoRotate={autoRotate} model={model} />
           </Canvas>
           <Loading text={loadingText} />
         </div>
@@ -136,6 +140,6 @@ export const KneeViewer = forwardRef<ViewerHandle, ViewerProps & { errorText: st
     </div>
   ),
 );
-KneeViewer.displayName = 'KneeViewer';
+AnatomyViewer.displayName = 'AnatomyViewer';
 
-useGLTF.preload(MODEL_URL);
+useGLTF.preload(modelUrl('knee'));

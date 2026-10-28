@@ -3,6 +3,7 @@ import { hashPassword, newSalt } from './crypto';
 import { gradeAttempt, correctAnswer } from './grading';
 import { SEED_ASSESSMENTS, SEED_QUESTIONS } from './content/assessments';
 import { SEED_COURSES, SEED_LESSONS, SEED_MODULES } from './content/courses';
+import { RUN_ASSESSMENT, RUN_COURSE, RUN_LESSONS, RUN_MODULES, RUN_QUESTIONS } from './content/runners';
 import type { AnswerValue, Organization, Role, User } from './types';
 
 /* Demo seed. Every organization, person and result below is SYNTHETIC and
@@ -47,17 +48,18 @@ export async function seedDemo() {
     user('u-super', 'super@demo.example', 'Администратор платформы (демо)', 'super_admin', 'org-platform'),
     user('u-uniadmin', 'uni@demo.example', 'Администратор университета (демо)', 'uni_admin', 'org-uni'),
     user('u-clinicadmin', 'clinic@demo.example', 'Администратор клиники (демо)', 'clinic_admin', 'org-clinic'),
+    user('u-rehab', 'rehab@demo.example', 'Реабилитолог курса', 'instructor', 'org-platform', { headline: 'Спортивная реабилитация' }),
     user('u-instructor', 'instructor@demo.example', 'Преподаватель (демо)', 'instructor', 'org-uni', { headline: 'Кафедра реабилитологии (демо)' }),
     user('u-student', 'student@demo.example', 'Студент (демо)', 'student', 'org-uni', { cohort: 'Поток 2025', headline: 'Студент-реабилитолог' }),
     ...[1, 2, 3, 4, 5, 6].map((i) => user(`u-s${i}`, `s${i}@demo.example`, `Синтетический студент ${i}`, 'student', 'org-uni', { cohort: i <= 3 ? 'Поток 2025' : 'Поток 2024' })),
     user('u-employee', 'staff@demo.example', 'Сотрудник клиники (демо)', 'student', 'org-clinic'),
   ]);
 
-  t.courses = SEED_COURSES.map((c) => ({ ...c, createdAt: now - 40 * DAY, updatedAt: now - 10 * DAY }));
-  t.modules = [...SEED_MODULES];
-  t.lessons = [...SEED_LESSONS];
-  t.assessments = SEED_ASSESSMENTS.map((a) => ({ ...a, createdAt: now - 40 * DAY }));
-  t.questions = [...SEED_QUESTIONS];
+  t.courses = [RUN_COURSE, ...SEED_COURSES].map((c) => ({ ...c, createdAt: now - 40 * DAY, updatedAt: now - 10 * DAY }));
+  t.modules = [...RUN_MODULES, ...SEED_MODULES];
+  t.lessons = [...RUN_LESSONS, ...SEED_LESSONS];
+  t.assessments = [RUN_ASSESSMENT, ...SEED_ASSESSMENTS].map((a) => ({ ...a, createdAt: now - 40 * DAY }));
+  t.questions = [...RUN_QUESTIONS, ...SEED_QUESTIONS];
   t.reviews = [
     { id: 'rv-1', entity: 'course', entityId: 'c-knee', from: 'medical_review', to: 'approved', byUserId: 'u-super', note: 'Демо-запись проверки', at: now - 35 * DAY },
     { id: 'rv-2', entity: 'course', entityId: 'c-knee', from: 'approved', to: 'published', byUserId: 'u-super', at: now - 34 * DAY },
@@ -132,4 +134,19 @@ export async function seedDemo() {
 /** Seeds on first launch (or after a schema bump / reset). */
 export async function ensureSeeded() {
   if (useDb.getState().seededVersion !== SCHEMA_VERSION || useDb.getState().users.length === 0) await seedDemo();
+  syncRunnersCourse();
 }
+
+/** The runners course is managed in code (content/runners.ts): refresh it on
+ *  every launch so edits there (e.g. video or chat links) reach existing browsers. */
+function syncRunnersCourse() {
+  const keep = <T extends { id: string }>(rows: T[], fresh: T[]) => [...fresh, ...rows.filter((r) => !fresh.some((f) => f.id === r.id))];
+  useDb.setState((s) => ({
+    modules: keep(s.modules, RUN_MODULES),
+    lessons: keep(s.lessons, RUN_LESSONS),
+    questions: keep(s.questions, RUN_QUESTIONS),
+    assessments: keep(s.assessments, [{ ...RUN_ASSESSMENT, createdAt: s.assessments.find((a) => a.id === RUN_ASSESSMENT.id)?.createdAt ?? Date.now() }]),
+    courses: keep(s.courses, [{ ...RUN_COURSE, ...pick(s.courses.find((c) => c.id === RUN_COURSE.id)) }]),
+  }));
+}
+const pick = (c?: { createdAt: number; updatedAt: number }) => (c ? { createdAt: c.createdAt, updatedAt: c.updatedAt } : { createdAt: Date.now(), updatedAt: Date.now() });
