@@ -8,7 +8,7 @@ const kk: Partial<Record<I18nKey, string>> = {
   'nav.progress': 'Менің прогресім', 'nav.certificates': 'Сертификаттар', 'nav.career': 'Мансап',
   'nav.settings': 'Баптаулар', 'nav.logout': 'Шығу', 'nav.pricing': 'Тарифтер',
   'auth.signIn': 'Кіру', 'auth.signUp': 'Тіркелу', 'auth.password': 'Құпиясөз', 'auth.submitIn': 'Кіру',
-  'role.student': 'Студент', 'role.instructor': 'Оқытушы',
+  'role.athlete': 'Спортшы (жүгіруші)', 'role.student': 'Студент', 'role.instructor': 'Оқытушы',
   'common.save': 'Сақтау', 'common.cancel': 'Болдырмау', 'common.start': 'Бастау', 'common.continue': 'Жалғастыру',
   'common.next': 'Келесі', 'common.back': 'Артқа',
   'set.language': 'Интерфейс тілі',

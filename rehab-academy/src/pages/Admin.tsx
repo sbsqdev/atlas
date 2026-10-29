@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { activatePilot, cancelSubscription, createOrg, createOrgAdmin, useMe } from '@/data/api';
+import { activatePilot, cancelSubscription, createOrg, createOrgAdmin, roleKey, useMe } from '@/data/api';
 import { PLANS, PLAN_BY_ID } from '@/data/content/plans';
 import { SIMULATIONS } from '@/data/content/simulations';
 import type { OrgType, PlanId } from '@/data/types';
@@ -103,7 +103,7 @@ export default function Admin() {
               {d.users.map((u) => (
                 <tr key={u.id}>
                   <td className="px-5 py-2.5"><div className="font-medium">{u.fullName} {u.demo && <Badge tone="warning" className="ml-1">DEMO</Badge>}</div><div className="text-[12px] text-navy-500">{u.email}</div></td>
-                  <td className="px-3 py-2.5">{t(`role.${u.role}` as I18nKey)}</td>
+                  <td className="px-3 py-2.5">{t(roleKey(u) as I18nKey)}</td>
                   <td className="px-3 py-2.5 text-navy-500">{d.orgs.find((o) => o.id === u.orgId)?.name ?? '—'}</td>
                   <td className="px-3 py-2.5 text-navy-500">{fmtDate(u.createdAt, locale)}</td>
                 </tr>

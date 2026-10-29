@@ -5,7 +5,7 @@ import {
   LayoutDashboard, LogOut, Menu, PenSquare, Search, Settings, ShieldCheck, Stethoscope, Tag, Users, X,
 } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { logout, markNotificationsRead, useMe } from '@/data/api';
+import { forTrack, isAthlete, logout, markNotificationsRead, roleKey, useMe } from '@/data/api';
 import { can, canSeeCourse } from '@/data/rbac';
 import { STRUCTURES } from '@/data/content/anatomy';
 import { SIMULATIONS } from '@/data/content/simulations';
@@ -30,7 +30,15 @@ export function Logo({ collapsed }: { collapsed?: boolean }) {
 
 function useNav() {
   const u = useMe();
-  const learn: Item[] = [
+  // Athletes get a short menu: their courses, the 3D atlas and their progress.
+  const athlete: Item[] = [
+    { to: '/', key: 'nav.home', icon: <LayoutDashboard />, end: true },
+    { to: '/courses', key: 'nav.myCourses', icon: <BookOpen /> },
+    { to: '/anatomy', key: 'nav.atlas', icon: <Bone /> },
+    { to: '/progress', key: 'nav.progress', icon: <GraduationCap /> },
+    { to: '/certificates', key: 'nav.certificates', icon: <Award /> },
+  ];
+  const learn: Item[] = isAthlete(u) ? athlete : [
     { to: '/', key: 'nav.dashboard', icon: <LayoutDashboard />, end: true },
     { to: '/anatomy', key: 'nav.anatomy', icon: <Bone /> },
     { to: '/simulations', key: 'nav.simulations', icon: <FlaskConical /> },
@@ -124,10 +132,10 @@ function GlobalSearch() {
     const s = q.trim().toLowerCase();
     if (s.length < 2 || !u) return [];
     const r: { label: string; kind: I18nKey; to: string }[] = [];
-    courses.filter((c) => canSeeCourse(u, c) && c.title.toLowerCase().includes(s)).forEach((c) => r.push({ label: c.title, kind: 'nav.courses', to: `/courses/${c.id}` }));
+    courses.filter((c) => canSeeCourse(u, c) && forTrack(u, c) && c.title.toLowerCase().includes(s)).forEach((c) => r.push({ label: c.title, kind: 'nav.courses', to: `/courses/${c.id}` }));
     STRUCTURES.filter((x) => x.name.toLowerCase().includes(s) || x.latin.toLowerCase().includes(s)).forEach((x) => r.push({ label: `${x.name} · ${x.latin}`, kind: 'nav.anatomy', to: `/anatomy?s=${x.id}` }));
-    SIMULATIONS.filter((x) => x.title.toLowerCase().includes(s)).forEach((x) => r.push({ label: x.title, kind: 'nav.simulations', to: `/simulations/${x.id}` }));
-    PATIENTS.filter((x) => x.title.toLowerCase().includes(s)).forEach((x) => r.push({ label: x.title, kind: 'nav.patients', to: `/patients/${x.id}` }));
+    if (!isAthlete(u)) SIMULATIONS.filter((x) => x.title.toLowerCase().includes(s)).forEach((x) => r.push({ label: x.title, kind: 'nav.simulations', to: `/simulations/${x.id}` }));
+    if (!isAthlete(u)) PATIENTS.filter((x) => x.title.toLowerCase().includes(s)).forEach((x) => r.push({ label: x.title, kind: 'nav.patients', to: `/patients/${x.id}` }));
     return r.slice(0, 10);
   }, [q, u, courses]);
   return (
@@ -135,7 +143,7 @@ function GlobalSearch() {
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy-300" />
       <input
         value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
-        placeholder={t('nav.search')} aria-label={t('common.search')}
+        placeholder={t(isAthlete(u) ? 'nav.searchAthlete' : 'nav.search')} aria-label={t('common.search')}
         className="h-10 w-full rounded-xl border border-line bg-bg pl-9 pr-3 text-sm placeholder:text-navy-300 focus:border-teal focus:bg-white focus:outline-none"
       />
       {open && q.trim().length >= 2 && (
@@ -205,7 +213,7 @@ function UserMenu() {
         <span className="grid h-9 w-9 place-items-center rounded-full bg-navy text-[13px] font-bold text-white">{initials}</span>
         <span className="hidden text-left md:block">
           <span className="block max-w-[180px] truncate text-[13px] font-semibold text-navy">{u.fullName}</span>
-          <span className="block text-[11px] text-navy-500">{t(`role.${u.role}` as I18nKey)}</span>
+          <span className="block text-[11px] text-navy-500">{t(roleKey(u) as I18nKey)}</span>
         </span>
       </button>
       {open && (

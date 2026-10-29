@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, GraduationCap, MessageSquare, ShieldCheck, Users } from 'lucide-react';
+import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, Footprints, GraduationCap, MessageCircle, MessageSquare, ShieldCheck, Users } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { activeSubscriptions, courseLessons, useMe } from '@/data/api';
+import { activeSubscriptions, courseLessons, forTrack, isAthlete, useMe } from '@/data/api';
 import { activityByDay, avg, bestAttempts, coursePct, missedQuestions, totalMinutes } from '@/data/analytics';
 import { canSeeCourse } from '@/data/rbac';
 import { STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { PLAN_BY_ID } from '@/data/content/plans';
+import { RUN_LINKS, RUN_OFFER } from '@/data/content/runners';
 import type { User } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { fmtDate, fmtHours, LOCALE_TAG } from '@/lib/format';
@@ -16,10 +17,112 @@ import { BarSeries } from '@/components/charts';
 
 export default function Dashboard() {
   const u = useMe()!;
+  if (isAthlete(u)) return <AthleteDash u={u} />;
   if (u.role === 'instructor') return <InstructorDash u={u} />;
   if (u.role === 'uni_admin' || u.role === 'clinic_admin') return <OrgDash u={u} />;
   if (u.role === 'super_admin') return <PlatformDash u={u} />;
   return <StudentDash u={u} />;
+}
+
+/** Home for athletes: continue the course, open the 3D atlas, join the chat. */
+function AthleteDash({ u }: { u: User }) {
+  const { t } = useT();
+  const d = useDb();
+  const v = useMemo(() => {
+    const enrolled = d.enrollments.filter((e) => e.userId === u.id);
+    const courses = enrolled.map((e) => d.courses.find((c) => c.id === e.courseId)).filter((c): c is NonNullable<typeof c> => !!c);
+    const current = courses.find((c) => coursePct(d, u.id, c.id) < 100) ?? courses[0];
+    const lessons = current ? courseLessons(current.id) : [];
+    const last = enrolled.find((e) => e.courseId === current?.id)?.lastLessonId;
+    const next = lessons.find((l) => l.id === last && !d.progress.some((p) => p.userId === u.id && p.lessonId === l.id))
+      ?? lessons.find((l) => !d.progress.some((p) => p.userId === u.id && p.lessonId === l.id));
+    const more = d.courses.filter((c) => c.status === 'published' && canSeeCourse(u, c) && forTrack(u, c) && !enrolled.some((e) => e.courseId === c.id));
+    const recent = d.anatomyViews.filter((x) => x.userId === u.id).sort((a, b) => b.at - a.at).slice(0, 6);
+    const done = d.progress.filter((p) => p.userId === u.id).length;
+    return { current, next, more, recent, done, lessonsTotal: lessons.length };
+  }, [d, u]);
+  const pct = v.current ? coursePct(d, u.id, v.current.id) : 0;
+  const chatHref = RUN_LINKS.telegramChat || `/courses/${RUN_OFFER.courseId}/lessons/l-r3`;
+
+  return (
+    <div className="animate-fade-up" data-testid="athlete-home">
+      <PageHeader eyebrow={t('ath.eyebrow')} title={t('dash.welcome', { name: u.fullName.split(' ')[0] })} subtitle={t('ath.sub')} />
+      {v.current ? (
+        <Card className="overflow-hidden">
+          <div className="grid md:grid-cols-[1fr_260px]">
+            <div className="p-6 md:p-8">
+              <div className="text-[12px] font-semibold uppercase tracking-wider text-teal">{t('dash.continue')}</div>
+              <h2 className="mt-2 text-2xl font-bold">{v.current.title}</h2>
+              {v.next && <p className="mt-1 text-sm text-navy-500">{t('courses.nextLesson')}: {v.next.title}</p>}
+              <div className="mt-5 flex items-center gap-3"><Progress value={pct} className="max-w-sm" /><span className="text-sm font-semibold">{pct}%</span></div>
+              <Link to={v.next ? `/courses/${v.current.id}/lessons/${v.next.id}` : `/courses/${v.current.id}`} className={buttonVariants({ size: 'lg', className: 'mt-6' })}>{t('common.continue')}</Link>
+            </div>
+            <div className="hidden items-center justify-center bg-gradient-to-br from-teal to-navy md:flex"><Footprints className="h-24 w-24 text-white/80" strokeWidth={1.2} /></div>
+          </div>
+        </Card>
+      ) : (
+        <EmptyState title={t('dash.noCourses')} action={<Link to="/courses" className={buttonVariants()}>{t('dash.browseCourses')}</Link>} />
+      )}
+
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {[
+          { to: '/anatomy?m=knee', icon: <Bone className="h-5 w-5" />, title: t('ath.knee'), text: t('ath.kneeText') },
+          { to: '/anatomy?m=foot', icon: <Footprints className="h-5 w-5" />, title: t('ath.foot'), text: t('ath.footText') },
+        ].map((c) => (
+          <Link key={c.to} to={c.to} className="group">
+            <Card className="h-full p-5 transition-shadow group-hover:shadow-[var(--shadow-lift)]">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-50 text-teal">{c.icon}</span>
+              <h3 className="mt-3 font-semibold">{c.title}</h3>
+              <p className="mt-1 text-[13px] text-navy-500">{c.text}</p>
+            </Card>
+          </Link>
+        ))}
+        {(() => {
+          const inner = (
+            <Card className="h-full p-5 transition-shadow hover:shadow-[var(--shadow-lift)]">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-50 text-teal"><MessageCircle className="h-5 w-5" /></span>
+              <h3 className="mt-3 font-semibold">{t('ath.chat')}</h3>
+              <p className="mt-1 text-[13px] text-navy-500">{t('ath.chatText')}</p>
+            </Card>
+          );
+          return chatHref.startsWith('http') ? <a href={chatHref} target="_blank" rel="noreferrer">{inner}</a> : <Link to={chatHref}>{inner}</Link>;
+        })()}
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 xl:col-span-2">
+          <StatCard label={t('dash.lessonsDone')} value={v.done} icon={<BookOpen className="h-4 w-4" />} />
+          <StatCard label={t('dash.hours')} value={fmtHours(totalMinutes(d, u.id))} icon={<Clock className="h-4 w-4" />} tone="cyan" />
+        </div>
+        <Card>
+          <CardHeader title={t('dash.recentAnatomy')} icon={<Bone className="h-4 w-4" />} />
+          <CardBody>
+            {v.recent.length === 0 ? <p className="text-sm text-navy-500">{t('common.noData')}</p> : (
+              <div className="flex flex-wrap gap-2">
+                {v.recent.map((x) => STRUCTURE_BY_ID[x.structureId] && (
+                  <Link key={x.structureId} to={`/anatomy?s=${x.structureId}`} className="rounded-full bg-teal-50 px-3 py-1 text-[12px] font-semibold text-teal hover:bg-teal hover:text-white">{STRUCTURE_BY_ID[x.structureId].name}</Link>
+                ))}
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </div>
+
+      {v.more.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader title={t('ath.more')} icon={<BookOpen className="h-4 w-4" />} />
+          <CardBody className="grid gap-3 md:grid-cols-2">
+            {v.more.map((c) => (
+              <Link key={c.id} to={`/courses/${c.id}`} className="rounded-xl border border-line p-4 hover:border-teal">
+                <div className="font-semibold">{c.title}</div>
+                <div className="mt-1 text-[12px] text-navy-500">{c.durationMin} {t('common.min')}</div>
+              </Link>
+            ))}
+          </CardBody>
+        </Card>
+      )}
+    </div>
+  );
 }
 
 function StudentDash({ u }: { u: User }) {

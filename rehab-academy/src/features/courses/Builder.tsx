@@ -3,10 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useDb } from '@/data/db';
 import { createCourse, useMe } from '@/data/api';
-import type { ContentStatus, Level } from '@/data/types';
+import type { ContentStatus, Level, Track } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { fmtDate } from '@/lib/format';
 import { Badge, Button, Card, Dialog, EmptyState, Field, Input, PageHeader, Select, Textarea } from '@/components/ui';
+
+/** Course audience presets: athletes first, specialists later. */
+type Who = 'athlete' | 'pro' | 'both';
+const AUDIENCE: Record<Who, Track[]> = { athlete: ['athlete'], pro: ['pro'], both: ['athlete', 'pro'] };
 
 export const STATUS_TONE: Record<ContentStatus, 'gray' | 'warning' | 'cyan' | 'success' | 'navy'> = {
   draft: 'gray', medical_review: 'warning', approved: 'cyan', published: 'success', archived: 'navy',
@@ -18,12 +22,13 @@ export default function Builder() {
   const d = useDb();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: '', category: '', level: 'beginner' as Level, description: '', durationMin: 60 });
+  const [form, setForm] = useState({ title: '', category: '', level: 'beginner' as Level, description: '', durationMin: 60, who: 'athlete' as Who });
   const mine = d.courses.filter((c) => c.instructorId === u.id || u.role === 'super_admin').sort((a, b) => b.updatedAt - a.updatedAt);
 
   function create() {
     if (!form.title.trim()) return;
-    const c = createCourse({ ...form, title: form.title.trim(), category: form.category.trim() || '—' });
+    const { who, ...rest } = form;
+    const c = createCourse({ ...rest, title: form.title.trim(), category: form.category.trim() || '—', audience: AUDIENCE[who] });
     setOpen(false);
     nav(`/teach/builder/${c.id}`);
   }
@@ -62,7 +67,14 @@ export default function Builder() {
               </Select>
             </Field>
           </div>
-          <Field label={t('builder.duration')}><Input type="number" min={5} value={form.durationMin} onChange={(e) => setForm({ ...form, durationMin: Number(e.target.value) })} /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('builder.duration')}><Input type="number" min={5} value={form.durationMin} onChange={(e) => setForm({ ...form, durationMin: Number(e.target.value) })} /></Field>
+            <Field label={t('builder.audience')}>
+              <Select value={form.who} onChange={(e) => setForm({ ...form, who: e.target.value as Who })} name="audience">
+                {(Object.keys(AUDIENCE) as Who[]).map((w) => <option key={w} value={w}>{t(`builder.audience.${w}` as I18nKey)}</option>)}
+              </Select>
+            </Field>
+          </div>
           <Field label={t('common.description')}><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></Field>
         </div>
       </Dialog>

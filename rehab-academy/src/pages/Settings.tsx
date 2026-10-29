@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Database, Download, Globe, RotateCcw, User } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { activeSubscriptions, exportMyData, resetDemo, updateProfile, useMe } from '@/data/api';
+import { activeSubscriptions, exportMyData, resetDemo, roleKey, updateProfile, useMe } from '@/data/api';
 import { PLAN_BY_ID } from '@/data/content/plans';
 import { LOCALES, useLocale, useT, type I18nKey } from '@/i18n';
 import { cn } from '@/lib/cn';
@@ -30,7 +30,7 @@ export default function Settings() {
           <CardBody className="space-y-4">
             <Field label={t('auth.fullName')}><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
             <Field label={t('auth.email')}><Input value={u.email} disabled /></Field>
-            <div className="text-sm text-navy-500">{t(`role.${u.role}` as I18nKey)}{u.cohort ? ` · ${u.cohort}` : ''}</div>
+            <div className="text-sm text-navy-500">{t(roleKey(u) as I18nKey)}{u.cohort ? ` · ${u.cohort}` : ''}</div>
             <Button disabled={!name.trim()} onClick={() => { updateProfile({ fullName: name.trim() }); setSaved(true); setTimeout(() => setSaved(false), 1500); }}>{saved ? t('common.saved') : t('common.save')}</Button>
           </CardBody>
         </Card>

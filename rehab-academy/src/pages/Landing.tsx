@@ -5,7 +5,7 @@ import {
   Rotate3d, ShieldCheck, Smartphone, Stethoscope, Timer, Trophy, Users,
 } from 'lucide-react';
 import { enroll, login } from '@/data/api';
-import { DEMO_PASSWORD } from '@/data/seed';
+import { DEMO_ATHLETE, DEMO_PASSWORD } from '@/data/seed';
 import { RUN_LESSONS, RUN_MODULES, RUN_OFFER } from '@/data/content/runners';
 import { useT } from '@/i18n';
 import { fmtKzt } from '@/lib/format';
@@ -41,7 +41,7 @@ export default function Landing() {
   async function openDemo() {
     setBusy(true);
     try {
-      await login('student@demo.example', DEMO_PASSWORD);
+      await login(DEMO_ATHLETE, DEMO_PASSWORD);
       try { enroll(RUN_OFFER.courseId); } catch { /* already enrolled or not entitled: the course page explains */ }
       nav(`/courses/${RUN_OFFER.courseId}`);
     } finally {
@@ -309,6 +309,17 @@ export default function Landing() {
             ))}
           </div>
         </Section>
+      </section>
+
+      {/* Specialists come next */}
+      <section className="mx-auto w-full max-w-6xl px-5 pb-16 md:px-8">
+        <div className="flex flex-col items-start gap-4 rounded-3xl border border-dashed border-line p-6 md:flex-row md:items-center md:justify-between md:p-8">
+          <div>
+            <div className="text-[13px] font-bold uppercase tracking-[0.18em] text-navy-500">Скоро · для специалистов</div>
+            <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-navy-700">Академия для реабилитологов, тренеров и спортивных врачей: профессиональные курсы, 3D-лаборатория анатомии, симуляции и возможность публиковать собственные программы.</p>
+          </div>
+          <Link to="/login" className={buttonVariants({ variant: 'secondary' })}>Вход для специалистов</Link>
+        </div>
       </section>
 
       {/* Final CTA + footer */}

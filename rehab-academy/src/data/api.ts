@@ -5,8 +5,7 @@ import { gradeAttempt } from './grading';
 import { seedDemo } from './seed';
 import { PLAN_BY_ID } from './content/plans';
 import type {
-  ActivityLog, AnswerValue, Assessment, AssessmentAttempt, Course, CourseModule, ContentStatus, Entitlement, Lesson, OrgType, PatientAttempt,
-  PlanId, Question, Role, SimulationAttempt, Subscription, User,
+  ActivityLog, AnswerValue, Assessment, AssessmentAttempt, Course, CourseModule, ContentStatus, Entitlement, Lesson, OrgType, PatientAttempt, PlanId, Question, Role, SimulationAttempt, Subscription, User, Track,
 } from './types';
 
 /* Service layer. Every mutation re-reads the current user and enforces RBAC
@@ -50,7 +49,7 @@ export async function login(email: string, password: string) {
   return u;
 }
 
-export async function register(input: { email: string; password: string; fullName: string; role: 'student' | 'instructor'; consent: boolean }) {
+export async function register(input: { email: string; password: string; fullName: string; role: 'athlete' | 'student' | 'instructor'; consent: boolean }) {
   const email = input.email.trim().toLowerCase();
   if (!input.fullName.trim()) throw new ApiError('auth.err.name');
   if (!EMAIL_RE.test(email)) throw new ApiError('auth.err.email');
@@ -59,9 +58,10 @@ export async function register(input: { email: string; password: string; fullNam
   if (db().users.some((u) => u.email === email)) throw new ApiError('auth.err.exists');
   // Self-registration is limited to learner/instructor roles; admin roles are provisioned by the platform.
   const role: Role = input.role === 'instructor' ? 'instructor' : 'student';
+  const track: Track = input.role === 'athlete' ? 'athlete' : 'pro';
   const salt = newSalt();
   const u: User = {
-    id: uid('u'), email, fullName: input.fullName.trim(), role, orgId: null, salt, passwordHash: await hashPassword(input.password, salt),
+    id: uid('u'), email, fullName: input.fullName.trim(), role, track, orgId: null, salt, passwordHash: await hashPassword(input.password, salt),
     careerVisible: false, consentAt: Date.now(), createdAt: Date.now(),
   };
   write((t) => ({ users: [...t.users, u] }));
@@ -216,7 +216,7 @@ function editableCourse(courseId: string) {
 }
 const touch = (courseId: string) => write((t) => ({ courses: t.courses.map((c) => (c.id === courseId ? { ...c, updatedAt: Date.now() } : c)) }));
 
-export function createCourse(input: Pick<Course, 'title' | 'category' | 'level' | 'description' | 'durationMin'>) {
+export function createCourse(input: Pick<Course, 'title' | 'category' | 'level' | 'description' | 'durationMin' | 'audience'>) {
   const u = me();
   assertCan(u, 'course.author');
   const now = Date.now();
@@ -528,3 +528,10 @@ export function touchLesson(courseId: string, lessonId: string) {
   if (!u) return;
   write((t) => ({ enrollments: t.enrollments.map((e) => (e.userId === u.id && e.courseId === courseId ? { ...e, lastLessonId: lessonId } : e)) }));
 }
+
+/** Athletes (runners, marathoners…) get the simplified app; everyone else the specialist one. */
+export const isAthlete = (u: User | null | undefined) => u?.track === 'athlete';
+/** Courses meant for this learner's track. */
+/** i18n key of the user's role label; athletes are shown as athletes, not students. */
+export const roleKey = (u: User) => (isAthlete(u) ? 'role.athlete' : `role.${u.role}`) as `role.${string}`;
+export const forTrack = (u: User, c: Course) => !isAthlete(u) || (c.audience ?? ['pro']).includes('athlete');

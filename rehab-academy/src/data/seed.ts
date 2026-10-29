@@ -5,18 +5,21 @@ import { SEED_ASSESSMENTS, SEED_QUESTIONS } from './content/assessments';
 import { SEED_COURSES, SEED_LESSONS, SEED_MODULES } from './content/courses';
 import { RUN_ASSESSMENT, RUN_COURSE, RUN_LESSONS, RUN_MODULES, RUN_QUESTIONS } from './content/runners';
 import type { AnswerValue, Organization, Role, User } from './types';
+import type { I18nKey } from '@/i18n';
 
 /* Demo seed. Every organization, person and result below is SYNTHETIC and
    flagged demo:true. No real institutions, people or metrics. */
 
 export const DEMO_PASSWORD = 'demo1234';
-export const DEMO_ACCOUNTS: { email: string; role: Role }[] = [
-  { email: 'student@demo.example', role: 'student' },
-  { email: 'instructor@demo.example', role: 'instructor' },
-  { email: 'uni@demo.example', role: 'uni_admin' },
-  { email: 'clinic@demo.example', role: 'clinic_admin' },
-  { email: 'super@demo.example', role: 'super_admin' },
+export const DEMO_ACCOUNTS: { email: string; role: Role; label: I18nKey }[] = [
+  { email: 'runner@demo.example', role: 'student', label: 'role.athlete' },
+  { email: 'student@demo.example', role: 'student', label: 'role.student' },
+  { email: 'instructor@demo.example', role: 'instructor', label: 'role.instructor' },
+  { email: 'uni@demo.example', role: 'uni_admin', label: 'role.uni_admin' },
+  { email: 'clinic@demo.example', role: 'clinic_admin', label: 'role.clinic_admin' },
+  { email: 'super@demo.example', role: 'super_admin', label: 'role.super_admin' },
 ];
+export const DEMO_ATHLETE = 'runner@demo.example';
 
 // Small deterministic PRNG so demo analytics are stable between reloads.
 function rng(seed: number) {
@@ -48,6 +51,7 @@ export async function seedDemo() {
     user('u-super', 'super@demo.example', 'Администратор платформы (демо)', 'super_admin', 'org-platform'),
     user('u-uniadmin', 'uni@demo.example', 'Администратор университета (демо)', 'uni_admin', 'org-uni'),
     user('u-clinicadmin', 'clinic@demo.example', 'Администратор клиники (демо)', 'clinic_admin', 'org-clinic'),
+    user('u-runner', DEMO_ATHLETE, 'Бегун (демо)', 'student', null, { track: 'athlete', headline: 'Полумарафон, готовлюсь к марафону' }),
     user('u-rehab', 'rehab@demo.example', 'Реабилитолог курса', 'instructor', 'org-platform', { headline: 'Спортивная реабилитация' }),
     user('u-instructor', 'instructor@demo.example', 'Преподаватель (демо)', 'instructor', 'org-uni', { headline: 'Кафедра реабилитологии (демо)' }),
     user('u-student', 'student@demo.example', 'Студент (демо)', 'student', 'org-uni', { cohort: 'Поток 2025', headline: 'Студент-реабилитолог' }),
@@ -55,7 +59,7 @@ export async function seedDemo() {
     user('u-employee', 'staff@demo.example', 'Сотрудник клиники (демо)', 'student', 'org-clinic'),
   ]);
 
-  t.courses = [RUN_COURSE, ...SEED_COURSES].map((c) => ({ ...c, createdAt: now - 40 * DAY, updatedAt: now - 10 * DAY }));
+  t.courses = [RUN_COURSE, ...SEED_COURSES.map((c) => ({ ...c, audience: ['pro' as const] }))].map((c) => ({ ...c, createdAt: now - 40 * DAY, updatedAt: now - 10 * DAY }));
   t.modules = [...RUN_MODULES, ...SEED_MODULES];
   t.lessons = [...RUN_LESSONS, ...SEED_LESSONS];
   t.assessments = [RUN_ASSESSMENT, ...SEED_ASSESSMENTS].map((a) => ({ ...a, createdAt: now - 40 * DAY }));
@@ -113,6 +117,14 @@ export async function seedDemo() {
       }
     }
   });
+  // Demo athlete: enrolled in the runners course, first module done.
+  t.enrollments.push({ id: 'en-u-runner', userId: 'u-runner', courseId: 'c-run', enrolledAt: now - 3 * DAY, lastLessonId: 'l-r4' });
+  ['l-r1', 'l-r2', 'l-r3'].forEach((lessonId, i) => {
+    const l = RUN_LESSONS.find((x) => x.id === lessonId)!;
+    t.progress.push({ id: `lp-u-runner-${lessonId}`, userId: 'u-runner', courseId: 'c-run', lessonId, completedAt: now - (3 - i) * DAY, timeSpentSec: l.durationMin * 60 });
+    t.activity.push({ userId: 'u-runner', kind: 'lesson', at: now - (3 - i) * DAY, minutes: l.durationMin });
+  });
+  t.anatomyViews.push({ userId: 'u-runner', structureId: 'calcaneal_tendon', at: now - DAY }, { userId: 'u-runner', structureId: 'patella', at: now - DAY + 60_000 });
   t.simAttempts.push({ id: 'sa-u-student', userId: 'u-student', simulationId: 'sim-knee', score: 5, maxScore: 7, decisions: [], completedAt: now - 3 * DAY, durationSec: 840 });
   t.activity.push({ userId: 'u-student', kind: 'simulation', at: now - 3 * DAY, minutes: 14 });
   t.anatomyViews.push(

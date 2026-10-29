@@ -22,7 +22,7 @@ export const RUN_OFFER = {
 export const RUN_COURSE: Course = {
   id: 'c-run', title: 'Колени, стопы и восстановление: курс для бегунов', category: 'Спортивная реабилитация', level: 'beginner',
   description: 'Как беречь колени, восстанавливаться после забегов и укрепить стопы. Видео от реабилитолога, 3D-атлас тела, программы упражнений и закрытый чат.',
-  instructorId: 'u-rehab', orgId: null, durationMin: 210, status: 'published', cover: 'teal', finalAssessmentId: 'as-run',
+  instructorId: 'u-rehab', orgId: null, audience: ['athlete', 'pro'], durationMin: 210, status: 'published', cover: 'teal', finalAssessmentId: 'as-run',
   createdAt: 0, updatedAt: 0, version: 1,
 };
 

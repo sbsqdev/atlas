@@ -42,7 +42,7 @@ export const EMPTY: Tables = {
   subscriptions: [], reviews: [], audit: [], notifications: [], anatomyViews: [], activity: [],
 };
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 interface DbState extends Tables { seededVersion: number }
 

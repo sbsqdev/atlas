@@ -2,6 +2,8 @@
    the local demo adapter can be swapped for the Postgres/Supabase adapter. */
 
 export type Role = 'student' | 'instructor' | 'uni_admin' | 'clinic_admin' | 'super_admin';
+/** Who a learner is: an athlete (runner, marathoner…) or a specialist. Athletes get a simpler app. */
+export type Track = 'athlete' | 'pro';
 export type OrgType = 'university' | 'clinic' | 'platform';
 export type ContentStatus = 'draft' | 'medical_review' | 'approved' | 'published' | 'archived';
 export type Level = 'beginner' | 'intermediate' | 'advanced';
@@ -15,6 +17,7 @@ export interface User {
   salt: string;
   fullName: string;
   role: Role;
+  track?: Track;
   orgId: string | null;
   cohort?: string;
   headline?: string;
@@ -43,6 +46,8 @@ export interface Course {
   instructorId: string;
   /** null = platform-wide catalog; otherwise restricted to one organization. */
   orgId: string | null;
+  /** Who the course is for (default: specialists only). */
+  audience?: Track[];
   durationMin: number;
   status: ContentStatus;
   cover: 'teal' | 'navy' | 'cyan' | 'slate';

@@ -58,6 +58,18 @@ await check('public course page: program, price, sign-up and demo entry', async 
   await text('Колени, стопы и восстановление: курс для бегунов').waitFor();
 });
 
+await check('athlete app: short menu, home with the course, runner-only catalog', async () => {
+  await page.goto(`${BASE}/`);
+  await page.getByTestId('athlete-home').waitFor();
+  await text('Продолжить обучение').waitFor();
+  const navText = await page.getByRole('navigation').innerText();
+  for (const hidden of ['Симуляции', 'Виртуальные пациенты', 'Карьера', 'Тарифы']) if (navText.includes(hidden)) throw new Error(`athlete sees ${hidden}`);
+  await page.goto(`${BASE}/courses`);
+  await page.getByTestId('course-c-run').waitFor();
+  if (await page.getByTestId('course-c-knee').count()) throw new Error('specialist course shown to athlete');
+  await shot('00b-athlete-home');
+});
+
 await check('runners course: chat lesson and foot 3D model', async () => {
   await page.goto(`${BASE}/courses/c-run/lessons/l-r3`);
   await page.getByTestId('lesson-cta').waitFor();
@@ -72,7 +84,8 @@ await logout();
 
 await check('login page renders with demo accounts', async () => {
   await page.goto(`${BASE}/login`);
-  await text('Анатомия, симуляции и курсы').waitFor();
+  await text('Бегайте дольше и без боли').waitFor();
+  await page.getByTestId('demo-athlete').waitFor();
   await page.getByTestId('demo-student').waitFor();
   await shot('01-login');
 });
@@ -322,6 +335,7 @@ await check('self-registration: new student has no simulation entitlement; can r
   await page.getByRole('button', { name: 'Создать аккаунт' }).click();
   await text('Необходимо согласие').waitFor();
   await page.check('input[name=consent]');
+  await page.locator('select[name=role]').selectOption('student');
   await page.getByRole('button', { name: 'Создать аккаунт' }).click();
   await page.waitForURL(HOME);
   await page.goto(`${BASE}/simulations`);

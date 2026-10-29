@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Brain, ClipboardCheck, FlaskConical, Hand, MessageSquare } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { useMe } from '@/data/api';
+import { isAthlete, useMe } from '@/data/api';
 import { avg, bestAttempts, coursePct, totalMinutes, activityByDay } from '@/data/analytics';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { PATIENT_BY_ID } from '@/data/content/patients';
@@ -37,7 +37,8 @@ export default function Progress() {
         <StatCard label={t('dash.assessments')} value={v.best.filter((a) => a.passed).length} tone="warning" />
       </div>
 
-      <Card className="mt-6">
+      {/* The competency profile is for specialists; athletes just follow their courses. */}
+      {!isAthlete(u) && <Card className="mt-6">
         <CardHeader title={t('prog.competency')} subtitle={t('prog.competencySub')} />
         <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Competency icon={<Brain className="h-5 w-5" />} title={t('prog.theory')} value={v.theory} hint={t('prog.theoryHint')} />
@@ -47,7 +48,7 @@ export default function Progress() {
             <p className="mt-2 text-[13px] text-navy-500">{t('prog.clinicalHint')}</p>
           </div>
         </CardBody>
-      </Card>
+      </Card>}
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card>

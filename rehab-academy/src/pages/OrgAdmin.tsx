@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Building2, Copy, Download, Plus, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDb } from '@/data/db';
-import { assignCourseToOrgMembers, createOrgUser, orgSeats, setUserCohort, useMe } from '@/data/api';
+import { assignCourseToOrgMembers, createOrgUser, orgSeats, roleKey, setUserCohort, useMe } from '@/data/api';
 import { avg, bestAttempts, coursePct } from '@/data/analytics';
 import { PLAN_BY_ID } from '@/data/content/plans';
 import { useT, type I18nKey } from '@/i18n';
@@ -97,7 +97,7 @@ export default function OrgAdmin() {
               {members.map((m) => (
                 <tr key={m.id}>
                   <td className="px-5 py-2.5"><div className="font-medium">{m.fullName}</div><div className="text-[12px] text-navy-500">{m.email}</div></td>
-                  <td className="px-3 py-2.5"><Badge tone="gray">{t(`role.${m.role}` as I18nKey)}</Badge></td>
+                  <td className="px-3 py-2.5"><Badge tone="gray">{t(roleKey(m) as I18nKey)}</Badge></td>
                   <td className="px-3 py-2.5">
                     {m.role === 'student'
                       ? <input defaultValue={m.cohort ?? ''} onBlur={(e) => e.target.value !== (m.cohort ?? '') && setUserCohort(m.id, e.target.value)} className="w-36 rounded-lg border border-transparent bg-transparent px-2 py-1 hover:border-line focus:border-teal focus:outline-none" aria-label={t('org.cohorts')} />

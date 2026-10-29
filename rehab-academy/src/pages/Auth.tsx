@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Bone, FlaskConical, Users } from 'lucide-react';
+import { Bone, MessageCircle, PlayCircle } from 'lucide-react';
 import { login, register, useMe } from '@/data/api';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/data/seed';
 import { LOCALES, useLocale, useT, type I18nKey } from '@/i18n';
@@ -18,7 +18,7 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState<'student' | 'instructor'>('student');
+  const [role, setRole] = useState<'athlete' | 'student' | 'instructor'>('athlete');
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<I18nKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -57,7 +57,7 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
             <h1 className="text-[34px] font-bold leading-tight tracking-tight">{t('auth.heroTitle')}</h1>
             <p className="mt-4 text-[15px] leading-relaxed text-navy-300">{t('auth.heroText')}</p>
             <ul className="mt-8 space-y-3">
-              {([['auth.feature1', <Bone key="b" />], ['auth.feature2', <FlaskConical key="f" />], ['auth.feature3', <Users key="u" />]] as const).map(([k, icon]) => (
+              {([['auth.feature1', <Bone key="b" />], ['auth.feature2', <PlayCircle key="p" />], ['auth.feature3', <MessageCircle key="m" />]] as const).map(([k, icon]) => (
                 <li key={k} className="flex items-center gap-3 text-[14px]">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-cyan [&_svg]:h-[18px] [&_svg]:w-[18px]">{icon}</span>
                   {t(k)}
@@ -91,8 +91,9 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
               {mode === 'up' && (
                 <>
                   <Field label={t('auth.role')}>
-                    <Select value={role} onChange={(e) => setRole(e.target.value as 'student' | 'instructor')} name="role">
-                      <option value="student">{t('role.student')}</option>
+                    <Select value={role} onChange={(e) => setRole(e.target.value as 'athlete' | 'student' | 'instructor')} name="role">
+                      <option value="athlete">{t('auth.roleAthlete')}</option>
+                      <option value="student">{t('auth.rolePro')}</option>
                       <option value="instructor">{t('role.instructor')}</option>
                     </Select>
                   </Field>
@@ -114,10 +115,17 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
             {mode === 'in' && (
               <div className="mt-8 rounded-2xl border border-line bg-white p-4">
                 <div className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-navy-500">{t('auth.demoAccounts')}</div>
+                {DEMO_ACCOUNTS.filter((a) => a.label === 'role.athlete').map((a) => (
+                  <button key={a.email} disabled={busy} onClick={() => quick(a.email)} className="mb-3 w-full rounded-xl border-2 border-teal bg-teal-50 px-4 py-3 text-left hover:bg-teal hover:text-white" data-testid="demo-athlete">
+                    <div className="text-[14px] font-semibold">{t(a.label)}</div>
+                    <div className="truncate text-[12px] opacity-80">{a.email}</div>
+                  </button>
+                ))}
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-navy-300">{t('auth.demoPro')}</div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {DEMO_ACCOUNTS.map((a) => (
+                  {DEMO_ACCOUNTS.filter((a) => a.label !== 'role.athlete').map((a) => (
                     <button key={a.email} disabled={busy} onClick={() => quick(a.email)} className="rounded-xl border border-line px-3 py-2 text-left hover:border-teal hover:bg-teal-50" data-testid={`demo-${a.role}`}>
-                      <div className="text-[13px] font-semibold text-navy">{t(`role.${a.role}` as I18nKey)}</div>
+                      <div className="text-[13px] font-semibold text-navy">{t(a.label)}</div>
                       <div className="truncate text-[11px] text-navy-500">{a.email}</div>
                     </button>
                   ))}

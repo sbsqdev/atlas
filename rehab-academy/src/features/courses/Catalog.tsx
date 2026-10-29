@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Clock, Lock, Search } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { canOpenCourse, useMe } from '@/data/api';
+import { canOpenCourse, forTrack, isAthlete, useMe } from '@/data/api';
 import { canSeeCourse } from '@/data/rbac';
 import { coursePct } from '@/data/analytics';
 import type { Course } from '@/data/types';
@@ -24,12 +24,12 @@ export default function Catalog() {
   const [cat, setCat] = useState('');
   const [level, setLevel] = useState('');
   const [q, setQ] = useState('');
-  const courses = useMemo(() => d.courses.filter((c) => c.status === 'published' && canSeeCourse(u, c)), [d.courses, u]);
+  const courses = useMemo(() => d.courses.filter((c) => c.status === 'published' && canSeeCourse(u, c) && forTrack(u, c)), [d.courses, u]);
   const categories = [...new Set(courses.map((c) => c.category))];
   const list = courses.filter((c) => (!cat || c.category === cat) && (!level || c.level === level) && (!q || c.title.toLowerCase().includes(q.toLowerCase())));
   return (
     <div className="animate-fade-up">
-      <PageHeader title={t('courses.title')} subtitle={t('courses.subtitle')} />
+      <PageHeader title={t('courses.title')} subtitle={t(isAthlete(u) ? 'courses.subtitleAthlete' : 'courses.subtitle')} />
       <div className="mb-5 flex flex-wrap gap-3">
         <div className="relative w-full max-w-xs">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy-300" />
