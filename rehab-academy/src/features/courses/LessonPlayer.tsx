@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Download, ExternalLink, Lock } fro
 import { useDb } from '@/data/db';
 import { completeLesson, courseStatus, lessonLocked, touchLesson, useMe } from '@/data/api';
 import Paywall from '@/features/access/Paywall';
+import { ConsultBanner } from '@/features/consult/Consult';
 import { canSeeCourse } from '@/data/rbac';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { ANATOMY_MODELS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
@@ -46,6 +47,7 @@ export default function LessonPlayer() {
   if (!enrolled && !isAuthor) return <Navigate to={`/courses/${id}`} replace />;
   if (!lesson) return <NotFound />;
   const locked = lessonLocked(u, lesson);
+  const isAthleteCourse = !!c.audience?.includes('athlete');
   const done = st.done.has(lesson.id);
   const prev = st.lessons[idx - 1];
   const next = st.lessons[idx + 1];
@@ -91,6 +93,7 @@ export default function LessonPlayer() {
               : <p className="mt-5 rounded-xl border border-dashed border-line bg-bg px-4 py-3 text-sm text-navy-500" data-testid="lesson-cta">{t('lesson.ctaPending')}</p>
           )}
           </>}
+          {isAthleteCourse && !locked && <ConsultBanner className="mt-6" />}
           <EduNotice className="mt-6" />
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
             {prev ? <Link to={`/courses/${id}/lessons/${prev.id}`} className={buttonVariants({ variant: 'ghost' })}><ArrowLeft className="h-4 w-4" /> {t('courses.prevLesson')}</Link> : <span />}

@@ -2,14 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity, Award, Bike, CheckCircle2, ChevronDown, CreditCard, Footprints, GraduationCap, HeartPulse, KeyRound, MapPin, MessageCircle,
-  PlayCircle, Quote, Rotate3d, Send, ShieldCheck, Smartphone, Snowflake, Stethoscope, Users,
+  PlayCircle, Quote, Rotate3d, Send, ShieldCheck, Smartphone, Snowflake, Sparkles, Stethoscope, Users,
 } from 'lucide-react';
 import { enroll, login } from '@/data/api';
 import { DEMO_ATHLETE, DEMO_PASSWORD } from '@/data/seed';
 import { RUN_COURSE, RUN_LESSONS, RUN_MODULES } from '@/data/content/runners';
 import { TRI_COURSE, TRI_LESSONS, TRI_MODULES } from '@/data/content/triathlon';
 import { KZ_COURSE, KZ_LESSONS, KZ_MODULES } from '@/data/content/kazakhstan';
-import { CONTACTS, KASPI_URL, PRICING, REGIONS, REVIEWS, ZONES, type ZoneId } from '@/data/content/launch';
+import { CLINIC, CONTACTS, KASPI_URL, PRICING, REGIONS, REVIEWS, ZONES, type ZoneId } from '@/data/content/launch';
+import { ConsultOffer } from '@/features/consult/Consult';
 import { fmtKzt } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import { Button, buttonVariants } from '@/components/ui';
@@ -30,7 +31,7 @@ const COURSES = [
 const LESSONS_TOTAL = RUN_LESSONS.length + TRI_LESSONS.length + KZ_LESSONS.length;
 
 const RU = {
-  nav: { courses: 'Курсы', regions: 'Регионы', pricing: 'Тарифы', reviews: 'Отзывы', faq: 'Вопросы', login: 'Войти' },
+  nav: { courses: 'Курсы', regions: 'Регионы', consult: 'Консультация', pricing: 'Тарифы', reviews: 'Отзывы', faq: 'Вопросы', login: 'Войти' },
   heroBadge: 'Платформа для бегунов, марафонцев и триатлонистов Казахстана',
   heroTitle: ['Бегайте дольше,', 'восстанавливайтесь быстрее'],
   heroText: 'Курсы реабилитолога о коленях, стопах, плече пловца, посадке на велосипеде и восстановлении. 3D-атлас тела, тренировки с учётом климата вашего региона и сообщество бегунов по городам.',
@@ -50,7 +51,9 @@ const RU = {
     [PlayCircle, 'Видео от реабилитолога', 'Техника упражнений, разбор частых ошибок и восстановительная рутина.'],
     [Rotate3d, '3D-атлас тела', 'Колено, стопа и голеностоп: каждую мышцу можно повернуть и рассмотреть.'],
     [MapPin, 'Сообщество по городам', 'Чаты в Telegram: партнёры по пробежкам, маршруты, поездки на старты.'],
-    [Users, 'Профиль спортсмена', 'Город, виды спорта, цель сезона, личные рекорды и прогресс по курсам.'],
+    [Users, 'Профиль и нетворкинг', 'Фото, рекорды, цели и соцсети. Карточка спортсмена и каталог участников — находите партнёров по тренировкам.'],
+    [Sparkles, 'Сторис в один клик', 'Профиль, финиш или прогресс курса — готовая картинка для Instagram и Telegram.'],
+    [Stethoscope, 'Консультация реабилитолога', `Онлайн или очно в центре ${CLINIC.name}, ${CLINIC.city}.`],
     [ShieldCheck, 'Доказательный подход', 'Каждый урок опирается на исследования и консенсусы, источники указаны.'],
     [Award, 'Тесты и сертификаты', 'Проверьте себя в конце курса и получите сертификат.'],
   ] as [typeof PlayCircle, string, string][],
@@ -96,7 +99,7 @@ const RU = {
 type Copy = typeof RU;
 
 const KK: Copy = {
-  nav: { courses: 'Курстар', regions: 'Өңірлер', pricing: 'Тарифтер', reviews: 'Пікірлер', faq: 'Сұрақтар', login: 'Кіру' },
+  nav: { courses: 'Курстар', regions: 'Өңірлер', consult: 'Кеңес', pricing: 'Тарифтер', reviews: 'Пікірлер', faq: 'Сұрақтар', login: 'Кіру' },
   heroBadge: 'Қазақстанның жүгірушілері, марафоншылары мен триатлоншыларына арналған платформа',
   heroTitle: ['Ұзағырақ жүгіріңіз,', 'тезірек қалпына келіңіз'],
   heroText: 'Тізе, табан, жүзушінің иығы, велосипедке дұрыс отыру және қалпына келу туралы оңалтушы курстары. Дененің 3D-атласы, өңіріңіздің климатына сай жаттығулар және қалалар бойынша жүгірушілер қауымдастығы.',
@@ -116,7 +119,9 @@ const KK: Copy = {
     [PlayCircle, 'Оңалтушының бейнелері', 'Жаттығу техникасы, жиі кездесетін қателер және қалпына келу тәртібі.'],
     [Rotate3d, 'Дененің 3D-атласы', 'Тізе, табан және тобық: әр бұлшықетті айналдырып, қарап шығуға болады.'],
     [MapPin, 'Қалалар бойынша қауымдастық', 'Telegram-дағы чаттар: бірге жүгіру, маршруттар, жарыстарға бару.'],
-    [Users, 'Спортшы профилі', 'Қала, спорт түрлері, маусым мақсаты, жеке рекордтар және курстағы прогресс.'],
+    [Users, 'Профиль және нетворкинг', 'Фото, рекордтар, мақсаттар және әлеуметтік желілер. Спортшы карточкасы мен қатысушылар каталогы — жаттығу серіктерін табыңыз.'],
+    [Sparkles, 'Бір батырмамен сторис', 'Профиль, мәре немесе курс прогресі — Instagram мен Telegram үшін дайын сурет.'],
+    [Stethoscope, 'Оңалтушы кеңесі', `Онлайн немесе ${CLINIC.name} орталығында, ${CLINIC.cityKk}.`],
     [ShieldCheck, 'Дәлелді тәсіл', 'Әр сабақ зерттеулер мен консенсустарға сүйенеді, дереккөздері көрсетілген.'],
     [Award, 'Тесттер мен сертификаттар', 'Курс соңында өзіңізді тексеріп, сертификат алыңыз.'],
   ],
@@ -216,6 +221,7 @@ export default function Landing() {
           <nav className="ml-auto hidden items-center gap-5 text-sm text-navy-300 lg:flex">
             <a href="#courses" className="hover:text-white">{c.nav.courses}</a>
             <a href="#regions" className="hover:text-white">{c.nav.regions}</a>
+            <a href="#consult" className="hover:text-white">{c.nav.consult}</a>
             <a href="#pricing" className="hover:text-white">{c.nav.pricing}</a>
             <a href="#reviews" className="hover:text-white">{c.nav.reviews}</a>
             <a href="#faq" className="hover:text-white">{c.nav.faq}</a>
@@ -297,7 +303,7 @@ export default function Landing() {
       {/* Inside the platform */}
       <section className="bg-bg">
         <Section eyebrow={c.insideEyebrow} title={c.insideTitle}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {c.inside.map(([I, title, text]) => (
               <div key={title} className="rounded-3xl bg-white p-6 shadow-[var(--shadow-card)]">
                 <I className="h-6 w-6 text-teal" />
@@ -347,6 +353,14 @@ export default function Landing() {
             </div>
           ))}
         </div>
+      </Section>
+
+      {/* Consultation */}
+      <Section id="consult" eyebrow={c.nav.consult} title={lang === 'kk' ? 'Оңалтушының кеңесі: онлайн немесе орталықта' : 'Консультация реабилитолога: онлайн или очно'}>
+          <p className="-mt-4 mb-6 max-w-2xl text-[16px] leading-relaxed text-navy-500">{lang === 'kk'
+            ? `Тізе, табан немесе иық ауыра ма? Әлде жарыс алдында алдын алу жоспары керек пе? Курс оңалтушысына онлайн немесе ${CLINIC.name} орталығында (${CLINIC.cityKk}) жазылыңыз.`
+            : `Болит колено, стопа или плечо? Нужен план профилактики перед стартом? Запишитесь к реабилитологу курса — онлайн или очно в центре ${CLINIC.name} (${CLINIC.city}).`}</p>
+          <ConsultOffer className="max-w-3xl" />
       </Section>
 
       {/* Pricing */}

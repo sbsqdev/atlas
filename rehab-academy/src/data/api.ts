@@ -497,7 +497,7 @@ export function requestPilot(planId: PlanId) {
 }
 
 /* ---------------- Profile / settings ---------------- */
-export function updateProfile(patch: Partial<Pick<User, 'fullName' | 'headline' | 'jobPrefs' | 'careerVisible' | 'city' | 'sports' | 'goal' | 'nextRace' | 'pb'>>) {
+export function updateProfile(patch: Partial<Pick<User, 'fullName' | 'headline' | 'jobPrefs' | 'careerVisible' | 'city' | 'sports' | 'goal' | 'nextRace' | 'pb' | 'photo' | 'about' | 'socials' | 'openToMeet'>>) {
   const u = me();
   write((t) => ({ users: t.users.map((x) => (x.id === u.id ? { ...x, ...patch } : x)) }));
   if ('careerVisible' in patch) audit('career.visibility', 'user', u.id, String(patch.careerVisible));

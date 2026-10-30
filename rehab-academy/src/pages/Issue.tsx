@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Copy, KeyRound, Mail, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Copy, Eye, KeyRound, Mail, Trash2 } from 'lucide-react';
+import { activateAccess } from '@/data/api';
 import { signAccessCode, type PlanId } from '@/data/access';
-import { PRICING } from '@/data/content/launch';
+import { CONTACTS, PRICING } from '@/data/content/launch';
 import { fmtKzt } from '@/lib/format';
 import { Button, Card, CardBody, CardHeader, Field, Input, Select } from '@/components/ui';
 
@@ -52,7 +54,24 @@ export default function Issue() {
   const [days, setDays] = useState(31);
   const [out, setOut] = useState<{ code: string; link: string; until: number } | null>(null);
   const [err, setErr] = useState('');
+  const [ownerEmail, setOwnerEmail] = useState(CONTACTS.formsEmail);
+  const nav = useNavigate();
   useEffect(() => { document.title = 'Выдача доступа'; }, []);
+
+  /** Opens every lesson for the owner on this device for a year. */
+  async function ownerAccess() {
+    setErr('');
+    const e = ownerEmail.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(e)) return setErr('Проверьте email.');
+    const until = Date.now() + 365 * DAY;
+    try {
+      await signAccessCode(key!, { email: e, plan: 'personal', until });
+      await activateAccess({ email: e, plan: 'personal', until }, 'Владелец');
+      nav('/', { replace: true });
+    } catch {
+      setErr('Не удалось подписать код. Импортируйте ключ заново.');
+    }
+  }
 
   async function importKey(file: File) {
     setErr('');
@@ -107,6 +126,13 @@ export default function Issue() {
           </Card>
         ) : (
           <>
+            <Card>
+              <CardHeader title="Полный доступ для меня" subtitle="Откроет все уроки на этом устройстве на год — смотреть контент и показывать платформу" />
+              <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex-1"><Field label="Мой email"><Input name="ownerEmail" type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} /></Field></div>
+                <Button onClick={ownerAccess} data-testid="owner-access"><Eye className="h-4 w-4" /> Войти с полным доступом</Button>
+              </CardBody>
+            </Card>
             <Card>
               <CardHeader title="Новый доступ" subtitle="После того как увидели оплату в Kaspi" />
               <CardBody className="space-y-4">

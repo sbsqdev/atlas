@@ -46,9 +46,11 @@ await page.evaluate(() => localStorage.clear());
 
 // Site forms go to FormSubmit; capture them instead of sending real email.
 const forms = [];
+let failNextForm = false;
 await page.route('**/formsubmit.co/**', async (route) => {
   forms.push({ url: route.request().url(), body: JSON.parse(route.request().postData() ?? '{}') });
-  await route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":"true","message":"ok"}' });
+  const fail = failNextForm; failNextForm = false;
+  await route.fulfill({ status: 200, contentType: 'application/json', body: fail ? '{"success":"false","message":"This form needs Activation"}' : '{"success":"true","message":"ok"}' });
 });
 const plain = (s) => s.replace(/ | /g, ' ');
 
@@ -161,6 +163,67 @@ await check('profile and community: city chat, zone tips, region form', async ()
   if (forms.at(-1).body['Город'] !== 'Шымкент') throw new Error('region form city');
   await shot('00d-community');
 });
+await check('profile photo, socials and public athlete card', async () => {
+  await page.goto(`${BASE}/profile`);
+  await page.getByTestId('photo-input').setInputFiles(new URL('../public/landing/knee.webp', import.meta.url).pathname);
+  await page.getByTestId('profile-photo').waitFor();
+  await page.locator('input[name=fullName]').fill('Айгерим Бегун');
+  await page.locator('input[name=instagram]').fill('@aigerim.runs');
+  await page.locator('input[name=strava]').fill('12345');
+  await page.locator('input[name=pb-half]').fill('1:52:10');
+  await page.locator('input[name=openToMeet]').check();
+  await page.getByTestId('profile-save').click();
+  const link = await page.getByTestId('card-link').inputValue();
+  await page.goto(link);
+  await page.getByTestId('athlete-card').getByText('Айгерим Бегун').waitFor();
+  if ((await page.getByRole('link', { name: 'Instagram' }).getAttribute('href')) !== 'https://instagram.com/aigerim.runs') throw new Error('instagram link');
+  await text('Шымкент').waitFor();
+  await text('1:52:10').waitFor();
+  await shot('00f-athlete-card');
+});
+
+await check('stories: profile, race and course templates; picture downloads', async () => {
+  await page.goto(`${BASE}/stories`);
+  await page.getByTestId('story-canvas').waitFor();
+  const size = await page.getByTestId('story-canvas').evaluate((c) => [c.width, c.height].join('x'));
+  if (size !== '1080x1920') throw new Error(size);
+  await page.getByTestId('story-race').click();
+  await page.locator('input[name=event]').fill('Алматы марафон');
+  await page.locator('input[name=time]').fill('1:45:30');
+  await page.getByTestId('story-course').click();
+  await page.getByTestId('story-race').click();
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByTestId('story-save').click()]);
+  if (dl.suggestedFilename() !== 'fab3d-story-race.png') throw new Error(dl.suggestedFilename());
+  const painted = await page.getByTestId('story-canvas').evaluate((c) => c.toDataURL('image/png').length);
+  if (painted < 50_000) throw new Error('empty story');
+  await shot('00g-stories');
+});
+
+await check('consultation: MedLife offline request; failed send falls back to WhatsApp', async () => {
+  await page.goto(`${BASE}/`);
+  await page.getByTestId('consult-banner').waitFor();
+  await page.goto(`${BASE}/consult`);
+  await page.getByTestId('consult-offline').click();
+  const f = page.getByTestId('form-consult');
+  await f.locator('input[name=name]').fill('Айгерим');
+  await f.locator('input[name=contact]').fill('+7 700 000 00 00');
+  await f.locator('select[name=area]').selectOption('knee');
+  await f.locator('input[name=consent]').check();
+  failNextForm = true;
+  await f.getByTestId('form-consult-submit').click();
+  const wa = await page.getByTestId('form-consult-whatsapp').getAttribute('href');
+  if (!wa.startsWith('https://wa.me/77073737767?text=') || !decodeURIComponent(wa).includes('MedLife')) throw new Error(`fallback ${wa}`);
+  await f.getByTestId('form-consult-submit').click();
+  await page.getByTestId('form-consult-sent').waitFor();
+  const b = forms.at(-1).body;
+  if (!b._subject.startsWith('Запись на консультацию') || !b['Формат'].includes('MedLife') || b['Что беспокоит'] !== 'Колено' || b['Город'] !== 'Шымкент') throw new Error(JSON.stringify(b));
+  await page.goto(`${BASE}/courses/c-run/lessons/l-r2`);
+  await page.getByTestId('consult-banner').waitFor();
+  await page.goto(`${BASE}/community`);
+  await page.getByTestId('members-empty').waitFor();
+  await page.getByTestId('members-join').click();
+  await page.getByTestId('form-member').waitFor();
+});
 await logout();
 
 const KEY_FILE = process.env.ACCESS_KEY_FILE;
@@ -200,6 +263,15 @@ await check('owner issues a code on /issue; athlete activates it and gets full a
   await text('Итоговый тест: триатлон без травм').first().waitFor();
   await page.goto(`${BASE}/courses/c-kz/lessons/l-z8`);
   await text('Рамазан').first().waitFor();
+
+  // The owner opens everything for herself from /issue (the key is already imported).
+  await logout();
+  await page.goto(`${BASE}/issue`);
+  await page.getByTestId('owner-access').click();
+  await page.waitForURL(HOME);
+  if (!(await page.getByTestId('access-banner').innerText()).includes('Доступ до')) throw new Error('owner access');
+  await page.goto(`${BASE}/courses/c-run/lessons/l-r5`);
+  if (await page.getByTestId('paywall').count()) throw new Error('owner sees paywall');
 });
 await logout();
 

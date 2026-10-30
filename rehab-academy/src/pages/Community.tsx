@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, MessageCircle, Send, Users } from 'lucide-react';
 import { useMe } from '@/data/api';
-import { CONTACTS, REGIONS, ZONES, type ZoneId } from '@/data/content/launch';
+import { CONTACTS, MEMBERS, REGIONS, ZONES, type ZoneId } from '@/data/content/launch';
+import type { I18nKey } from '@/i18n';
+import SocialLinks from '@/features/network/SocialLinks';
+import { ConsultBanner } from '@/features/consult/Consult';
 import { useT } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { Badge, Button, Card, CardBody, CardHeader, PageHeader, buttonVariants } from '@/components/ui';
@@ -18,6 +21,9 @@ export default function Community() {
   const u = useMe()!;
   const mine = REGIONS.find((r) => r.id === u.city);
   const [join, setJoin] = useState<string | null>(null);
+  const [cityFilter, setCityFilter] = useState('');
+  const [addMe, setAddMe] = useState(false);
+  const members = MEMBERS.filter((m) => !cityFilter || m.city === cityFilter);
   const kazCourse = (lesson: string) => `/courses/c-kz/lessons/${lesson}`;
 
   const chatButton = (id: string, chat?: string) => chat
@@ -50,6 +56,41 @@ export default function Community() {
           {join && <SiteForm kind="region" className="mt-5" defaults={{ city: join, name: u.demo ? '' : u.fullName, regionRole: 'member' }} />}
         </CardBody>
       </Card>
+
+      <Card data-testid="members">
+        <CardHeader title={t('net.title')} subtitle={t('net.sub')} icon={<Users className="h-4 w-4" />} />
+        <CardBody>
+          {MEMBERS.length > 0 && (
+            <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} className="mb-4 h-10 rounded-xl border border-line px-3 text-sm">
+              <option value="">{t('net.all')}</option>
+              {REGIONS.filter((r) => MEMBERS.some((m) => m.city === r.id)).map((r) => <option key={r.id} value={r.id}>{r[lang]}</option>)}
+            </select>
+          )}
+          {members.length ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {members.map((m) => (
+                <div key={m.name + m.city} className="flex gap-4 rounded-2xl border border-line p-4">
+                  {m.photo ? <img src={m.photo} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" loading="lazy" /> : <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-navy text-lg font-bold text-white">{m.name.split(/\s+/).map((x) => x[0]).join('').slice(0, 2)}</span>}
+                  <div className="min-w-0">
+                    <div className="font-bold">{m.name}</div>
+                    <div className="text-[13px] text-navy-500">{REGIONS.find((r) => r.id === m.city)?.[lang]} · {m.sports.map((s) => t(`sport.${s}` as I18nKey)).join(', ')}</div>
+                    {m.pb && <div className="mt-1 text-[13px]">{m.pb}</div>}
+                    {m.about && <p className="mt-1 text-[13px] text-navy-700">{m.about}</p>}
+                    <div className="mt-2"><SocialLinks ig={m.instagram} tg={m.telegram} st={m.strava} /></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : <p className="text-[14px] text-navy-500" data-testid="members-empty">{t('net.empty')}</p>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => setAddMe((x) => !x)} data-testid="members-join">{t('net.join')}</Button>
+            <Link to="/profile" className={buttonVariants({ variant: 'ghost' })}>{t('prof.card')} →</Link>
+          </div>
+          {addMe && <SiteForm kind="member" className="mt-4" defaults={{ name: u.demo ? '' : u.fullName, city: u.city ?? '' }} />}
+        </CardBody>
+      </Card>
+
+      <ConsultBanner />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {ZONE_ORDER.map((z) => (

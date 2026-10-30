@@ -27,6 +27,11 @@ export interface User {
   goal?: string;
   nextRace?: string;
   pb?: Partial<Record<'5k' | '10k' | 'half' | 'marathon', string>>;
+  /** Small JPEG data URL, kept on this device. */
+  photo?: string;
+  about?: string;
+  socials?: { instagram?: string; telegram?: string; strava?: string };
+  openToMeet?: boolean;
   orgId: string | null;
   cohort?: string;
   headline?: string;

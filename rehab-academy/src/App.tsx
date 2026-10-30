@@ -40,6 +40,9 @@ const Legal = lazy(() => import('@/pages/Legal'));
 const Community = lazy(() => import('@/pages/Community'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Paywall = lazy(() => import('@/features/access/Paywall'));
+const Stories = lazy(() => import('@/pages/Stories'));
+const ConsultPage = lazy(() => import('@/features/consult/Consult'));
+const AthleteCard = lazy(() => import('@/pages/AthleteCard'));
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const u = useMe();
@@ -72,6 +75,7 @@ export default function App() {
         <Route path="/register" element={<AuthPage mode="up" />} />
         <Route path="/atlas" element={<AtlasRedirect />} />
         <Route path="/activate" element={<Activate />} />
+        <Route path="/a/:data" element={<AthleteCard />} />
         <Route path="/issue" element={<Issue />} />
         <Route path="/offer" element={<Legal doc="offer" />} />
         <Route path="/privacy" element={<Legal doc="privacy" />} />
@@ -82,6 +86,8 @@ export default function App() {
           <Route path="community" element={<Community />} />
           <Route path="profile" element={<Profile />} />
           <Route path="access" element={<Paywall />} />
+          <Route path="stories" element={<Stories />} />
+          <Route path="consult" element={<ConsultPage />} />
           <Route path="simulations" element={<SimLibrary />} />
           <Route path="simulations/:id" element={<SimPlayer />} />
           <Route path="patients" element={<Patients />} />

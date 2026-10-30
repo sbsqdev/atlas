@@ -34,6 +34,32 @@ export const LEGAL = {
 /** Real reviews only: { name, city, sport, text }. Empty — the page shows the review form. */
 export const REVIEWS: { name: string; city: string; sport: string; text: string }[] = [];
 
+/** Partner centre for consultations with the course rehabilitologist. Fill in the address and map link. */
+export const CLINIC = {
+  name: 'MedLife',
+  city: 'Алматы',
+  cityKk: 'Алматы',
+  address: '',
+  mapUrl: '',
+};
+
+export interface Member {
+  name: string;
+  /** Region id from REGIONS. */
+  city: string;
+  sports: string[];
+  about?: string;
+  pb?: string;
+  instagram?: string;
+  telegram?: string;
+  strava?: string;
+  /** Link to a photo the athlete agreed to publish. */
+  photo?: string;
+}
+
+/** Athlete directory: only people who sent the «Каталог участников» form and agreed to publication. */
+export const MEMBERS: Member[] = [];
+
 export type ZoneId = 'north' | 'centerEast' | 'almaty' | 'south' | 'west';
 
 export interface Region { id: string; ru: string; kk: string; zone: ZoneId; chat?: string }

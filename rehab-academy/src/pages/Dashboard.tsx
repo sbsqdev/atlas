@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, Footprints, GraduationCap, KeyRound, MessageCircle, MessageSquare, ShieldCheck, Users } from 'lucide-react';
+import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, Footprints, GraduationCap, KeyRound, MessageCircle, MessageSquare, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import { useDb } from '@/data/db';
 import { activeSubscriptions, courseLessons, forTrack, isAthlete, useMe } from '@/data/api';
 import { activityByDay, avg, bestAttempts, coursePct, missedQuestions, totalMinutes } from '@/data/analytics';
@@ -9,6 +9,7 @@ import { STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { PLAN_BY_ID } from '@/data/content/plans';
 import { RUN_LINKS } from '@/data/content/runners';
+import { ConsultBanner } from '@/features/consult/Consult';
 import type { User } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { fmtDate, fmtHours, LOCALE_TAG } from '@/lib/format';
@@ -69,6 +70,12 @@ function AthleteDash({ u }: { u: User }) {
       ) : (
         <EmptyState title={t('dash.noCourses')} action={<Link to="/courses" className={buttonVariants()}>{t('dash.browseCourses')}</Link>} />
       )}
+
+      <ConsultBanner className="mt-6" />
+      <Link to="/stories" className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-5 hover:border-teal" data-testid="home-stories">
+        <span className="flex items-center gap-3"><Sparkles className="h-5 w-5 text-teal" /> <span><b className="block">{t('story.title')}</b><span className="text-[13.5px] text-navy-500">{t('story.sub')}</span></span></span>
+        <span className="text-teal">→</span>
+      </Link>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {[
