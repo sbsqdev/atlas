@@ -4,6 +4,7 @@ import { gradeAttempt, correctAnswer } from './grading';
 import { SEED_ASSESSMENTS, SEED_QUESTIONS } from './content/assessments';
 import { SEED_COURSES, SEED_LESSONS, SEED_MODULES } from './content/courses';
 import { RUN_ASSESSMENT, RUN_COURSE, RUN_LESSONS, RUN_MODULES, RUN_QUESTIONS } from './content/runners';
+import { TRI_ASSESSMENT, TRI_COURSE, TRI_LESSONS, TRI_MODULES, TRI_QUESTIONS } from './content/triathlon';
 import type { AnswerValue, Organization, Role, User } from './types';
 import type { I18nKey } from '@/i18n';
 
@@ -146,19 +147,23 @@ export async function seedDemo() {
 /** Seeds on first launch (or after a schema bump / reset). */
 export async function ensureSeeded() {
   if (useDb.getState().seededVersion !== SCHEMA_VERSION || useDb.getState().users.length === 0) await seedDemo();
-  syncRunnersCourse();
+  syncCodeCourses();
 }
 
-/** The runners course is managed in code (content/runners.ts): refresh it on
- *  every launch so edits there (e.g. video or chat links) reach existing browsers. */
-function syncRunnersCourse() {
+/** The athlete courses are managed in code (content/runners.ts, content/triathlon.ts):
+ *  refresh them on every launch so edits there (e.g. video or chat links) reach existing browsers. */
+const CODE_COURSES = [
+  { course: RUN_COURSE, modules: RUN_MODULES, lessons: RUN_LESSONS, assessment: RUN_ASSESSMENT, questions: RUN_QUESTIONS },
+  { course: TRI_COURSE, modules: TRI_MODULES, lessons: TRI_LESSONS, assessment: TRI_ASSESSMENT, questions: TRI_QUESTIONS },
+];
+function syncCodeCourses() {
   const keep = <T extends { id: string }>(rows: T[], fresh: T[]) => [...fresh, ...rows.filter((r) => !fresh.some((f) => f.id === r.id))];
   useDb.setState((s) => ({
-    modules: keep(s.modules, RUN_MODULES),
-    lessons: keep(s.lessons, RUN_LESSONS),
-    questions: keep(s.questions, RUN_QUESTIONS),
-    assessments: keep(s.assessments, [{ ...RUN_ASSESSMENT, createdAt: s.assessments.find((a) => a.id === RUN_ASSESSMENT.id)?.createdAt ?? Date.now() }]),
-    courses: keep(s.courses, [{ ...RUN_COURSE, ...pick(s.courses.find((c) => c.id === RUN_COURSE.id)) }]),
+    modules: keep(s.modules, CODE_COURSES.flatMap((x) => x.modules)),
+    lessons: keep(s.lessons, CODE_COURSES.flatMap((x) => x.lessons)),
+    questions: keep(s.questions, CODE_COURSES.flatMap((x) => x.questions)),
+    assessments: keep(s.assessments, CODE_COURSES.map(({ assessment: a }) => ({ ...a, createdAt: s.assessments.find((x) => x.id === a.id)?.createdAt ?? Date.now() }))),
+    courses: keep(s.courses, CODE_COURSES.map(({ course: c }) => ({ ...c, ...pick(s.courses.find((x) => x.id === c.id)) }))),
   }));
 }
 const pick = (c?: { createdAt: number; updatedAt: number }) => (c ? { createdAt: c.createdAt, updatedAt: c.updatedAt } : { createdAt: Date.now(), updatedAt: Date.now() });

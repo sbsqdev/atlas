@@ -66,6 +66,7 @@ await check('athlete app: short menu, home with the course, runner-only catalog'
   for (const hidden of ['Симуляции', 'Виртуальные пациенты', 'Карьера', 'Тарифы']) if (navText.includes(hidden)) throw new Error(`athlete sees ${hidden}`);
   await page.goto(`${BASE}/courses`);
   await page.getByTestId('course-c-run').waitFor();
+  await page.getByTestId('course-c-tri').waitFor();
   if (await page.getByTestId('course-c-knee').count()) throw new Error('specialist course shown to athlete');
   await shot('00b-athlete-home');
 });
@@ -79,6 +80,22 @@ await check('runners course: chat lesson and foot 3D model', async () => {
   await page.getByTestId('structure-info').getByText('Пяточное (ахиллово) сухожилие').waitFor();
   await page.getByRole('button', { name: 'Коленный сустав (правый)' }).click();
   await page.locator('[data-testid=anatomy-viewer][data-model=knee]').waitFor();
+});
+await logout();
+
+await check('triathlon course: landing block, demo entry, 3D lesson, test', async () => {
+  await page.goto(`${BASE}/`);
+  await page.locator('#triathlon').scrollIntoViewIfNeeded();
+  await shot('00c-landing-triathlon');
+  const href = await page.getByTestId('landing-tri-signup').getAttribute('href');
+  if (!href?.startsWith('https://wa.me/77073737767') || !decodeURIComponent(href).includes('Триатлон')) throw new Error(`bad tri WhatsApp link ${href}`);
+  await page.getByTestId('landing-tri-demo').click();
+  await page.waitForURL(/courses\/c-tri$/);
+  await text('Триатлон без травм: плавание, велосипед, бег и восстановление').first().waitFor();
+  await page.goto(`${BASE}/courses/c-tri/lessons/l-t10`);
+  await page.locator('[data-testid=anatomy-viewer][data-model=knee] canvas').waitFor();
+  await page.goto(`${BASE}/assessments/as-tri`);
+  await text('Итоговый тест: триатлон без травм').first().waitFor();
 });
 await logout();
 

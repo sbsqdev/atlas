@@ -47,7 +47,8 @@ export function canSeeCourse(user: User, c: Course) {
   return inScope && c.status === 'published';
 }
 
-/** Entitlement a course requires. */
+/** Entitlement a course requires. Athlete courses are sold one by one outside
+ *  the platform plans, so any level counts as basic. */
 export function courseEntitlement(c: Course): Entitlement {
-  return c.level === 'beginner' ? 'courses.basic' : 'courses.advanced';
+  return c.level === 'beginner' || c.audience?.includes('athlete') ? 'courses.basic' : 'courses.advanced';
 }

@@ -2,11 +2,12 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity, ArrowRight, Bone, CheckCircle2, ChevronDown, Footprints, GraduationCap, HeartPulse, MessageCircle, PlayCircle,
-  Rotate3d, ShieldCheck, Smartphone, Stethoscope, Timer, Trophy, Users,
+  Bike, Rotate3d, ShieldCheck, Smartphone, Stethoscope, Timer, Trophy, Users, Waves,
 } from 'lucide-react';
 import { enroll, login } from '@/data/api';
 import { DEMO_ATHLETE, DEMO_PASSWORD } from '@/data/seed';
 import { RUN_LESSONS, RUN_MODULES, RUN_OFFER } from '@/data/content/runners';
+import { TRI_LESSONS, TRI_MODULES, TRI_OFFER } from '@/data/content/triathlon';
 import { useT } from '@/i18n';
 import { fmtKzt } from '@/lib/format';
 import { cn } from '@/lib/cn';
@@ -18,7 +19,9 @@ import { LESSON_ICON } from '@/features/courses/CourseDetail';
    opens the course as the demo student. */
 
 const img = (name: string) => `${import.meta.env.BASE_URL}landing/${name}`;
-const WHATSAPP = `https://wa.me/${RUN_OFFER.whatsapp}?text=${encodeURIComponent('Здравствуйте! Хочу записаться на курс «Колени, стопы и восстановление» для бегунов.')}`;
+const wa = (text: string) => `https://wa.me/${RUN_OFFER.whatsapp}?text=${encodeURIComponent(text)}`;
+const WHATSAPP = wa('Здравствуйте! Хочу записаться на курс «Колени, стопы и восстановление» для бегунов.');
+const WHATSAPP_TRI = wa('Здравствуйте! Хочу записаться на курс «Триатлон без травм».');
 const VIDEOS = RUN_LESSONS.filter((l) => l.type === 'video').length;
 const HOURS = Math.round(RUN_LESSONS.reduce((s, l) => s + l.durationMin, 0) / 6) / 10;
 
@@ -38,12 +41,12 @@ export default function Landing() {
   const [busy, setBusy] = useState(false);
   useEffect(() => { document.title = 'Курс для бегунов: колени, стопы и восстановление · Rehab Academy'; }, []);
 
-  async function openDemo() {
+  async function openDemo(courseId: string = RUN_OFFER.courseId) {
     setBusy(true);
     try {
       await login(DEMO_ATHLETE, DEMO_PASSWORD);
-      try { enroll(RUN_OFFER.courseId); } catch { /* already enrolled or not entitled: the course page explains */ }
-      nav(`/courses/${RUN_OFFER.courseId}`);
+      try { enroll(courseId); } catch { /* already enrolled or not entitled: the course page explains */ }
+      nav(`/courses/${courseId}`);
     } finally {
       setBusy(false);
     }
@@ -55,7 +58,7 @@ export default function Landing() {
     </a>
   );
   const Demo = ({ className, light }: { className?: string; light?: boolean }) => (
-    <Button size="lg" variant={light ? 'secondary' : 'outline'} onClick={openDemo} loading={busy} className={cn(!light && 'border-white/40 text-white hover:bg-white/10', className)} data-testid="landing-demo">
+    <Button size="lg" variant={light ? 'secondary' : 'outline'} onClick={() => openDemo()} loading={busy} className={cn(!light && 'border-white/40 text-white hover:bg-white/10', className)} data-testid="landing-demo">
       <PlayCircle className="h-5 w-5" /> Смотреть демо
     </Button>
   );
@@ -74,6 +77,7 @@ export default function Landing() {
             <a href="#atlas" className="hover:text-white">3D-атлас</a>
             <a href="#experts" className="hover:text-white">Эксперты</a>
             <a href="#price" className="hover:text-white">Стоимость</a>
+            <a href="#triathlon" className="hover:text-white">Триатлон</a>
           </nav>
           <Link to="/login" className="ml-auto text-sm font-semibold text-white/90 hover:text-white md:ml-0">Войти</Link>
         </div>
@@ -291,6 +295,41 @@ export default function Landing() {
           </div>
         </div>
       </Section>
+
+      {/* Second course: triathlon */}
+      <section id="triathlon" className="scroll-mt-20 bg-navy text-white">
+        <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
+          <div className="text-[13px] font-bold uppercase tracking-[0.18em] text-cyan">Новый курс · для триатлонистов</div>
+          <h2 className="mt-3 max-w-3xl text-[28px] font-bold leading-tight md:text-[38px]">Триатлон без травм: плавание, велосипед, бег и восстановление</h2>
+          <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-navy-300">Три вида спорта — одно тело. Курс о том, как не потерять сезон из-за плеча, колена или ахилла, и как восстанавливаться от спринта до Ironman.</p>
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [Waves, 'Плечо пловца', 'Почему болит и 4 упражнения для вращательной манжеты и лопатки.'],
+              [Bike, 'Посадка на велосипеде', 'Высота седла, колени, поясница и шея в аэропозиции.'],
+              [Footprints, 'Бег после велосипеда', 'Брик-тренировки, «ватные ноги», ахилл и голень.'],
+              [HeartPulse, 'Топливо и восстановление', 'Углеводы на длинном старте, вода и соль, сон, REDs.'],
+            ].map(([Icon, title, text]) => {
+              const I = Icon as typeof Waves;
+              return (
+                <div key={title as string} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                  <I className="h-6 w-6 text-cyan" />
+                  <h3 className="mt-4 text-[17px] font-bold">{title as string}</h3>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-navy-300">{text as string}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href={WHATSAPP_TRI} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg' })} data-testid="landing-tri-signup">
+              <MessageCircle className="h-5 w-5" /> Записаться на курс
+            </a>
+            <Button size="lg" variant="outline" onClick={() => openDemo(TRI_OFFER.courseId)} loading={busy} className="border-white/40 text-white hover:bg-white/10" data-testid="landing-tri-demo">
+              <PlayCircle className="h-5 w-5" /> Смотреть демо
+            </Button>
+            <span className="text-[14px] text-navy-300">{TRI_MODULES.length} модулей · {TRI_LESSONS.length} уроков · стоимость — по запросу</span>
+          </div>
+        </div>
+      </section>
 
       {/* FAQ */}
       <section className="bg-bg">
