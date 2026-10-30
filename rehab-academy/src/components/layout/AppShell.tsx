@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Activity, Award, Bell, BookOpen, Bone, Briefcase, Building2, ChevronsLeft, ChevronsRight, ClipboardCheck, FlaskConical, GraduationCap,
-  LayoutDashboard, LogOut, Menu, PenSquare, Search, Settings, ShieldCheck, Stethoscope, Tag, Users, X,
+  LayoutDashboard, LogOut, Menu, PenSquare, Search, Settings, ShieldCheck, Stethoscope, Tag, UserRound, Users, X,
 } from 'lucide-react';
 import { useDb } from '@/data/db';
 import { forTrack, isAthlete, logout, markNotificationsRead, roleKey, useMe } from '@/data/api';
@@ -23,7 +23,7 @@ export function Logo({ collapsed }: { collapsed?: boolean }) {
       <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal to-cyan text-white shadow-sm">
         <Activity className="h-5 w-5" strokeWidth={2.4} />
       </div>
-      {!collapsed && <span className="text-[16px] font-bold tracking-tight text-white">Rehab Academy</span>}
+      {!collapsed && <span className="text-[16px] font-bold tracking-tight text-white">FAB3D Academy</span>}
     </div>
   );
 }
@@ -35,6 +35,8 @@ function useNav() {
     { to: '/', key: 'nav.home', icon: <LayoutDashboard />, end: true },
     { to: '/courses', key: 'nav.myCourses', icon: <BookOpen /> },
     { to: '/anatomy', key: 'nav.atlas', icon: <Bone /> },
+    { to: '/community', key: 'nav.community', icon: <Users /> },
+    { to: '/profile', key: 'nav.profile', icon: <UserRound /> },
     { to: '/progress', key: 'nav.progress', icon: <GraduationCap /> },
     { to: '/certificates', key: 'nav.certificates', icon: <Award /> },
   ];
@@ -249,6 +251,7 @@ export default function AppShell() {
     try { return localStorage.getItem('ra-sidebar') === '1'; } catch { return false; }
   });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const u = useMe()!;
   const loc = useLocation();
   useEffect(() => { try { localStorage.setItem('ra-sidebar', collapsed ? '1' : '0'); } catch { /* storage unavailable */ } }, [collapsed]);
   useEffect(() => { window.scrollTo(0, 0); }, [loc.pathname]);
@@ -256,7 +259,7 @@ export default function AppShell() {
     <div className="min-h-full">
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((v) => !v)} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
       <div className={cn('flex min-h-screen flex-col transition-[padding] duration-200', collapsed ? 'lg:pl-[76px]' : 'lg:pl-[256px]')}>
-        <DemoBanner />
+        {u.demo && <DemoBanner />}
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-white/90 px-4 backdrop-blur md:px-6">
           <button className="grid h-10 w-10 place-items-center rounded-xl text-navy-500 hover:bg-bg lg:hidden" onClick={() => setMobileOpen(true)} aria-label="menu"><Menu className="h-5 w-5" /></button>
           <GlobalSearch />

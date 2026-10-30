@@ -5,6 +5,7 @@ import { SEED_ASSESSMENTS, SEED_QUESTIONS } from './content/assessments';
 import { SEED_COURSES, SEED_LESSONS, SEED_MODULES } from './content/courses';
 import { RUN_ASSESSMENT, RUN_COURSE, RUN_LESSONS, RUN_MODULES, RUN_QUESTIONS } from './content/runners';
 import { TRI_ASSESSMENT, TRI_COURSE, TRI_LESSONS, TRI_MODULES, TRI_QUESTIONS } from './content/triathlon';
+import { KZ_ASSESSMENT, KZ_COURSE, KZ_LESSONS, KZ_MODULES, KZ_QUESTIONS } from './content/kazakhstan';
 import type { AnswerValue, Organization, Role, User } from './types';
 import type { I18nKey } from '@/i18n';
 
@@ -155,6 +156,7 @@ export async function ensureSeeded() {
 const CODE_COURSES = [
   { course: RUN_COURSE, modules: RUN_MODULES, lessons: RUN_LESSONS, assessment: RUN_ASSESSMENT, questions: RUN_QUESTIONS },
   { course: TRI_COURSE, modules: TRI_MODULES, lessons: TRI_LESSONS, assessment: TRI_ASSESSMENT, questions: TRI_QUESTIONS },
+  { course: KZ_COURSE, modules: KZ_MODULES, lessons: KZ_LESSONS, assessment: KZ_ASSESSMENT, questions: KZ_QUESTIONS },
 ];
 function syncCodeCourses() {
   const keep = <T extends { id: string }>(rows: T[], fresh: T[]) => [...fresh, ...rows.filter((r) => !fresh.some((f) => f.id === r.id))];

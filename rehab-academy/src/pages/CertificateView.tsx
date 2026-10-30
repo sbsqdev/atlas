@@ -26,11 +26,11 @@ export default function CertificateView() {
         <div className="flex h-full flex-col items-center justify-between text-center">
           <div className="flex items-center gap-2.5">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-teal to-cyan text-white"><Activity className="h-5 w-5" /></div>
-            <span className="text-lg font-bold">Rehab Academy</span>
+            <span className="text-lg font-bold">FAB3D Academy</span>
           </div>
           <div>
             <div className="text-[13px] font-semibold uppercase tracking-[0.3em] text-teal">{t('cert.heading')}</div>
-            <p className="mt-6 text-navy-500">Rehab Academy {t('cert.certifies')}</p>
+            <p className="mt-6 text-navy-500">FAB3D Academy {t('cert.certifies')}</p>
             <div className="mt-2 text-[32px] font-bold">{holder?.fullName}</div>
             <p className="mt-4 text-navy-500">{t('cert.completed')}</p>
             <div className="mt-2 text-xl font-semibold text-teal">«{c.courseTitle}»</div>

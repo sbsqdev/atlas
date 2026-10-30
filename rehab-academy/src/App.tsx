@@ -34,6 +34,12 @@ const OrgAdmin = lazy(() => import('@/pages/OrgAdmin'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const Review = lazy(() => import('@/pages/Review'));
 const Landing = lazy(() => import('@/pages/Landing'));
+const Activate = lazy(() => import('@/pages/Activate'));
+const Issue = lazy(() => import('@/pages/Issue'));
+const Legal = lazy(() => import('@/pages/Legal'));
+const Community = lazy(() => import('@/pages/Community'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const Paywall = lazy(() => import('@/features/access/Paywall'));
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const u = useMe();
@@ -41,6 +47,11 @@ function RequireAuth({ children }: { children: ReactNode }) {
   // Signed-out visitors see the public course page at the root.
   if (!u) return loc.pathname === '/' ? <Landing /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />;
   return <>{children}</>;
+}
+/** /atlas without the trailing slash reaches the SPA rewrite; send it to the Human Atlas app at /atlas/. */
+function AtlasRedirect() {
+  useEffect(() => { if (!location.pathname.endsWith('/')) location.replace(`${location.pathname}/`); }, []);
+  return null;
 }
 function RequirePerm({ p, children }: { p: Permission; children: ReactNode }) {
   const u = useMe();
@@ -59,10 +70,18 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<AuthPage mode="in" />} />
         <Route path="/register" element={<AuthPage mode="up" />} />
+        <Route path="/atlas" element={<AtlasRedirect />} />
+        <Route path="/activate" element={<Activate />} />
+        <Route path="/issue" element={<Issue />} />
+        <Route path="/offer" element={<Legal doc="offer" />} />
+        <Route path="/privacy" element={<Legal doc="privacy" />} />
         <Route path="/certificates/:id/print" element={<RequireAuth><CertificateView /></RequireAuth>} />
         <Route element={<RequireAuth><AppShell /></RequireAuth>}>
           <Route index element={<Dashboard />} />
           <Route path="anatomy" element={<AnatomyLab />} />
+          <Route path="community" element={<Community />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="access" element={<Paywall />} />
           <Route path="simulations" element={<SimLibrary />} />
           <Route path="simulations/:id" element={<SimPlayer />} />
           <Route path="patients" element={<Patients />} />

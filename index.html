@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="ru">
   <head>
+    <!-- Served at /atlas/: relative asset paths need the trailing slash. -->
+    <script>if (/\/atlas$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);</script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

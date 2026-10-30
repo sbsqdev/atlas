@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, Footprints, GraduationCap, MessageCircle, MessageSquare, ShieldCheck, Users } from 'lucide-react';
+import { Award, BookOpen, Bone, Building2, CalendarClock, ClipboardCheck, Clock, FlaskConical, Footprints, GraduationCap, KeyRound, MessageCircle, MessageSquare, ShieldCheck, Users } from 'lucide-react';
 import { useDb } from '@/data/db';
 import { activeSubscriptions, courseLessons, forTrack, isAthlete, useMe } from '@/data/api';
 import { activityByDay, avg, bestAttempts, coursePct, missedQuestions, totalMinutes } from '@/data/analytics';
@@ -8,10 +8,11 @@ import { canSeeCourse } from '@/data/rbac';
 import { STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { PLAN_BY_ID } from '@/data/content/plans';
-import { RUN_LINKS, RUN_OFFER } from '@/data/content/runners';
+import { RUN_LINKS } from '@/data/content/runners';
 import type { User } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { fmtDate, fmtHours, LOCALE_TAG } from '@/lib/format';
+import { cn } from '@/lib/cn';
 import { Badge, buttonVariants, Card, CardBody, CardHeader, EmptyState, PageHeader, Progress, StatCard } from '@/components/ui';
 import { BarSeries } from '@/components/charts';
 
@@ -26,7 +27,7 @@ export default function Dashboard() {
 
 /** Home for athletes: continue the course, open the 3D atlas, join the chat. */
 function AthleteDash({ u }: { u: User }) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const d = useDb();
   const v = useMemo(() => {
     const enrolled = d.enrollments.filter((e) => e.userId === u.id);
@@ -42,11 +43,16 @@ function AthleteDash({ u }: { u: User }) {
     return { current, next, more, recent, done, lessonsTotal: lessons.length };
   }, [d, u]);
   const pct = v.current ? coursePct(d, u.id, v.current.id) : 0;
-  const chatHref = RUN_LINKS.telegramChat || `/courses/${RUN_OFFER.courseId}/lessons/l-r3`;
+  const chatHref = RUN_LINKS.telegramChat || '/community';
+  const paid = (u.accessUntil ?? 0) > Date.now();
 
   return (
     <div className="animate-fade-up" data-testid="athlete-home">
       <PageHeader eyebrow={t('ath.eyebrow')} title={t('dash.welcome', { name: u.fullName.split(' ')[0] })} subtitle={t('ath.sub')} />
+      <div className={cn('mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl px-5 py-3.5 text-[14px]', paid ? 'bg-success/10 text-navy' : 'bg-navy text-white')} data-testid="access-banner">
+        <span className="flex items-center gap-2"><KeyRound className="h-4 w-4" /> {paid ? t('access.until', { date: fmtDate(u.accessUntil!, locale) }) : t('access.none')}</span>
+        {!paid && <Link to="/access" className={buttonVariants({ size: 'sm' })}>{t('access.get')}</Link>}
+      </div>
       {v.current ? (
         <Card className="overflow-hidden">
           <div className="grid md:grid-cols-[1fr_260px]">

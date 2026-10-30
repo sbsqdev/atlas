@@ -6,10 +6,10 @@
   "description": "Human Atlas — bilingual (RU/EN) training platform with an interactive 3D muscle map",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && npm run build:academy",
+    "build": "tsc --noEmit && rm -rf dist && vite build --outDir dist/atlas && npm run build:academy",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "build:academy": "npm --prefix rehab-academy ci --no-audit --no-fund && VITE_BASE=/academy/ npm --prefix rehab-academy run build && rm -rf dist/academy && cp -r rehab-academy/dist dist/academy"
+    "build:academy": "npm --prefix rehab-academy ci --no-audit --no-fund && npm --prefix rehab-academy run build && cp -r rehab-academy/dist/. dist/"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",

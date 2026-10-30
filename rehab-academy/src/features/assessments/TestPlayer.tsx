@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { attemptsLeft, canTakeAssessment, questionsFor, submitAttempt, useMe } from '@/data/api';
+import { assessmentLocked, attemptsLeft, canTakeAssessment, questionsFor, submitAttempt, useMe } from '@/data/api';
+import Paywall from '@/features/access/Paywall';
 import type { AnswerValue, AssessmentAttempt, Question } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
 import { errorKey } from '@/lib/errors';
@@ -49,6 +50,7 @@ export default function TestPlayer() {
   useEffect(() => { if (deadline && now >= deadline) finish(true); }, [now, deadline, finish]);
 
   if (!a) return <NotFound />;
+  if (assessmentLocked(u, a)) return <Paywall />;
   if (!canTakeAssessment(u, a)) return <Forbidden />;
   const qs = questionsFor(a.id);
   const left = attemptsLeft(u, a);

@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Download, ExternalLink, Lock } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { completeLesson, courseStatus, touchLesson, useMe } from '@/data/api';
+import { completeLesson, courseStatus, lessonLocked, touchLesson, useMe } from '@/data/api';
+import Paywall from '@/features/access/Paywall';
 import { canSeeCourse } from '@/data/rbac';
 import { SIM_BY_ID } from '@/data/content/simulations';
 import { ANATOMY_MODELS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
@@ -31,8 +32,8 @@ export default function LessonPlayer() {
 
   useEffect(() => {
     opened.current = Date.now();
-    if (enrolled && lesson) touchLesson(id, lesson.id);
-  }, [id, lesson, enrolled]);
+    if (enrolled && lesson && !lessonLocked(u, lesson)) touchLesson(id, lesson.id);
+  }, [id, lesson, enrolled, u]);
 
   // Simulation and quiz lessons complete themselves once the activity is done.
   const simDone = lesson?.type === 'simulation' && d.simAttempts.some((a) => a.userId === u.id && a.simulationId === lesson.simulationId);
@@ -44,10 +45,11 @@ export default function LessonPlayer() {
   if (!c || !canSeeCourse(u, c) || !st) return <NotFound />;
   if (!enrolled && !isAuthor) return <Navigate to={`/courses/${id}`} replace />;
   if (!lesson) return <NotFound />;
+  const locked = lessonLocked(u, lesson);
   const done = st.done.has(lesson.id);
   const prev = st.lessons[idx - 1];
   const next = st.lessons[idx + 1];
-  const canMark = enrolled && !done && lesson.type !== 'quiz' && lesson.type !== 'simulation';
+  const canMark = enrolled && !done && !locked && lesson.type !== 'quiz' && lesson.type !== 'simulation';
 
   function markDone() {
     completeLesson(id, lesson!.id, Math.max(60, Math.round((Date.now() - opened.current) / 1000)));
@@ -64,7 +66,7 @@ export default function LessonPlayer() {
             const Icon = LESSON_ICON[l.type];
             return (
               <Link key={l.id} to={`/courses/${id}/lessons/${l.id}`} className={cn('flex items-center gap-2.5 rounded-lg px-2 py-2 text-[13px]', l.id === lesson.id ? 'bg-teal-50 font-semibold text-teal' : 'text-navy hover:bg-bg')}>
-                {st.done.has(l.id) ? <CheckCircle2 className="h-4 w-4 shrink-0 text-success" /> : <Icon className="h-4 w-4 shrink-0 text-navy-300" />}
+                {st.done.has(l.id) ? <CheckCircle2 className="h-4 w-4 shrink-0 text-success" /> : lessonLocked(u, l) ? <Lock className="h-4 w-4 shrink-0 text-navy-300" /> : <Icon className="h-4 w-4 shrink-0 text-navy-300" />}
                 <span className="truncate">{i + 1}. {l.title}</span>
               </Link>
             );
@@ -81,12 +83,14 @@ export default function LessonPlayer() {
             {!enrolled && <Badge tone="warning">{t('courses.preview')}</Badge>}
           </div>
           <h1 className="mt-3 text-[24px] font-bold tracking-tight">{lesson.title}</h1>
+          {locked ? <div className="mt-5"><Paywall /></div> : <>
           <div className="mt-2"><LessonBody lesson={lesson} /></div>
           {lesson.ctaLabel && (
             lesson.ctaUrl
               ? <a href={lesson.ctaUrl} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg', className: 'mt-5' })} data-testid="lesson-cta"><ExternalLink className="h-4 w-4" /> {lesson.ctaLabel}</a>
               : <p className="mt-5 rounded-xl border border-dashed border-line bg-bg px-4 py-3 text-sm text-navy-500" data-testid="lesson-cta">{t('lesson.ctaPending')}</p>
           )}
+          </>}
           <EduNotice className="mt-6" />
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
             {prev ? <Link to={`/courses/${id}/lessons/${prev.id}`} className={buttonVariants({ variant: 'ghost' })}><ArrowLeft className="h-4 w-4" /> {t('courses.prevLesson')}</Link> : <span />}

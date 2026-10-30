@@ -3,14 +3,22 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
+  "redirects": [
     {
       "source": "/academy",
-      "destination": "/academy/index.html"
+      "destination": "/",
+      "permanent": false
     },
     {
-      "source": "/academy/(.*)",
-      "destination": "/academy/index.html"
+      "source": "/academy/:path*",
+      "destination": "/:path*",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!api/|atlas/|assets/|models/|landing/|materials/|favicon).*)",
+      "destination": "/index.html"
     }
   ]
 }

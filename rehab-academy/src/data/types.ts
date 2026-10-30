@@ -18,6 +18,15 @@ export interface User {
   fullName: string;
   role: Role;
   track?: Track;
+  /** Athlete access bought outside the platform (Kaspi) and granted by a signed code. */
+  accessUntil?: number;
+  accessPlan?: string;
+  /** Athlete profile (kept on this device). */
+  city?: string;
+  sports?: string[];
+  goal?: string;
+  nextRace?: string;
+  pb?: Partial<Record<'5k' | '10k' | 'half' | 'marathon', string>>;
   orgId: string | null;
   cohort?: string;
   headline?: string;

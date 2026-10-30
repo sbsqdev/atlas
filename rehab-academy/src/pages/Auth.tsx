@@ -6,7 +6,7 @@ import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '@/data/seed';
 import { LOCALES, useLocale, useT, type I18nKey } from '@/i18n';
 import { errorKey } from '@/lib/errors';
 import { Button, Field, Input, Select } from '@/components/ui';
-import { Logo, DemoBanner } from '@/components/layout/AppShell';
+import { Logo } from '@/components/layout/AppShell';
 import { cn } from '@/lib/cn';
 
 export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
@@ -47,7 +47,6 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
       <div className="grid flex-1 lg:grid-cols-[1.05fr_1fr]">
         <section className="relative hidden overflow-hidden bg-navy p-12 text-white lg:flex lg:flex-col">
           <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-teal/30 blur-3xl" />
@@ -78,7 +77,10 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
                 <button key={l.id} onClick={() => setLocale(l.id)} className={cn('rounded-lg px-2.5 py-1 text-[12px] font-semibold', locale === l.id ? 'bg-navy text-white' : 'text-navy-500 hover:bg-white')}>{l.label}</button>
               ))}
             </div>
-            <Link to="/" className="mb-3 inline-block text-[13px] font-semibold text-teal">← {t('auth.toCourse')}</Link>
+            <div className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px] font-semibold">
+              <Link to="/" className="text-teal">← {t('auth.toCourse')}</Link>
+              <Link to="/activate" className="text-navy-500 hover:text-teal" data-testid="auth-activate">{t('access.haveCode')}</Link>
+            </div>
             <h2 className="text-[26px] font-bold tracking-tight">{t(mode === 'in' ? 'auth.signIn' : 'auth.signUp')}</h2>
             <p className="mt-1 text-sm text-navy-500">{t('app.tagline')}</p>
 

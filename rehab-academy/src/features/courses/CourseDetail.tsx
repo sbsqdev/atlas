@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Award, CheckCircle2, ClipboardCheck, Clock, FileText, FlaskConical, Bone, Lock, PlayCircle, Circle, type LucideIcon } from 'lucide-react';
 import { useDb } from '@/data/db';
-import { canOpenCourse, courseStatus, enroll, useMe } from '@/data/api';
+import { canOpenCourse, courseStatus, enroll, lessonLocked, useMe } from '@/data/api';
 import { canSeeCourse } from '@/data/rbac';
 import type { LessonType } from '@/data/types';
 import { useT, type I18nKey } from '@/i18n';
@@ -84,7 +84,7 @@ export default function CourseDetail() {
                         <Icon className="h-4 w-4 shrink-0 text-teal" />
                         <span className="min-w-0 flex-1 truncate">{l.title}</span>
                         <span className="hidden text-[12px] text-navy-500 sm:inline">{t(`lesson.${l.type}` as I18nKey)} · {l.durationMin} {t('common.min')}</span>
-                        {done ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Circle className="h-4 w-4 text-line" />}
+                        {done ? <CheckCircle2 className="h-4 w-4 text-success" /> : lessonLocked(u, l) ? <Lock className="h-4 w-4 text-navy-300" data-testid="lesson-locked" /> : <Circle className="h-4 w-4 text-line" />}
                       </>
                     );
                     return (

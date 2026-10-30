@@ -4,6 +4,7 @@ import { assertCan, can, canSeeCourse, courseEntitlement, ForbiddenError, sameOr
 import { gradeAttempt } from './grading';
 import { seedDemo } from './seed';
 import { PLAN_BY_ID } from './content/plans';
+import type { AccessGrant } from './access';
 import type {
   ActivityLog, AnswerValue, Assessment, AssessmentAttempt, Course, CourseModule, ContentStatus, Entitlement, Lesson, OrgType, PatientAttempt, PlanId, Question, Role, SimulationAttempt, Subscription, User, Track,
 } from './types';
@@ -496,7 +497,7 @@ export function requestPilot(planId: PlanId) {
 }
 
 /* ---------------- Profile / settings ---------------- */
-export function updateProfile(patch: Partial<Pick<User, 'fullName' | 'headline' | 'jobPrefs' | 'careerVisible'>>) {
+export function updateProfile(patch: Partial<Pick<User, 'fullName' | 'headline' | 'jobPrefs' | 'careerVisible' | 'city' | 'sports' | 'goal' | 'nextRace' | 'pb'>>) {
   const u = me();
   write((t) => ({ users: t.users.map((x) => (x.id === u.id ? { ...x, ...patch } : x)) }));
   if ('careerVisible' in patch) audit('career.visibility', 'user', u.id, String(patch.careerVisible));
@@ -531,7 +532,39 @@ export function touchLesson(courseId: string, lessonId: string) {
 
 /** Athletes (runners, marathoners…) get the simplified app; everyone else the specialist one. */
 export const isAthlete = (u: User | null | undefined) => u?.track === 'athlete';
-/** Courses meant for this learner's track. */
 /** i18n key of the user's role label; athletes are shown as athletes, not students. */
 export const roleKey = (u: User) => (isAthlete(u) ? 'role.athlete' : `role.${u.role}`) as `role.${string}`;
+/** Courses meant for this learner's track. */
 export const forTrack = (u: User, c: Course) => !isAthlete(u) || (c.audience ?? ['pro']).includes('athlete');
+
+/* ---------------- Athlete access ----------------
+   Athletes pay by Kaspi; the owner emails them a signed access code. Without
+   access an athlete sees the first module of each athlete course. */
+export const hasAccess = (u: User | null | undefined, now = Date.now()) => !isAthlete(u) || (u?.accessUntil ?? 0) > now;
+const athleteCourse = (courseId: string) => !!db().courses.find((c) => c.id === courseId)?.audience?.includes('athlete');
+export function lessonLocked(u: User, l: Lesson) {
+  if (hasAccess(u) || !athleteCourse(l.courseId)) return false;
+  return (db().modules.find((m) => m.id === l.moduleId)?.order ?? 1) > 1;
+}
+export const assessmentLocked = (u: User, a: Assessment) => !hasAccess(u) && !!a.courseId && athleteCourse(a.courseId);
+
+/** Signs the code's owner in on this device and opens access until the code's date. */
+export async function activateAccess(grant: AccessGrant, fullName: string) {
+  const email = grant.email.trim().toLowerCase();
+  const existing = db().users.find((x) => x.email.toLowerCase() === email);
+  let id = existing?.id;
+  if (existing) {
+    write((t) => ({ users: t.users.map((x) => (x.id === existing.id ? { ...x, accessUntil: Math.max(x.accessUntil ?? 0, grant.until), accessPlan: grant.plan, fullName: fullName.trim() || x.fullName } : x)) }));
+  } else {
+    const salt = newSalt();
+    const u: User = {
+      id: uid('u'), email, fullName: fullName.trim() || email.split('@')[0], role: 'student', track: 'athlete', orgId: null,
+      salt, passwordHash: await hashPassword(tempPassword(), salt), accessUntil: grant.until, accessPlan: grant.plan,
+      careerVisible: false, consentAt: Date.now(), createdAt: Date.now(),
+    };
+    write((t) => ({ users: [...t.users, u] }));
+    id = u.id;
+  }
+  useSession.setState({ userId: id! });
+  audit('access.activated', 'user', id, `${grant.plan} until ${new Date(grant.until).toISOString().slice(0, 10)}`);
+}

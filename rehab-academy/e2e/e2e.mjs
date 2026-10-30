@@ -44,60 +44,162 @@ async function logout() {
 await page.goto(BASE);
 await page.evaluate(() => localStorage.clear());
 
-await check('public course page: program, price, sign-up and demo entry', async () => {
+// Site forms go to FormSubmit; capture them instead of sending real email.
+const forms = [];
+await page.route('**/formsubmit.co/**', async (route) => {
+  forms.push({ url: route.request().url(), body: JSON.parse(route.request().postData() ?? '{}') });
+  await route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":"true","message":"ok"}' });
+});
+const plain = (s) => s.replace(/ | /g, ' ');
+
+await check('public page: three courses, prices, Kaspi, WhatsApp and Telegram', async () => {
   await page.goto(`${BASE}/`);
   await page.getByTestId('landing').waitFor();
-  await text('Колени, стопы').waitFor();
-  const price = await page.getByTestId('landing-price').innerText();
-  if (!/50\s000\s₸/.test(price.replace(/\u00a0|\u202f/g, ' '))) throw new Error(`price: ${price}`);
-  const href = await page.getByTestId('landing-signup').first().getAttribute('href');
-  if (!href.startsWith('https://wa.me/')) throw new Error(`sign-up link: ${href}`);
+  for (const id of ['c-run', 'c-tri', 'c-kz']) await page.getByTestId(`landing-course-${id}`).waitFor();
+  const prices = (await page.getByTestId('plan-price').allInnerTexts()).map(plain);
+  if (prices.join('|') !== '20 000 ₸|10 000 ₸|200 000 ₸') throw new Error(`prices ${prices}`);
+  if (!plain(await page.getByTestId('landing-launch').innerText()).includes('первых 500')) throw new Error('launch offer');
+  if ((await page.getByTestId('landing-kaspi').getAttribute('href')) !== 'https://pay.kaspi.kz/pay/jk9m2wsj') throw new Error('kaspi link');
+  if (!(await page.getByTestId('landing-whatsapp').getAttribute('href')).startsWith('https://wa.me/77073737767')) throw new Error('whatsapp');
+  if ((await page.getByTestId('landing-telegram').getAttribute('href')) !== 'https://t.me/ecosystem_tech') throw new Error('telegram');
+  for (const z of ['north', 'almaty', 'south', 'west', 'centerEast']) await page.getByTestId(`zone-${z}`).waitFor();
+  await page.getByTestId('reviews-empty').waitFor();
   await shot('00-landing');
-  await page.getByTestId('landing-demo').first().click();
-  await page.waitForURL(/courses\/c-run$/);
-  await text('Колени, стопы и восстановление: курс для бегунов').waitFor();
 });
 
-await check('athlete app: short menu, home with the course, runner-only catalog', async () => {
+await check('application form → email (FormSubmit) → Kaspi payment button', async () => {
+  await page.getByTestId('choose-month').click();
+  const f = page.getByTestId('form-apply');
+  await f.getByTestId('form-apply-submit').click();
+  await text('Заполните обязательные поля').waitFor();
+  await f.locator('input[name=name]').fill('Айгерим');
+  await f.locator('input[name=email]').fill('aigerim@test.example');
+  await f.locator('input[name=contact]').fill('+7 700 000 00 00');
+  await f.locator('select[name=city]').selectOption('astana');
+  await f.locator('select[name=sport]').selectOption('marathon');
+  await f.locator('input[name=consent]').check();
+  await f.getByTestId('form-apply-submit').click();
+  await page.getByTestId('form-apply-sent').waitFor();
+  await page.getByTestId('kaspi-pay').waitFor();
+  const sent = forms.at(-1);
+  if (!sent.url.includes('formsubmit.co/ajax/sbsqbiz@gmail.com')) throw new Error(`endpoint ${sent.url}`);
+  const b = sent.body;
+  if (!b._subject.startsWith('Заявка на доступ') || b.Email !== 'aigerim@test.example' || b['Город'] !== 'Астана' || !plain(b['Тариф']).includes('10 000')) throw new Error(JSON.stringify(b));
+});
+
+await check('Kazakh: landing switches to Kazakh and back', async () => {
+  await page.getByTestId('lang-switch').getByText('KZ').click();
+  await text('Ұзағырақ жүгіріңіз').waitFor();
+  await text('Бір жазылымда үш курс').waitFor();
+  await shot('00-landing-kk');
+  await page.getByTestId('lang-switch').getByText('RU').click();
+  await text('Бегайте дольше').waitFor();
+});
+
+await check('offer and privacy pages', async () => {
+  await page.goto(`${BASE}/offer`);
+  await page.getByTestId('legal-offer').waitFor();
+  const o = plain(await page.getByTestId('legal-offer').innerText());
+  for (const s of ['SB dev', '20 000 ₸', '10 000 ₸', 'pay.kaspi.kz/pay/jk9m2wsj', 'в течение 24 часов', '+77073737767', '@ecosystem_tech']) if (!o.includes(s)) throw new Error(`offer lacks ${s}`);
+  await page.goto(`${BASE}/privacy`);
+  await text('FormSubmit').waitFor();
+});
+
+await check('demo: athlete menu, trial banner, courses for athletes only', async () => {
+  await page.goto(`${BASE}/`);
+  await page.getByTestId('landing-demo').first().click();
+  await page.waitForURL(/courses\/c-run$/);
   await page.goto(`${BASE}/`);
   await page.getByTestId('athlete-home').waitFor();
   await text('Продолжить обучение').waitFor();
+  if (!(await page.getByTestId('access-banner').innerText()).includes('Пробный доступ')) throw new Error('trial banner');
   const navText = await page.getByRole('navigation').innerText();
+  for (const shown of ['Сообщество', 'Мой профиль']) if (!navText.includes(shown)) throw new Error(`no ${shown}`);
   for (const hidden of ['Симуляции', 'Виртуальные пациенты', 'Карьера', 'Тарифы']) if (navText.includes(hidden)) throw new Error(`athlete sees ${hidden}`);
   await page.goto(`${BASE}/courses`);
-  await page.getByTestId('course-c-run').waitFor();
-  await page.getByTestId('course-c-tri').waitFor();
+  for (const id of ['c-run', 'c-tri', 'c-kz']) await page.getByTestId(`course-${id}`).waitFor();
   if (await page.getByTestId('course-c-knee').count()) throw new Error('specialist course shown to athlete');
   await shot('00b-athlete-home');
 });
 
-await check('runners course: chat lesson and foot 3D model', async () => {
+await check('trial: first module open, later lessons and tests behind the paywall', async () => {
   await page.goto(`${BASE}/courses/c-run/lessons/l-r3`);
   await page.getByTestId('lesson-cta').waitFor();
+  await page.goto(`${BASE}/courses/c-run`);
+  await page.getByTestId('lesson-locked').first().waitFor();
+  await page.goto(`${BASE}/courses/c-run/lessons/l-r5`);
+  await page.getByTestId('paywall').waitFor();
+  if (await page.locator('[data-testid=anatomy-viewer]').count()) throw new Error('locked 3D lesson rendered');
+  await page.goto(`${BASE}/assessments/as-run`);
+  await page.getByTestId('paywall').waitFor();
+  await page.getByTestId('paywall-apply').click();
+  await page.getByTestId('form-apply').waitFor();
+  await shot('00c-paywall');
   await page.goto(`${BASE}/anatomy?m=foot`);
   await page.locator('[data-testid=anatomy-viewer][data-model=foot] canvas').waitFor();
   await page.getByTestId('struct-calcaneal_tendon').click();
   await page.getByTestId('structure-info').getByText('Пяточное (ахиллово) сухожилие').waitFor();
-  await page.getByRole('button', { name: 'Коленный сустав (правый)' }).click();
-  await page.locator('[data-testid=anatomy-viewer][data-model=knee]').waitFor();
+});
+
+await check('profile and community: city chat, zone tips, region form', async () => {
+  await page.goto(`${BASE}/profile`);
+  await page.locator('select[name=city]').selectOption('shymkent');
+  await page.getByRole('button', { name: 'Триатлон' }).click();
+  await page.locator('input[name=goal]').fill('Первый полумарафон');
+  await page.getByTestId('profile-save').click();
+  await text('Сохранено').waitFor();
+  await page.goto(`${BASE}/community`);
+  await page.getByTestId('community').waitFor();
+  await text('Юг').waitFor();
+  await page.getByTestId('join-shymkent').click();
+  const f = page.getByTestId('form-region');
+  await f.locator('input[name=name]').fill('Бегун');
+  await f.locator('input[name=contact]').fill('@runner');
+  await f.locator('input[name=consent]').check();
+  await f.getByTestId('form-region-submit').click();
+  await page.getByTestId('form-region-sent').waitFor();
+  if (forms.at(-1).body['Город'] !== 'Шымкент') throw new Error('region form city');
+  await shot('00d-community');
 });
 await logout();
 
-await check('triathlon course: landing block, demo entry, 3D lesson, test', async () => {
-  await page.goto(`${BASE}/`);
-  await page.locator('#triathlon').scrollIntoViewIfNeeded();
-  await shot('00c-landing-triathlon');
-  const prices = (await page.getByTestId('landing-tri-price').allInnerTexts()).map((p) => p.replace(/\s/g, ''));
-  if (prices.join('|') !== '70000₸|200000₸') throw new Error(`tri prices ${prices}`);
-  const href = await page.getByTestId('landing-tri-signup').first().getAttribute('href');
-  if (!href?.startsWith('https://wa.me/77073737767') || !decodeURIComponent(href).includes('Триатлон')) throw new Error(`bad tri WhatsApp link ${href}`);
-  await page.getByTestId('landing-tri-demo').click();
-  await page.waitForURL(/courses\/c-tri$/);
-  await text('Триатлон без травм: плавание, велосипед, бег и восстановление').first().waitFor();
+const KEY_FILE = process.env.ACCESS_KEY_FILE;
+await check('owner issues a code on /issue; athlete activates it and gets full access', async () => {
+  if (!KEY_FILE) { console.log('   (skipped: set ACCESS_KEY_FILE to the private key to run it)'); return; }
+  await page.goto(`${BASE}/activate?email=x@test.example&code=abc.def`);
+  await page.locator('input[name=consent]').check();
+  await page.getByTestId('activate-submit').click();
+  await page.getByTestId('activate-error').getByText('Код не подошёл').waitFor();
+
+  await page.goto(`${BASE}/issue`);
+  await page.getByTestId('issuer-key').setInputFiles(KEY_FILE);
+  await page.locator('input[name=email]').fill('Triathlete@Test.example');
+  await page.locator('input[name=name]').fill('Данияр');
+  await page.getByTestId('issue-submit').click();
+  const link = await page.getByTestId('issue-link').inputValue();
+  if (!link.startsWith(`${BASE}/activate?email=triathlete%40test.example&code=`)) throw new Error(`link ${link}`);
+  await shot('00e-issue');
+
+  await page.goto(link.replace('triathlete%40test.example', 'other%40test.example'));
+  await page.locator('input[name=consent]').check();
+  await page.getByTestId('activate-submit').click();
+  await page.getByTestId('activate-error').getByText('другой email').waitFor();
+
+  await page.goto(link);
+  await page.locator('input[name=name]').fill('Данияр');
+  await page.locator('input[name=consent]').check();
+  await page.getByTestId('activate-submit').click();
+  await page.waitForURL(HOME);
+  if (!(await page.getByTestId('access-banner').innerText()).includes('Доступ до')) throw new Error('no access');
+  await page.goto(`${BASE}/courses/c-tri`);
+  await page.getByTestId('course-enroll').click();
   await page.goto(`${BASE}/courses/c-tri/lessons/l-t10`);
   await page.locator('[data-testid=anatomy-viewer][data-model=knee] canvas').waitFor();
+  if (await page.getByTestId('paywall').count()) throw new Error('paywall after activation');
   await page.goto(`${BASE}/assessments/as-tri`);
   await text('Итоговый тест: триатлон без травм').first().waitFor();
+  await page.goto(`${BASE}/courses/c-kz/lessons/l-z8`);
+  await text('Рамазан').first().waitFor();
 });
 await logout();
 
