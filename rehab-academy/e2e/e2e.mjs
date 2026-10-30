@@ -143,6 +143,23 @@ await check('trial: first module open, later lessons and tests behind the paywal
   await page.getByTestId('structure-info').getByText('Пяточное (ахиллово) сухожилие').waitFor();
 });
 
+await check('3D exercises: animated figure, controls, trial lock', async () => {
+  await page.goto(`${BASE}/exercises`);
+  const player = page.locator('[data-testid=exercise-player][data-exercise=chair-squat]');
+  await player.locator('canvas').waitFor();
+  await page.getByTestId('exercise-view-side').click();
+  await page.getByTestId('exercise-play').click();
+  await page.getByTestId('exercise-play').getByText('Пуск').waitFor();
+  await page.getByTestId('exercise-play').click();
+  await shot('00h-exercises');
+  await page.getByTestId('ex-group-hip').click();
+  await page.getByTestId('exercise-glute-bridge').click();
+  await page.locator('[data-testid=exercise-player][data-exercise=glute-bridge] canvas').waitFor();
+  await page.getByTestId('exercise-side-plank').click();
+  await page.waitForURL(/\/access$/);
+  await page.getByTestId('paywall').waitFor();
+});
+
 await check('profile and community: city chat, zone tips, region form', async () => {
   await page.goto(`${BASE}/profile`);
   await page.locator('select[name=city]').selectOption('shymkent');
@@ -263,6 +280,14 @@ await check('owner issues a code on /issue; athlete activates it and gets full a
   await text('Итоговый тест: триатлон без травм').first().waitFor();
   await page.goto(`${BASE}/courses/c-kz/lessons/l-z8`);
   await text('Рамазан').first().waitFor();
+  await page.goto(`${BASE}/courses/c-tri/lessons/l-t17`);
+  await page.getByTestId('exercise-set').waitFor();
+  await page.getByTestId('exercise-plank').click();
+  await page.locator('[data-testid=exercise-player][data-exercise=plank] canvas').waitFor();
+  await page.goto(`${BASE}/exercises`);
+  await page.getByTestId('ex-group-hip').click();
+  await page.getByTestId('exercise-side-plank').click();
+  await page.locator('[data-testid=exercise-player][data-exercise=side-plank] canvas').waitFor();
 
   // The owner opens everything for herself from /issue (the key is already imported).
   await logout();

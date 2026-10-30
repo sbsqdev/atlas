@@ -41,6 +41,7 @@ const Community = lazy(() => import('@/pages/Community'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const Paywall = lazy(() => import('@/features/access/Paywall'));
 const Stories = lazy(() => import('@/pages/Stories'));
+const Exercises = lazy(() => import('@/pages/Exercises'));
 const ConsultPage = lazy(() => import('@/features/consult/Consult'));
 const AthleteCard = lazy(() => import('@/pages/AthleteCard'));
 
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="access" element={<Paywall />} />
           <Route path="stories" element={<Stories />} />
+          <Route path="exercises" element={<Exercises />} />
           <Route path="consult" element={<ConsultPage />} />
           <Route path="simulations" element={<SimLibrary />} />
           <Route path="simulations/:id" element={<SimPlayer />} />

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Activity, Award, Bell, BookOpen, Bone, Briefcase, Building2, ChevronsLeft, ChevronsRight, ClipboardCheck, FlaskConical, GraduationCap,
+  Activity, Award, Bell, BookOpen, Bone, Briefcase, Building2, ChevronsLeft, ChevronsRight, ClipboardCheck, FlaskConical, GraduationCap, Rotate3d,
   LayoutDashboard, LogOut, Menu, PenSquare, Search, Settings, ShieldCheck, Stethoscope, Sparkles, Tag, UserRound, Users, X,
 } from 'lucide-react';
 import { useDb } from '@/data/db';
@@ -35,6 +35,7 @@ function useNav() {
     { to: '/', key: 'nav.home', icon: <LayoutDashboard />, end: true },
     { to: '/courses', key: 'nav.myCourses', icon: <BookOpen /> },
     { to: '/anatomy', key: 'nav.atlas', icon: <Bone /> },
+    { to: '/exercises', key: 'nav.exercises', icon: <Rotate3d /> },
     { to: '/community', key: 'nav.community', icon: <Users /> },
     { to: '/profile', key: 'nav.profile', icon: <UserRound /> },
     { to: '/stories', key: 'nav.stories', icon: <Sparkles /> },

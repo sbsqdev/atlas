@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Download, ExternalLink, Lock } fro
 import { useDb } from '@/data/db';
 import { completeLesson, courseStatus, lessonLocked, touchLesson, useMe } from '@/data/api';
 import Paywall from '@/features/access/Paywall';
+import ExerciseSet from '@/features/exercises/ExerciseSet';
 import { ConsultBanner } from '@/features/consult/Consult';
 import { canSeeCourse } from '@/data/rbac';
 import { SIM_BY_ID } from '@/data/content/simulations';
@@ -87,6 +88,7 @@ export default function LessonPlayer() {
           <h1 className="mt-3 text-[24px] font-bold tracking-tight">{lesson.title}</h1>
           {locked ? <div className="mt-5"><Paywall /></div> : <>
           <div className="mt-2"><LessonBody lesson={lesson} /></div>
+          {lesson.exercises?.length ? <ExerciseSet ids={lesson.exercises} /> : null}
           {lesson.ctaLabel && (
             lesson.ctaUrl
               ? <a href={lesson.ctaUrl} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg', className: 'mt-5' })} data-testid="lesson-cta"><ExternalLink className="h-4 w-4" /> {lesson.ctaLabel}</a>

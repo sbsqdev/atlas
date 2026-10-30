@@ -163,6 +163,7 @@ export const TRI_LESSONS: Lesson[] = [
   }),
   L({
     id: 'l-t7', moduleId: 'm-t3', order: 2, type: 'text', durationMin: 12,
+    exercises: ['band-external-rotation', 'prone-y-t'],
     title: 'Программа для плеча: 4 упражнения',
     body: `Выполняйте 2–3 раза в неделю, лучше после лёгкой тренировки или в день отдыха. Боль во время упражнений — не выше 3–4 из 10.
 
@@ -273,6 +274,7 @@ export const TRI_LESSONS: Lesson[] = [
   }),
   L({
     id: 'l-t15', moduleId: 'm-t5', order: 3, type: 'text', durationMin: 10,
+    exercises: ['calf-raise', 'bent-knee-calf-raise', 'heel-drop'],
     title: 'Ахилл, икры и стопа: профилактика',
     body: `## Базовая программа (2–3 раза в неделю)
 1. **Подъёмы на носки на прямых ногах** — икроножная мышца. 3 × 15, затем на одной ноге.
@@ -311,6 +313,7 @@ export const TRI_LESSONS: Lesson[] = [
   }),
   L({
     id: 'l-t17', moduleId: 'm-t6', order: 2, type: 'text', durationMin: 12,
+    exercises: ['goblet-squat', 'rdl', 'reverse-lunge', 'calf-raise', 'plank', 'side-plank'],
     title: 'Программа: 6 упражнений, 2 раза в неделю',
     body: `Первые 2–3 недели — освоение техники с умеренным весом (3 × 10–12). Затем постепенно переходите к тяжёлой работе: **3–4 подхода по 4–6 повторений**, последние повторения тяжёлые, но технику не теряете.
 

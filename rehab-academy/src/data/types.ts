@@ -90,6 +90,8 @@ export interface Lesson {
   anatomyFocus?: string[];
   anatomyModel?: ModelId;
   /** Optional call-to-action shown under the lesson (e.g. a course chat link). */
+  /** Exercise ids shown by the 3D figure under the lesson text. */
+  exercises?: string[];
   ctaLabel?: string;
   ctaUrl?: string;
   durationMin: number;

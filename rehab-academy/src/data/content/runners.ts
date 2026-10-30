@@ -119,6 +119,7 @@ export const RUN_LESSONS: Lesson[] = [
   }),
   L({
     id: 'l-r6', moduleId: 'm-r2', order: 3, type: 'text', durationMin: 15,
+    exercises: ['chair-squat', 'split-squat', 'step-down', 'wall-sit', 'glute-bridge', 'sl-glute-bridge', 'side-lying-abduction', 'side-plank', 'sl-rdl'],
     title: 'Программа укрепления коленей',
     body: `Выполняйте **2–3 раза в неделю**. Начинайте с 2 подходов, через 2 недели переходите к 3. Нагрузку повышайте, когда последние повторения даются уверенно и без роста боли.
 
@@ -183,6 +184,7 @@ export const RUN_LESSONS: Lesson[] = [
   }),
   L({
     id: 'l-r10', moduleId: 'm-r3', order: 3, type: 'text', durationMin: 15,
+    exercises: ['calf-raise', 'bent-knee-calf-raise', 'heel-drop'],
     title: 'Программа укрепления стоп и голени',
     body: `Выполняйте **3–4 раза в неделю**, 10–15 минут. Большую часть можно делать босиком дома.
 
