@@ -14,7 +14,20 @@ export const TRI_LINKS = {
   telegramChat: '',
 };
 
-export const TRI_OFFER = { courseId: 'c-tri' };
+/** Price tiers shown on the public page; sign-up goes through WhatsApp. */
+export const TRI_OFFER = {
+  courseId: 'c-tri',
+  tiers: [
+    {
+      id: 'course', title: 'Курс + чат', priceKzt: 70_000,
+      points: ['Все модули курса и видео', '3D-атлас колена, стопы и голеностопа', 'Программы упражнений для плеча, колена и голени', 'Закрытый чат с реабилитологом на сезон', 'Итоговый тест и сертификат'],
+    },
+    {
+      id: 'personal', title: 'Курс + персональный разбор', priceKzt: 200_000,
+      points: ['Всё из тарифа «Курс + чат»', 'Разбор вашей техники по видео: плавание, велосипед, бег', 'Онлайн-консультация реабилитолога', 'Персональный план профилактики на сезон'],
+    },
+  ],
+};
 
 export const TRI_COURSE: Course = {
   id: 'c-tri', title: 'Триатлон без травм: плавание, велосипед, бег и восстановление', category: 'Спортивная реабилитация', level: 'intermediate',

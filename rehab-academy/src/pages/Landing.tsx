@@ -21,7 +21,7 @@ import { LESSON_ICON } from '@/features/courses/CourseDetail';
 const img = (name: string) => `${import.meta.env.BASE_URL}landing/${name}`;
 const wa = (text: string) => `https://wa.me/${RUN_OFFER.whatsapp}?text=${encodeURIComponent(text)}`;
 const WHATSAPP = wa('Здравствуйте! Хочу записаться на курс «Колени, стопы и восстановление» для бегунов.');
-const WHATSAPP_TRI = wa('Здравствуйте! Хочу записаться на курс «Триатлон без травм».');
+const waTri = (tier: string) => wa(`Здравствуйте! Хочу записаться на курс «Триатлон без травм», тариф «${tier}».`);
 const VIDEOS = RUN_LESSONS.filter((l) => l.type === 'video').length;
 const HOURS = Math.round(RUN_LESSONS.reduce((s, l) => s + l.durationMin, 0) / 6) / 10;
 
@@ -319,14 +319,27 @@ export default function Landing() {
               );
             })}
           </div>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href={WHATSAPP_TRI} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg' })} data-testid="landing-tri-signup">
-              <MessageCircle className="h-5 w-5" /> Записаться на курс
-            </a>
+          <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {TRI_OFFER.tiers.map((tier, i) => (
+              <div key={tier.id} className={cn('flex flex-col rounded-3xl p-7 md:p-8', i === 0 ? 'border border-white/15 bg-white/5' : 'bg-white text-navy')} data-testid={`landing-tri-tier-${tier.id}`}>
+                <div className={cn('text-[15px]', i === 0 ? 'text-navy-300' : 'text-navy-500')}>{tier.title}</div>
+                <div className="mt-1 text-[40px] font-extrabold tracking-tight md:text-[46px]" data-testid="landing-tri-price">{fmtKzt(tier.priceKzt)}</div>
+                <ul className="mt-5 flex-1 space-y-2.5 text-[15px]">
+                  {tier.points.map((p) => (
+                    <li key={p} className="flex gap-2.5"><CheckCircle2 className={cn('mt-0.5 h-5 w-5 shrink-0', i === 0 ? 'text-cyan' : 'text-teal')} />{p}</li>
+                  ))}
+                </ul>
+                <a href={waTri(tier.title)} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg', variant: i === 0 ? 'primary' : 'dark', className: 'mt-7 self-start' })} data-testid="landing-tri-signup">
+                  <MessageCircle className="h-5 w-5" /> Записаться
+                </a>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button size="lg" variant="outline" onClick={() => openDemo(TRI_OFFER.courseId)} loading={busy} className="border-white/40 text-white hover:bg-white/10" data-testid="landing-tri-demo">
               <PlayCircle className="h-5 w-5" /> Смотреть демо
             </Button>
-            <span className="text-[14px] text-navy-300">{TRI_MODULES.length} модулей · {TRI_LESSONS.length} уроков · стоимость — по запросу</span>
+            <span className="text-[14px] text-navy-300">{TRI_MODULES.length} модулей · {TRI_LESSONS.length} уроков · видео, 3D-атлас и чат</span>
           </div>
         </div>
       </section>

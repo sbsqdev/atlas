@@ -87,7 +87,9 @@ await check('triathlon course: landing block, demo entry, 3D lesson, test', asyn
   await page.goto(`${BASE}/`);
   await page.locator('#triathlon').scrollIntoViewIfNeeded();
   await shot('00c-landing-triathlon');
-  const href = await page.getByTestId('landing-tri-signup').getAttribute('href');
+  const prices = (await page.getByTestId('landing-tri-price').allInnerTexts()).map((p) => p.replace(/\s/g, ''));
+  if (prices.join('|') !== '70000₸|200000₸') throw new Error(`tri prices ${prices}`);
+  const href = await page.getByTestId('landing-tri-signup').first().getAttribute('href');
   if (!href?.startsWith('https://wa.me/77073737767') || !decodeURIComponent(href).includes('Триатлон')) throw new Error(`bad tri WhatsApp link ${href}`);
   await page.getByTestId('landing-tri-demo').click();
   await page.waitForURL(/courses\/c-tri$/);
