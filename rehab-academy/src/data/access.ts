@@ -9,7 +9,8 @@ const PUBLIC_JWK: JsonWebKey = {
   y: 'jIG7EadFj4_SWJOMqHsk7qiGFnMgONmXDp9RDOEwtyk',
 };
 
-export type PlanId = 'launch' | 'month' | 'personal';
+export type PlanId = 'launch' | 'month' | 'personal' | 'brand-start' | 'brand-pro' | 'brand-producer';
+export const isBrandPlan = (p: string) => p.startsWith('brand');
 export interface AccessGrant { email: string; plan: PlanId; until: number }
 
 const ALG = { name: 'ECDSA', namedCurve: 'P-256' } as const;

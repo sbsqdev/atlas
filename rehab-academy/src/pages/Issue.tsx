@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Copy, Eye, KeyRound, Mail, Trash2 } from 'lucide-react';
 import { activateAccess } from '@/data/api';
-import { signAccessCode, type PlanId } from '@/data/access';
+import { isBrandPlan, signAccessCode, type PlanId } from '@/data/access';
 import { CONTACTS, PRICING } from '@/data/content/launch';
+import { PACKAGES } from '@/brand/content';
 import { fmtKzt } from '@/lib/format';
 import { Button, Card, CardBody, CardHeader, Field, Input, Select } from '@/components/ui';
 
@@ -21,17 +22,18 @@ const PLANS: { id: PlanId; label: string; days: number }[] = [
   { id: 'launch', label: `Первый поток — ${fmtKzt(PRICING.launch.firstMonthKzt)}, 1 месяц`, days: 31 },
   { id: 'month', label: `Подписка — ${fmtKzt(PRICING.monthlyKzt)}, 1 месяц`, days: 31 },
   { id: 'personal', label: `Персональное сопровождение — ${fmtKzt(PRICING.personalKzt)}, 3 месяца`, days: 92 },
+  ...PACKAGES.map((p) => ({ id: p.plan, label: `FAB3D Brand «${p.name}» — ${fmtKzt(p.priceKzt)}, ${p.days} дней`, days: p.days })),
 ];
 
 const read = <T,>(k: string, d: T): T => { try { return JSON.parse(localStorage.getItem(k) ?? '') as T; } catch { return d; } };
 const save = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* storage blocked */ } };
 const day = (ms: number) => new Date(ms).toLocaleDateString('ru-RU');
 
-function letter(name: string, link: string, code: string, until: number) {
+function letter(name: string, link: string, code: string, until: number, product = 'FAB3D Academy') {
   const hi = name ? `Здравствуйте, ${name}!` : 'Здравствуйте!';
   return `${hi}
 
-Спасибо за оплату. Ваш доступ к FAB3D Academy открыт до ${day(until)}.
+Спасибо за оплату. Ваш доступ к ${product} открыт до ${day(until)}.
 
 Откройте ссылку, чтобы войти:
 ${link}
@@ -40,7 +42,7 @@ ${link}
 ${code}
 
 —
-Сәлеметсіз бе! Төлеміңізге рақмет. FAB3D Academy-ге қолжетімділік ${day(until)} дейін ашық. Кіру үшін жоғарыдағы сілтемені ашыңыз.
+Сәлеметсіз бе! Төлеміңізге рақмет. ${product} қолжетімділігі ${day(until)} дейін ашық. Кіру үшін жоғарыдағы сілтемені ашыңыз.
 
 Вопросы: WhatsApp +7 707 373 77 67, Telegram @ecosystem_tech`;
 }
@@ -93,7 +95,7 @@ export default function Issue() {
     const until = Date.now() + days * DAY;
     try {
       const code = await signAccessCode(key!, { email: e, plan, until });
-      const link = `${location.origin}${import.meta.env.BASE_URL}activate?email=${encodeURIComponent(e)}&code=${encodeURIComponent(code)}`;
+      const link = `${location.origin}${import.meta.env.BASE_URL}${isBrandPlan(plan) ? 'brand' : 'activate'}?email=${encodeURIComponent(e)}&code=${encodeURIComponent(code)}`;
       setOut({ code, link, until });
       const next = [{ at: Date.now(), email: e, name, plan, until, link }, ...log];
       setLog(next);
@@ -153,8 +155,8 @@ export default function Issue() {
                     <p className="text-[14px]">Доступ до <b>{day(out.until)}</b>. Отправьте участнику письмо со ссылкой:</p>
                     <textarea readOnly value={out.link} rows={3} className="w-full rounded-xl border border-line bg-white p-2 font-mono text-[12px]" data-testid="issue-link" />
                     <div className="flex flex-wrap gap-2">
-                      <a className="inline-flex h-10 items-center gap-2 rounded-xl bg-teal px-4 text-sm font-semibold text-white" href={`mailto:${email.trim()}?subject=${encodeURIComponent('Доступ к FAB3D Academy')}&body=${encodeURIComponent(letter(name, out.link, out.code, out.until))}`}><Mail className="h-4 w-4" /> Открыть письмо</a>
-                      <Button variant="secondary" onClick={() => navigator.clipboard?.writeText(letter(name, out.link, out.code, out.until))}><Copy className="h-4 w-4" /> Скопировать текст письма</Button>
+                      <a className="inline-flex h-10 items-center gap-2 rounded-xl bg-teal px-4 text-sm font-semibold text-white" href={`mailto:${email.trim()}?subject=${encodeURIComponent(isBrandPlan(plan) ? 'Доступ к FAB3D Brand' : 'Доступ к FAB3D Academy')}&body=${encodeURIComponent(letter(name, out.link, out.code, out.until, isBrandPlan(plan) ? 'FAB3D Brand' : 'FAB3D Academy'))}`}><Mail className="h-4 w-4" /> Открыть письмо</a>
+                      <Button variant="secondary" onClick={() => navigator.clipboard?.writeText(letter(name, out.link, out.code, out.until, isBrandPlan(plan) ? 'FAB3D Brand' : 'FAB3D Academy'))}><Copy className="h-4 w-4" /> Скопировать текст письма</Button>
                     </div>
                   </div>
                 )}

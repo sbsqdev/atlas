@@ -34,6 +34,9 @@ const OrgAdmin = lazy(() => import('@/pages/OrgAdmin'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const Review = lazy(() => import('@/pages/Review'));
 const Landing = lazy(() => import('@/pages/Landing'));
+const BrandApp = lazy(() => import('@/brand/BrandApp'));
+/** brand.* subdomain serves only FAB3D Brand. */
+const BRAND_HOST = location.hostname.startsWith('brand.');
 const Activate = lazy(() => import('@/pages/Activate'));
 const Issue = lazy(() => import('@/pages/Issue'));
 const Legal = lazy(() => import('@/pages/Legal'));
@@ -71,7 +74,16 @@ export default function App() {
   if (!ready) return <Spinner label={t('common.loading')} />;
   return (
     <Suspense fallback={<Spinner label={t('common.loading')} />}>
+      {BRAND_HOST ? (
+        <Routes>
+          <Route path="/brand-offer" element={<Legal doc="brandOffer" />} />
+          <Route path="/privacy" element={<Legal doc="privacy" />} />
+          <Route path="*" element={<BrandApp />} />
+        </Routes>
+      ) : (
       <Routes>
+        <Route path="/brand/*" element={<BrandApp />} />
+        <Route path="/brand-offer" element={<Legal doc="brandOffer" />} />
         <Route path="/login" element={<AuthPage mode="in" />} />
         <Route path="/register" element={<AuthPage mode="up" />} />
         <Route path="/atlas" element={<AtlasRedirect />} />
@@ -114,6 +126,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      )}
     </Suspense>
   );
 }

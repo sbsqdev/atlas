@@ -26,7 +26,7 @@ export async function sendForm(subject: string, fields: Record<string, string>) 
   if (!res.ok || String(body.success) === 'false') throw new Error(body.message ?? `HTTP ${res.status}`);
 }
 
-export type FormKind = 'apply' | 'question' | 'review' | 'region' | 'consult' | 'member';
+export type FormKind = 'apply' | 'question' | 'review' | 'region' | 'consult' | 'member' | 'brand';
 type Lang = 'ru' | 'kk';
 
 const clinicPlace = `${CLINIC.name}, ${CLINIC.city}`;
@@ -42,6 +42,8 @@ const OPTIONS = {
     regionRole: { member: 'Участник чата', lead: 'Хочу вести чат города', club: 'Тренер или беговой клуб' },
     format: { online: 'Онлайн-консультация', offline: `Очно в центре ${clinicPlace}` },
     area: { knee: 'Колено', foot: 'Стопа, пятка', achilles: 'Ахилл, икры, голень', shoulder: 'Плечо', back: 'Спина, поясница', hip: 'Бедро, таз', plan: 'Нет боли — нужен план профилактики' },
+    brandPackage: { start: 'Старт — 25 000 ₸', pro: 'Про — 50 000 ₸', producer: 'Продюсер — 100 000 ₸' },
+    who: { exec: 'Топ-менеджер, руководитель', expert: 'Эксперт, специалист', founder: 'Предприниматель', student: 'Студент', teen: 'Подросток 14–17 (заявку оставляет родитель)' },
   },
   kk: {
     sport: { run: 'Жүгіру, 5–10 км', marathon: 'Жартылай марафон, марафон', trail: 'Трейл, ультра', triathlon: 'Триатлон', other: 'Басқа' },
@@ -53,6 +55,8 @@ const OPTIONS = {
     regionRole: { member: 'Чат қатысушысы', lead: 'Қала чатын жүргізгім келеді', club: 'Жаттықтырушы немесе жүгіру клубы' },
     format: { online: 'Онлайн-кеңес', offline: `${clinicPlace} орталығында кездесу` },
     area: { knee: 'Тізе', foot: 'Табан, өкше', achilles: 'Ахилл, балтыр, сирақ', shoulder: 'Иық', back: 'Арқа, бел', hip: 'Сан, жамбас', plan: 'Ауырмайды — алдын алу жоспары керек' },
+    brandPackage: { start: 'Старт — 25 000 ₸', pro: 'Про — 50 000 ₸', producer: 'Продюсер — 100 000 ₸' },
+    who: { exec: 'Топ-менеджер, басшы', expert: 'Сарапшы, маман', founder: 'Кәсіпкер', student: 'Студент', teen: 'Жасөспірім 14–17 (өтінімді ата-ана қалдырады)' },
   },
 };
 type OptionField = keyof typeof OPTIONS.ru;
@@ -64,14 +68,15 @@ const COPY = {
       name: 'Имя', email: 'Email', contact: 'WhatsApp или Telegram', city: 'Город', sport: 'Вид спорта', plan: 'Тариф', comment: 'Комментарий',
       message: 'Ваш вопрос', review: 'Отзыв', regionRole: 'Как хотите участвовать', format: 'Формат', area: 'Что беспокоит',
       socials: 'Instagram, Telegram или Strava', about: 'О себе: дистанции, цели, с кем хотите познакомиться',
+      phone: 'Телефон (WhatsApp)', brandPackage: 'Пакет', who: 'Для кого распаковка',
     } as Record<string, string>,
     pick: 'Выберите…',
     consent: 'Согласен(на) с', offer: 'договором-офертой', and: 'и', privacy: 'политикой конфиденциальности',
     publish: 'Разрешаю опубликовать отзыв на сайте с именем и городом',
     publishMember: 'Разрешаю опубликовать мою карточку (имя, город, спорт, соцсети) в каталоге участников',
-    submit: { apply: 'Отправить заявку', question: 'Отправить вопрос', review: 'Отправить отзыв', region: 'Отправить', consult: 'Записаться на консультацию', member: 'Отправить карточку' },
-    subject: { apply: 'Заявка на доступ', question: 'Вопрос с сайта', review: 'Отзыв', region: 'Сообщество региона', consult: 'Запись на консультацию', member: 'Каталог участников' },
-    sent: { apply: 'Заявка отправлена', question: 'Вопрос отправлен', review: 'Спасибо за отзыв!', region: 'Заявка отправлена', consult: 'Заявка на консультацию отправлена', member: 'Карточка отправлена' },
+    submit: { apply: 'Отправить заявку', question: 'Отправить вопрос', review: 'Отправить отзыв', region: 'Отправить', consult: 'Записаться на консультацию', member: 'Отправить карточку', brand: 'Отправить заявку' },
+    subject: { apply: 'Заявка на доступ', question: 'Вопрос с сайта', review: 'Отзыв', region: 'Сообщество региона', consult: 'Запись на консультацию', member: 'Каталог участников', brand: 'FAB3D Brand: заявка' },
+    sent: { apply: 'Заявка отправлена', question: 'Вопрос отправлен', review: 'Спасибо за отзыв!', region: 'Заявка отправлена', consult: 'Заявка на консультацию отправлена', member: 'Карточка отправлена', brand: 'Заявка отправлена' },
     sentText: {
       apply: 'Оплатите выбранный тариф через Kaspi. После оплаты мы пришлём код доступа на ваш email в течение 24 часов.',
       question: 'Мы ответим в WhatsApp, Telegram или на email.',
@@ -79,6 +84,7 @@ const COPY = {
       region: 'Мы добавим вас в чат города или свяжемся, когда он откроется.',
       consult: 'Администратор свяжется с вами, чтобы подобрать время и рассказать о стоимости.',
       member: 'После проверки карточка появится в каталоге участников.',
+      brand: 'Оплатите пакет через Kaspi Pay. В комментарии к платежу укажите email и номер телефона — код доступа придёт на почту в течение 24 часов.',
     },
     pay: 'Оплатить через Kaspi', payHint: 'В комментарии к платежу укажите ваш email.',
     error: 'Форма не отправилась. Отправьте ту же заявку в WhatsApp — одной кнопкой:',
@@ -90,14 +96,15 @@ const COPY = {
       name: 'Аты', email: 'Email', contact: 'WhatsApp немесе Telegram', city: 'Қала', sport: 'Спорт түрі', plan: 'Тариф', comment: 'Түсініктеме',
       message: 'Сұрағыңыз', review: 'Пікір', regionRole: 'Қалай қатысқыңыз келеді', format: 'Формат', area: 'Не мазалайды',
       socials: 'Instagram, Telegram немесе Strava', about: 'Өзіңіз туралы: қашықтықтар, мақсаттар, кіммен танысқыңыз келеді',
+      phone: 'Телефон (WhatsApp)', brandPackage: 'Пакет', who: 'Кімге арналған',
     } as Record<string, string>,
     pick: 'Таңдаңыз…',
     consent: 'Келісемін:', offer: 'оферта шартымен', and: 'және', privacy: 'құпиялылық саясатымен',
     publish: 'Пікірімді атыммен және қаламмен сайтта жариялауға рұқсат етемін',
     publishMember: 'Карточкамды (аты, қала, спорт, әлеуметтік желілер) қатысушылар каталогында жариялауға рұқсат етемін',
-    submit: { apply: 'Өтінім жіберу', question: 'Сұрақ жіберу', review: 'Пікір жіберу', region: 'Жіберу', consult: 'Кеңеске жазылу', member: 'Карточканы жіберу' },
-    subject: { apply: 'Заявка на доступ (KZ)', question: 'Вопрос с сайта (KZ)', review: 'Отзыв (KZ)', region: 'Сообщество региона (KZ)', consult: 'Запись на консультацию (KZ)', member: 'Каталог участников (KZ)' },
-    sent: { apply: 'Өтінім жіберілді', question: 'Сұрақ жіберілді', review: 'Пікіріңізге рақмет!', region: 'Өтінім жіберілді', consult: 'Кеңеске өтінім жіберілді', member: 'Карточка жіберілді' },
+    submit: { apply: 'Өтінім жіберу', question: 'Сұрақ жіберу', review: 'Пікір жіберу', region: 'Жіберу', consult: 'Кеңеске жазылу', member: 'Карточканы жіберу', brand: 'Өтінім жіберу' },
+    subject: { apply: 'Заявка на доступ (KZ)', question: 'Вопрос с сайта (KZ)', review: 'Отзыв (KZ)', region: 'Сообщество региона (KZ)', consult: 'Запись на консультацию (KZ)', member: 'Каталог участников (KZ)', brand: 'FAB3D Brand: заявка (KZ)' },
+    sent: { apply: 'Өтінім жіберілді', question: 'Сұрақ жіберілді', review: 'Пікіріңізге рақмет!', region: 'Өтінім жіберілді', consult: 'Кеңеске өтінім жіберілді', member: 'Карточка жіберілді', brand: 'Өтінім жіберілді' },
     sentText: {
       apply: 'Таңдаған тарифті Kaspi арқылы төлеңіз. Төлемнен кейін 24 сағат ішінде email-ге қолжетімділік кодын жібереміз.',
       question: 'WhatsApp, Telegram немесе email арқылы жауап береміз.',
@@ -105,6 +112,7 @@ const COPY = {
       region: 'Сізді қала чатына қосамыз немесе ол ашылғанда хабарласамыз.',
       consult: 'Әкімші уақытты таңдау және бағасын айту үшін сізбен хабарласады.',
       member: 'Тексеруден кейін карточка қатысушылар каталогында шығады.',
+      brand: 'Пакетті Kaspi Pay арқылы төлеңіз. Төлемге түсініктемеде email мен телефон нөмірін көрсетіңіз — қолжетімділік коды 24 сағат ішінде поштаға келеді.',
     },
     pay: 'Kaspi арқылы төлеу', payHint: 'Төлемге түсініктемеде email-іңізді көрсетіңіз.',
     error: 'Форма жіберілмеді. Сол өтінімді WhatsApp-қа бір батырмамен жіберіңіз:',
@@ -120,6 +128,7 @@ const FIELDS: Record<FormKind, string[]> = {
   region: ['name', 'contact', 'city', 'regionRole'],
   consult: ['name', 'contact', 'format', 'city', 'area', 'comment'],
   member: ['name', 'city', 'sport', 'socials', 'contact', 'about'],
+  brand: ['name', 'email', 'phone', 'who', 'brandPackage', 'comment'],
 };
 const REQUIRED: Record<FormKind, string[]> = {
   apply: ['name', 'email', 'contact', 'city', 'plan'],
@@ -128,9 +137,10 @@ const REQUIRED: Record<FormKind, string[]> = {
   region: ['name', 'contact', 'city'],
   consult: ['name', 'contact', 'format'],
   member: ['name', 'city', 'socials'],
+  brand: ['name', 'email', 'phone', 'brandPackage'],
 };
 const DEFAULTS: Partial<Record<FormKind, Record<string, string>>> = {
-  apply: { plan: 'launch' }, region: { regionRole: 'member' }, consult: { format: 'online' },
+  apply: { plan: 'launch' }, region: { regionRole: 'member' }, consult: { format: 'online' }, brand: { brandPackage: 'start' },
 };
 const WIDE = new Set(['message', 'review', 'comment', 'plan', 'about', 'format']);
 const TEXTAREA = new Set(['message', 'review', 'comment', 'about']);
@@ -179,10 +189,10 @@ export default function SiteForm({ kind, defaults = {}, className }: { kind: For
         <CheckCircle2 className="h-9 w-9 text-success" />
         <h3 className="mt-3 text-[20px] font-bold">{c.sent[kind]}</h3>
         <p className="mt-1.5 text-[15px] leading-relaxed text-navy-500">{c.sentText[kind]}</p>
-        {kind === 'apply' && (
+        {(kind === 'apply' || kind === 'brand') && (
           <div className="mt-5">
             <a href={KASPI_URL} target="_blank" rel="noreferrer" className={buttonVariants({ size: 'lg' })} data-testid="kaspi-pay"><CreditCard className="h-5 w-5" /> {c.pay}</a>
-            <p className="mt-2 text-[13px] text-navy-500">{c.payHint}</p>
+            {kind === 'apply' && <p className="mt-2 text-[13px] text-navy-500">{c.payHint}</p>}
           </div>
         )}
       </div>

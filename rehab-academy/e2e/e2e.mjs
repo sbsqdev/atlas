@@ -14,6 +14,7 @@ if (SHOTS) mkdirSync(SHOTS, { recursive: true });
 const browser = await pw.chromium.launch({ executablePath: process.env.CHROMIUM, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true, locale: 'ru-RU' });
 const page = await ctx.newPage();
+page.on('dialog', (d) => d.accept());
 const errors = [];
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
 page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
@@ -300,6 +301,107 @@ await check('owner issues a code on /issue; athlete activates it and gets full a
 });
 await logout();
 
+const pill = (name) => page.getByRole('button', { name, exact: true }).click();
+// The AI endpoint (DeepSeek) is stood in for: check the request and return a patch.
+let aiRequest = null;
+await page.route('**/api/brand-unpack', async (route) => {
+  aiRequest = JSON.parse(route.request().postData() ?? '{}');
+  await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ patch: { positioning: 'Спортивный реабилитолог, который возвращает бегунов к тренировкам без боли (ИИ).', superpower: 'Эмпатия + экспертиза' } }) });
+});
+
+await check('FAB3D Brand: landing, packages, application, free steps and teaser', async () => {
+  await page.goto(`${BASE}/brand`);
+  await page.getByTestId('brand-landing').waitFor();
+  const prices = (await page.getByTestId('brand-price').allInnerTexts()).map(plain);
+  if (prices.join('|') !== '25 000 ₸|50 000 ₸|100 000 ₸') throw new Error(`prices ${prices}`);
+  if ((await page.getByTestId('brand-kaspi-pro').getAttribute('href')) !== 'https://pay.kaspi.kz/pay/jk9m2wsj') throw new Error('kaspi');
+  await page.getByTestId('brand-apply-pro').click();
+  const f = page.getByTestId('form-brand');
+  await f.locator('input[name=name]').fill('Алия');
+  await f.locator('input[name=email]').fill('aliya@test.example');
+  await f.locator('input[name=phone]').fill('+7 701 000 00 00');
+  await f.locator('select[name=who]').selectOption('exec');
+  await f.locator('input[name=consent]').check();
+  await f.getByTestId('form-brand-submit').click();
+  await page.getByTestId('form-brand-sent').getByText('email и номер телефона').waitFor();
+  const b = forms.at(-1).body;
+  if (!b._subject.startsWith('FAB3D Brand: заявка') || b['Пакет'] !== 'Про — 50 000 ₸' || b['Телефон (WhatsApp)'] !== '+7 701 000 00 00') throw new Error(JSON.stringify(b));
+  await shot('00i-brand-landing');
+
+  await page.getByTestId('brand-start').click();
+  await fillBrandFree();
+  await page.getByTestId('brand-teaser').waitFor();
+  await page.getByTestId('brand-teaser-focus').waitFor();
+  await page.getByTestId('brand-code-form').waitFor();
+  await shot('00j-brand-teaser');
+  // Nothing from the answers is kept in browser storage.
+  const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
+  if (stored.includes('Около 5 клиентов')) throw new Error('answers stored');
+});
+
+async function fillBrandFree() {
+  await page.getByTestId('seg-expert').click();
+  await page.locator('input[name=age]').fill('34');
+  await page.locator('input[name=role]').fill('Спортивный реабилитолог');
+  await page.getByTestId('brand-next').click();
+  await page.locator('textarea[name=now]').fill('Около 5 клиентов в месяц по сарафану');
+  await pill('3–5 часов');
+  await page.getByTestId('brand-next').click();
+  await pill('Больше клиентов');
+  await page.locator('textarea[name=goal]').fill('20 клиентов в месяц со средним чеком 25 000 ₸');
+  await pill('6 месяцев');
+  await page.locator('input[name=kpiName]').fill('клиентов в месяц');
+  await page.locator('input[name=kpiNow]').fill('5');
+  await page.locator('input[name=kpiTarget]').fill('20');
+  await page.getByTestId('brand-next').click();
+}
+
+await check('FAB3D Brand: paid code unlocks the full unpacking and a downloadable report', async () => {
+  if (!KEY_FILE) { console.log('   (skipped: set ACCESS_KEY_FILE)'); return; }
+  await page.goto(`${BASE}/issue`);
+  await page.locator('select[name=plan]').selectOption('brand-pro');
+  await page.locator('input[name=email]').fill('aliya@test.example');
+  await page.getByTestId('issue-submit').click();
+  const link = await page.getByTestId('issue-link').inputValue();
+  if (!link.startsWith(`${BASE}/brand?email=aliya%40test.example&code=`)) throw new Error(link);
+  await page.goto(link);
+  await page.getByTestId('brand-wizard').waitFor();
+  await fillBrandFree();
+  await pill('Эмпатия'); await pill('Обучение других'); await pill('Глубокая экспертиза');
+  await page.locator('textarea[name=easy]').fill('Объяснять сложное простыми словами');
+  await page.getByTestId('brand-next').click();
+  await page.locator('textarea[name=proud]').fill('Вернула марафонца к бегу после травмы колена');
+  await page.getByTestId('brand-next').click();
+  await page.locator('textarea[name=audience]').fill('Бегуны-любители 30–45 лет в Алматы');
+  await page.locator('textarea[name=pains]').fill('Болит колено после длинных\nНе знают, как восстанавливаться');
+  await page.locator('textarea[name=result]').fill('Бегать без боли и готовиться к марафону');
+  await page.locator('textarea[name=proof]').fill('Помогла 40 бегунам вернуться к тренировкам');
+  await page.getByTestId('brand-next').click();
+  await page.locator('textarea[name=diff]').fill('Работаю через силовую и 3D-разбор техники, а не только массаж');
+  await pill('Честность'); await pill('Забота'); await pill('Результат');
+  await pill('Экспертный и спокойный');
+  await page.locator('input[name=topics]').fill('колени бегуна, восстановление, силовая');
+  await page.getByTestId('brand-next').click();
+  await pill('Консультация');
+  await page.locator('textarea[name=clientResult]').fill('План восстановления и упражнений за одну встречу');
+  await page.getByTestId('brand-next').click();
+  await pill('15 минут');
+  await page.getByTestId('brand-next').click();
+  await page.getByTestId('brand-report').waitFor();
+  if (!(await page.getByTestId('report-positioning').innerText()).includes('(ИИ)')) throw new Error('AI patch not applied');
+  await text('тексты улучшены ИИ').waitFor();
+  if (!aiRequest?.code || aiRequest.answers?.name !== undefined || aiRequest.answers?.role !== 'Спортивный реабилитолог') throw new Error(`AI request ${JSON.stringify(aiRequest)?.slice(0, 200)}`);
+  if ((await page.getByTestId('bio-instagram').innerText()).length > 150) throw new Error('instagram bio too long');
+  if ((await page.getByTestId('report-plan').locator('li').count()) !== 30) throw new Error('content plan');
+  await page.getByTestId('report-kpi').getByText('20').first().waitFor();
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByTestId('report-md').click()]);
+  if (dl.suggestedFilename() !== 'fab3d-brand-report.md') throw new Error(dl.suggestedFilename());
+  await shot('00k-brand-report');
+  const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
+  if (stored.includes('Бегуны-любители') || stored.includes('Спортивный реабилитолог')) throw new Error('answers stored');
+  await page.goto(`${BASE}/brand-offer`);
+  await text('Продюсер').first().waitFor();
+});
 await check('login page renders with demo accounts', async () => {
   await page.goto(`${BASE}/login`);
   await text('Бегайте дольше и без боли').waitFor();

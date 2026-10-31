@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { KeyRound } from 'lucide-react';
 import { activateAccess } from '@/data/api';
-import { verifyAccessCode } from '@/data/access';
+import { isBrandPlan, verifyAccessCode } from '@/data/access';
 import { useT, type I18nKey } from '@/i18n';
 import { Button, Field, Input } from '@/components/ui';
 import LangSwitch from '@/components/LangSwitch';
@@ -29,6 +29,7 @@ export default function Activate() {
     try {
       const g = await verifyAccessCode(code);
       if (!g) return setErr('access.bad');
+      if (isBrandPlan(g.plan)) { location.assign(`${import.meta.env.BASE_URL}brand?email=${encodeURIComponent(g.email)}&code=${encodeURIComponent(code.trim())}`); return; }
       if (g.email !== email.trim().toLowerCase()) return setErr('access.wrongEmail');
       if (g.until < Date.now()) return setErr('access.expired');
       await activateAccess(g, name);
