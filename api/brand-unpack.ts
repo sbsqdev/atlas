@@ -41,6 +41,12 @@ const SYSTEM = `Ты — продюсер личного бренда, марк�
 "plan90": string[12] (каждая строка начинается с "Неделя N. ")}`;
 
 export default async function handler(req: any, res: any) {
+  // GET is a health check for the owner: shows whether the key is set (never the key itself).
+  if (req.method === 'GET') {
+    res.setHeader('cache-control', 'no-store');
+    res.status(200).json({ ai: Boolean(process.env.DEEPSEEK_API_KEY), message: process.env.DEEPSEEK_API_KEY ? 'Ключ DeepSeek подключён' : 'Ключ DeepSeek не найден: добавьте DEEPSEEK_API_KEY в Vercel и сделайте Redeploy' });
+    return;
+  }
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method_not_allowed' });
     return;
