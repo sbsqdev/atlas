@@ -20,7 +20,7 @@ const Ul = ({ items, icon = 'check' }: { items: string[]; icon?: 'check' | 'x' }
   </ul>
 );
 
-export default function ReportView({ r, onRestart }: { r: Report; onRestart: () => void }) {
+export default function ReportView({ r, onRestart, demo }: { r: Report; onRestart: () => void; demo?: boolean }) {
   const [copied, setCopied] = useState('');
   const max = Math.max(1, ...r.kpi.months.map((m) => m.value));
   const copy = async (k: string, text: string) => {
@@ -45,7 +45,7 @@ export default function ReportView({ r, onRestart }: { r: Report; onRestart: () 
       </div>
 
       <header className="rounded-3xl bg-gradient-to-br from-[#14112B] to-[#3B2A8C] p-7 text-white md:p-10">
-        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FFB547]"><Sparkles className="h-4 w-4" /> FAB3D Brand · {r.ai ? 'тексты улучшены ИИ' : 'собрано по вашим ответам'}</div>
+        <div className="flex items-center gap-2 text-[13px] font-semibold text-[#FFB547]"><Sparkles className="h-4 w-4" /> FAB3D Brand · {demo ? 'пример отчёта' : r.ai ? 'тексты улучшены ИИ' : 'собрано по вашим ответам'}</div>
         <h1 className="mt-3 text-[30px] font-extrabold leading-tight md:text-[42px]">Распаковка личного бренда{r.name !== 'Вы' ? ` — ${r.name}` : ''}</h1>
         <p className="mt-4 max-w-3xl text-[17px] leading-relaxed text-white/85" data-testid="report-positioning">{r.positioning}</p>
         <p className="mt-4 inline-block rounded-2xl bg-white/10 px-4 py-2 text-[15px]">Суперсила: <b>{r.superpower}</b></p>

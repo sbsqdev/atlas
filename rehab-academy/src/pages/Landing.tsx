@@ -488,6 +488,7 @@ export default function Landing() {
             <Link to="/privacy" className="hover:text-white">{c.footer.privacy}</Link>
             <Link to="/activate" className="hover:text-white">{c.footer.activate}</Link>
             <Link to="/login" className="hover:text-white">{c.footer.login}</Link>
+            <Link to="/brand" className="hover:text-white" data-testid="footer-brand">FAB3D Brand — распаковка личного бренда</Link>
             <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="hover:text-white">WhatsApp</a>
             <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="hover:text-white">Telegram</a>
           </div>

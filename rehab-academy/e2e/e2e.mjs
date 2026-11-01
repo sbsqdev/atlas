@@ -356,6 +356,27 @@ async function fillBrandFree() {
   await page.getByTestId('brand-next').click();
 }
 
+await check('FAB3D Brand demo: click through an example and see the sample report', async () => {
+  await page.goto(`${BASE}/`);
+  await page.getByTestId('footer-brand').click();
+  await page.getByTestId('brand-landing').waitFor();
+  await page.getByTestId('brand-demo-walk-exec').click();
+  await page.getByTestId('brand-demo-banner').waitFor();
+  if (await page.locator('input[name=role]').isEnabled()) throw new Error('demo answers editable');
+  for (let i = 0; i < 9; i++) await page.getByTestId('brand-next').click();
+  await page.getByTestId('brand-demo-report').waitFor();
+  if (!(await page.getByTestId('report-positioning').innerText()).includes('Ерлан')) throw new Error('demo report');
+  await text('пример отчёта').waitFor();
+  await shot('00l-brand-demo-report');
+  await page.goto(`${BASE}/brand`);
+  await page.getByTestId('brand-demo-report-teen').click();
+  await page.getByTestId('brand-report').getByText('Безопасность').waitFor();
+  await page.getByTestId('brand-demo-own').click();
+  await page.getByTestId('brand-wizard').waitFor();
+  if (await page.getByTestId('brand-demo-banner').count()) throw new Error('still in demo');
+  if (!(await page.locator('input[name=role]').isEnabled()) || (await page.locator('input[name=role]').inputValue())) throw new Error('own run not empty');
+});
+
 await check('FAB3D Brand: paid code unlocks the full unpacking and a downloadable report', async () => {
   if (!KEY_FILE) { console.log('   (skipped: set ACCESS_KEY_FILE)'); return; }
   await page.goto(`${BASE}/issue`);

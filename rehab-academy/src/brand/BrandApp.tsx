@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, BadgeCheck, Brain, CheckCircle2, ChevronDown, CreditCard, KeyRound, Lock, MessageCircle, Repeat, Send, ShieldCheck, Sparkles, Target, Telescope, Users,
+  ArrowLeft, ArrowRight, BadgeCheck, Brain, CheckCircle2, ChevronDown, CreditCard, KeyRound, Lock, MessageCircle, PlayCircle, Repeat, Send, ShieldCheck, Sparkles, Target, Telescope, Users,
 } from 'lucide-react';
 import { verifyAccessCode, isBrandPlan } from '@/data/access';
 import { CONTACTS, KASPI_URL } from '@/data/content/launch';
 import { fmtKzt } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import SiteForm, { TELEGRAM_URL, WHATSAPP_URL } from '@/features/forms/SiteForm';
-import { FREE_STEPS, PACKAGES, SEGMENTS, STEPS, label, options, type Question, type Segment } from './content';
+import { DEMO_PERSONAS, FREE_STEPS, PACKAGES, SEGMENTS, STEPS, label, options, type Question, type Segment } from './content';
 import { buildReport, mergeAi, type AiPatch, type Answers, type Report } from './generate';
 import ReportView from './Report';
 
@@ -142,6 +142,8 @@ export default function BrandApp() {
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
   const [applyPack, setApplyPack] = useState('start');
+  /** Title of the demo persona while the visitor clicks through the example. */
+  const [demo, setDemo] = useState<string | null>(null);
   const params = useMemo(() => new URLSearchParams(location.search), []);
   const seg = ((answers.segment as string) || 'expert') as Segment;
 
@@ -159,10 +161,10 @@ export default function BrandApp() {
   }, [params, base]);
   // Warn before leaving with unsaved answers.
   useEffect(() => {
-    const h = (e: BeforeUnloadEvent) => { if (Object.keys(answers).length) { e.preventDefault(); e.returnValue = ''; } };
+    const h = (e: BeforeUnloadEvent) => { if (Object.keys(answers).length && !demo) { e.preventDefault(); e.returnValue = ''; } };
     window.addEventListener('beforeunload', h);
     return () => window.removeEventListener('beforeunload', h);
-  }, [answers]);
+  }, [answers, demo]);
   useEffect(() => { window.scrollTo(0, 0); }, [view, step]);
 
   function grant(a: Access) {
@@ -170,9 +172,22 @@ export default function BrandApp() {
     try { sessionStorage.setItem(SESSION, a.code); } catch { /* storage blocked: access lasts for this page */ }
   }
 
+  function startDemo(id: string, straightToReport = false) {
+    const persona = DEMO_PERSONAS.find((x) => x.id === id)!;
+    setDemo(`${persona.title} — ${persona.subtitle}`);
+    setAnswers(persona.answers);
+    setStep(0);
+    setMissing(false);
+    if (straightToReport) { setReport(buildReport(persona.answers)); setView('report'); } else setView('wizard');
+  }
+  function startOwn() {
+    if (demo) { setDemo(null); setAnswers({}); setStep(0); setReport(null); }
+    setView('wizard');
+  }
+
   const current = STEPS[step];
   const visible = current?.questions ?? [];
-  const locked = !access && step >= FREE_STEPS;
+  const locked = !access && !demo && step >= FREE_STEPS;
 
   function next() {
     const lacks = visible.some((q) => q.required && (Array.isArray(answers[q.id]) ? !(answers[q.id] as string[]).length : !String(answers[q.id] ?? '').trim()));
@@ -184,7 +199,7 @@ export default function BrandApp() {
   async function finish() {
     setBusy(true);
     let r = buildReport(answers);
-    if (aiOn && access) {
+    if (aiOn && access && !demo) {
       try {
         const { name: _name, ...rest } = answers;
         const res = await fetch('/api/brand-unpack', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: access.code, answers: rest, draft: { ...r, name: undefined } }) });
@@ -206,15 +221,30 @@ export default function BrandApp() {
         <nav className="ml-auto hidden items-center gap-5 text-sm text-white/70 md:flex">
           <a href="#how" onClick={() => setView('landing')} className="hover:text-white">Как это работает</a>
           <a href="#packages" onClick={() => setView('landing')} className="hover:text-white">Пакеты</a>
+          <a href="#demo" onClick={() => setView('landing')} className="hover:text-white">Демо</a>
           <a href="#faq" onClick={() => setView('landing')} className="hover:text-white">Вопросы</a>
         </nav>
-        <button onClick={() => { setView('wizard'); }} className="ml-auto whitespace-nowrap rounded-xl bg-[#6D4AFF] px-4 py-2 text-sm font-semibold md:ml-0" data-testid="brand-start-top">{access ? 'Продолжить' : <><span className="sm:hidden">Начать</span><span className="hidden sm:inline">Начать бесплатно</span></>}</button>
+        <button onClick={startOwn} className="ml-auto whitespace-nowrap rounded-xl bg-[#6D4AFF] px-4 py-2 text-sm font-semibold md:ml-0" data-testid="brand-start-top">{access ? 'Продолжить' : <><span className="sm:hidden">Начать</span><span className="hidden sm:inline">Начать бесплатно</span></>}</button>
       </div>
     </header>
   );
 
   if (view === 'report' && report) {
-    return <div className="min-h-screen bg-[#F7F5FD]">{Header}<ReportView r={report} onRestart={() => { setAnswers({}); setStep(0); setReport(null); setView('wizard'); }} /></div>;
+    return (
+      <div className="min-h-screen bg-[#F7F5FD]">
+        {Header}
+        {demo && (
+          <div className="no-print mx-auto mt-6 max-w-5xl px-4 md:px-8" data-testid="brand-demo-report">
+            <div className="flex flex-col gap-3 rounded-2xl bg-[#14112B] p-5 text-white md:flex-row md:items-center">
+              <div className="flex-1"><b className="text-[#FFB547]">Это пример отчёта:</b> {demo}. Ваш отчёт соберётся по вашим ответам — первые 3 шага бесплатно.</div>
+              <button onClick={() => startOwn()} className="inline-flex h-11 items-center justify-center rounded-xl bg-[#6D4AFF] px-5 font-semibold" data-testid="brand-demo-own">Пройти со своими ответами</button>
+              <button onClick={() => { setView('landing'); setTimeout(() => document.getElementById('packages')?.scrollIntoView(), 50); }} className="inline-flex h-11 items-center justify-center rounded-xl bg-white/10 px-5 font-semibold">Пакеты</button>
+            </div>
+          </div>
+        )}
+        <ReportView r={report} demo={!!demo} onRestart={() => { setDemo(null); setAnswers({}); setStep(0); setReport(null); setView('wizard'); }} />
+      </div>
+    );
   }
 
   if (view === 'wizard') {
@@ -226,6 +256,12 @@ export default function BrandApp() {
           <div className="mb-2 flex items-center justify-between text-[13px] text-[#7C7699]"><span>Шаг {step + 1} из {STEPS.length} · {current.method}</span><span>{progress}%</span></div>
           <div className="h-2 overflow-hidden rounded-full bg-[#E6E1F5]"><div className="h-full rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#FFB547] transition-all" style={{ width: `${progress}%` }} /></div>
 
+          {demo && (
+            <div className="mt-5 flex flex-col gap-3 rounded-2xl bg-[#14112B] p-4 text-[14.5px] text-white sm:flex-row sm:items-center" data-testid="brand-demo-banner">
+              <span className="flex-1"><b className="text-[#FFB547]">Демо на примере:</b> {demo}. Ответы уже заполнены — просто нажимайте «Дальше».</span>
+              <button type="button" onClick={startOwn} className="shrink-0 rounded-xl bg-white/10 px-4 py-2 font-semibold">Пройти со своими ответами</button>
+            </div>
+          )}
           {locked ? (
             <div className="mt-6 space-y-5" data-testid="brand-teaser">
               <Teaser answers={answers} />
@@ -241,10 +277,10 @@ export default function BrandApp() {
               <div className="text-[13px] font-bold uppercase tracking-[0.16em] text-[#6D4AFF]">{current.method}</div>
               <h1 className="mt-1 text-[28px] font-extrabold">{current.title}</h1>
               <p className="mt-2 text-[15px] leading-relaxed text-[#5C5677]">{label(current.intro, seg)}</p>
-              <div className="mt-6 space-y-6">
+              <fieldset disabled={!!demo} className="mt-6 space-y-6">
                 {visible.map((q) => <Field key={q.id} q={q} seg={seg} value={answers[q.id]} onChange={(v) => setAnswers((a) => ({ ...a, [q.id]: v }))} />)}
-              </div>
-              {step === STEPS.length - 1 && access && (
+              </fieldset>
+              {step === STEPS.length - 1 && access && !demo && (
                 <label className="mt-6 flex items-start gap-2.5 rounded-2xl bg-[#F6F4FC] p-4 text-[13.5px] text-[#5C5677]">
                   <input type="checkbox" checked={aiOn} onChange={(e) => setAiOn(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#6D4AFF]" data-testid="brand-ai" />
                   Улучшить тексты с помощью ИИ. Ответы один раз передаются ИИ-модели для обработки и нигде у нас не сохраняются. Без галочки отчёт соберётся прямо в браузере.
@@ -276,7 +312,8 @@ export default function BrandApp() {
           <h1 className="mt-5 max-w-4xl text-[38px] font-extrabold leading-[1.05] tracking-tight md:text-[60px]">Распакуйте личный бренд за 40 минут</h1>
           <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-white/75">Точка А → точка Б, сильные стороны, позиционирование, оффер, био, контент-план и KPI. По лучшим мировым подходам — Gallup, Harvard Business Review, кайдзен — и под вашу ситуацию: топ-менеджер, эксперт, предприниматель, студент или подросток.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button onClick={() => setView('wizard')} className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#6D4AFF] px-6 font-semibold" data-testid="brand-start">Начать бесплатно <ArrowRight className="h-4 w-4" /></button>
+            <button onClick={startOwn} className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#6D4AFF] px-6 font-semibold" data-testid="brand-start">Начать бесплатно <ArrowRight className="h-4 w-4" /></button>
+            <a href="#demo" className="inline-flex h-12 items-center gap-2 rounded-xl bg-[#FFB547] px-6 font-semibold text-[#14112B]" data-testid="brand-demo-link"><PlayCircle className="h-4 w-4" /> Смотреть демо</a>
             <a href="#packages" className="inline-flex h-12 items-center rounded-xl bg-white/10 px-6 font-semibold">Пакеты от {fmtKzt(PACKAGES[0].priceKzt)}</a>
           </div>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-white/70">
@@ -284,6 +321,26 @@ export default function BrandApp() {
             <span className="flex items-center gap-2"><Target className="h-4 w-4 text-[#FFB547]" /> Измеримый KPI</span>
             <span className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-[#FFB547]" /> Казахстан и СНГ</span>
           </div>
+        </div>
+      </section>
+
+      <section id="demo" className="mx-auto max-w-6xl scroll-mt-16 px-5 pt-16 md:px-8">
+        <div className="text-[13px] font-bold uppercase tracking-[0.16em] text-[#6D4AFF]">Демо</div>
+        <h2 className="mt-2 text-[30px] font-bold md:text-[38px]">Посмотрите на примере — за минуту</h2>
+        <p className="mt-2 max-w-3xl text-[15px] text-[#5C5677]">Выберите человека: ответы уже заполнены. Пройдите 9 шагов и посмотрите, как меняются вопросы, — или сразу откройте его готовый отчёт.</p>
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {DEMO_PERSONAS.map((d) => (
+            <div key={d.id} className="flex flex-col rounded-3xl bg-white p-5 ring-1 ring-[#E6E1F5]" data-testid={`brand-demo-${d.id}`}>
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-[#6D4AFF] to-[#FFB547] text-[18px] font-extrabold text-white">{d.title[0]}</span>
+              <div className="mt-3 text-[17px] font-bold">{d.title}</div>
+              <div className="text-[13.5px] text-[#7C7699]">{d.subtitle}</div>
+              <p className="mt-2 flex-1 text-[13.5px] text-[#2A2540]">Цель: {d.answers.goal as string}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button onClick={() => startDemo(d.id)} className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#14112B] px-4 text-[14px] font-semibold text-white" data-testid={`brand-demo-walk-${d.id}`}><PlayCircle className="h-4 w-4" /> Пройти</button>
+                <button onClick={() => startDemo(d.id, true)} className="inline-flex h-10 items-center rounded-xl bg-[#F0ECFF] px-4 text-[14px] font-semibold text-[#3B2A8C]" data-testid={`brand-demo-report-${d.id}`}>Сразу отчёт</button>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -363,7 +420,7 @@ export default function BrandApp() {
           <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white"><Send className="h-3.5 w-3.5" /> @{CONTACTS.telegram}</a>
           <Link to="/brand-offer" className="hover:text-white" data-testid="brand-offer-link">Договор-оферта</Link>
           <Link to="/privacy" className="hover:text-white">Конфиденциальность</Link>
-          <a href={base === '/' ? 'https://fab3d-scan.com' : `${import.meta.env.BASE_URL}`} className="hover:text-white">FAB3D Academy</a>
+          <a href={import.meta.env.BASE_URL} className="hover:text-white">FAB3D Academy</a>
         </div>
       </footer>
     </div>
