@@ -316,6 +316,9 @@ await check('MedTech forum page: EN/RU/UZ, open demos (3D anatomy, simulation, A
   await page.getByTestId('forum-title').getByText('sunʼiy intellekt agentlari').waitFor();
   await page.getByTestId('forum-lang').getByText('RU').click();
   await page.getByTestId('forum-title').getByText('3D-анатомия, симуляции и ИИ-агенты').waitFor();
+  await page.getByTestId('forum-pilots').getByText('200+').waitFor();
+  await page.getByTestId('forum-surgery').getByText('Ортогнатическая хирургия').waitFor();
+  if ((await page.getByTestId('forum-cbct-demo').getAttribute('href')) !== 'https://dycom-demo.vercel.app') throw new Error('cbct demo link');
   // 3D anatomy
   await page.locator('[data-testid=anatomy-viewer][data-model=knee] canvas').waitFor();
   await page.getByTestId('forum-model-foot').click();

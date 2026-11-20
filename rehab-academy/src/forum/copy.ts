@@ -18,19 +18,68 @@ export const COPY = {
     uz: 'Tibbiyot va reabilitatsiya uchun 3D anatomiya, simulyatsiyalar va sunʼiy intellekt agentlari',
   },
   sub: {
-    en: 'We build digital education and AI tools for clinics, universities and rehabilitation centres in Central Asia. Try the demos below — no registration needed.',
-    ru: 'Создаём цифровое обучение и ИИ-инструменты для клиник, университетов и реабилитационных центров Центральной Азии. Попробуйте демо ниже — без регистрации.',
-    uz: 'Markaziy Osiyodagi klinikalar, universitetlar va reabilitatsiya markazlari uchun raqamli taʼlim va sunʼiy intellekt vositalarini yaratamiz. Quyidagi demolarni sinab koʻring — roʻyxatdan oʻtish shart emas.',
+    en: 'Before/after simulations for orthognathic, dental and aesthetic surgeons, 3D face scanning, digital education and AI tools for clinics and universities in Central Asia. Try the demos below — no registration needed.',
+    ru: 'Симуляции «до / после» для ортогнатических хирургов, стоматологов и эстетической медицины, 3D-скан лица, цифровое обучение и ИИ-инструменты для клиник и университетов Центральной Азии. Попробуйте демо ниже — без регистрации.',
+    uz: 'Ortognatik jarrohlar, stomatologlar va estetik tibbiyot uchun «oldin / keyin» simulyatsiyalari, yuzning 3D skaneri, Markaziy Osiyodagi klinikalar va universitetlar uchun raqamli taʼlim va sunʼiy intellekt vositalari. Quyidagi demolarni sinab koʻring — roʻyxatdan oʻtish shart emas.',
   },
   ctaContact: { en: 'Leave your contact', ru: 'Оставить контакт', uz: 'Kontakt qoldirish' },
   ctaDemo: { en: 'Try the demo', ru: 'Смотреть демо', uz: 'Demoni koʻrish' },
   nav: {
     demo: { en: 'Demo', ru: 'Демо', uz: 'Demo' },
+    surgery: { en: 'Surgery', ru: 'Хирургия', uz: 'Jarrohlik' },
     agents: { en: 'AI agents', ru: 'ИИ-агенты', uz: 'AI agentlar' },
     partners: { en: 'Partnership', ru: 'Партнёрство', uz: 'Hamkorlik' },
     contact: { en: 'Contact', ru: 'Контакты', uz: 'Aloqa' },
   },
 
+  pilots: { en: '200+ simulation pilots', ru: '200+ пилотов в области симуляций', uz: 'Simulyatsiya sohasida 200+ pilot' },
+  pilotsLabel: { en: 'simulation pilots', ru: 'пилотов в области симуляций', uz: 'simulyatsiya sohasidagi pilot' },
+  surgTitle: { en: 'Before / after simulations for surgeons', ru: 'Симуляции «до / после» для хирургов', uz: 'Jarrohlar uchun «oldin / keyin» simulyatsiyalari' },
+  surgSub: {
+    en: 'We show the patient and the surgeon the expected result before treatment: orthognathic surgery, dentistry and aesthetic medicine — on CBCT data and a 3D scan of the face.',
+    ru: 'Показываем пациенту и хирургу ожидаемый результат до лечения: ортогнатическая хирургия, стоматология и эстетическая медицина — на данных КЛКТ и 3D-скане лица.',
+    uz: 'Davolashdan oldin bemor va jarrohga kutilayotgan natijani koʻrsatamiz: ortognatik jarrohlik, stomatologiya va estetik tibbiyot — KLKT maʼlumotlari va yuzning 3D skaneri asosida.',
+  },
+  surg: [
+    {
+      title: { en: 'Orthognathic surgery', ru: 'Ортогнатическая хирургия', uz: 'Ortognatik jarrohlik' },
+      text: {
+        en: '3D cephalometry from CBCT: ramus height, gonial angle and jaw asymmetry left vs right; planning of jaw movements and a before/after view of the profile.',
+        ru: '3D-цефалометрия по КЛКТ: высота ветви, гониальный угол и асимметрия челюсти справа и слева; планирование перемещений челюстей и вид профиля «до / после».',
+        uz: 'KLKT boʻyicha 3D sefalometriya: shox balandligi, gonial burchak va jagʻning oʻng-chap assimetriyasi; jagʻ siljishlarini rejalashtirish va profilning «oldin / keyin» koʻrinishi.',
+      },
+    },
+    {
+      title: { en: 'Dentistry and implantology', ru: 'Стоматология и имплантология', uz: 'Stomatologiya va implantologiya' },
+      text: {
+        en: 'Automatic CBCT segmentation of the jaws, teeth and mandibular nerve canals; a risk radar for implant planning: nerve safety buffer, thin cortical bone, soft bone, periapical lesions.',
+        ru: 'Автоматическая сегментация КЛКТ: челюсти, зубы и каналы нижнечелюстного нерва; «радар рисков» для планирования имплантации: зона безопасности нерва, тонкий кортикал, мягкая кость, очаги у верхушек.',
+        uz: 'KLKT ni avtomatik segmentatsiya qilish: jagʻlar, tishlar va pastki jagʻ nervi kanallari; implantatsiyani rejalashtirish uchun «xavf radari»: nerv xavfsizlik zonasi, yupqa kortikal qatlam, yumshoq suyak, ildiz uchidagi oʻchoqlar.',
+      },
+    },
+    {
+      title: { en: 'Aesthetic medicine', ru: 'Эстетическая медицина', uz: 'Estetik tibbiyot' },
+      text: {
+        en: 'Visualising the expected result on the patient’s own 3D face before the procedure — for an honest consultation and informed consent.',
+        ru: 'Визуализация ожидаемого результата на 3D-модели лица самого пациента до процедуры — для честной консультации и осознанного согласия.',
+        uz: 'Muolajadan oldin bemorning oʻz yuzining 3D modelida kutilayotgan natijani koʻrsatish — halol maslahat va ongli rozilik uchun.',
+      },
+    },
+    {
+      title: { en: '3D face scan', ru: '3D-скан лица', uz: 'Yuzning 3D skaneri' },
+      text: {
+        en: 'A 3D model of the face from a depth camera or a smartphone, aligned with CBCT: soft tissues and bone in one scene.',
+        ru: '3D-модель лица с глубинной камеры или смартфона, совмещённая с КЛКТ: мягкие ткани и кость в одной сцене.',
+        uz: 'Chuqurlik kamerasi yoki smartfon orqali olingan, KLKT bilan birlashtirilgan yuzning 3D modeli: yumshoq toʻqimalar va suyak bitta sahnada.',
+      },
+    },
+  ],
+  surgNote: {
+    en: 'A simulation is a planning and consultation tool, not a guarantee of the result; the final decision is made by the surgeon.',
+    ru: 'Симуляция — инструмент планирования и консультации, а не гарантия результата; окончательное решение принимает хирург.',
+    uz: 'Simulyatsiya — rejalashtirish va maslahat vositasi, natija kafolati emas; yakuniy qarorni jarroh qabul qiladi.',
+  },
+  surgDemo: { en: 'Open the CBCT segmentation demo', ru: 'Открыть демо сегментации КЛКТ', uz: 'KLKT segmentatsiyasi demosini ochish' },
   whatTitle: { en: 'What we do', ru: 'Что мы делаем', uz: 'Nima qilamiz' },
   what: [
     {
@@ -135,6 +184,7 @@ export const COPY = {
     { id: 'pilot', en: 'Pilot in a clinic', ru: 'Пилот в клинике', uz: 'Klinikada pilot' },
     { id: 'university', en: 'University licence', ru: 'Лицензия для университета', uz: 'Universitet litsenziyasi' },
     { id: 'agent', en: 'AI agent for my organisation', ru: 'ИИ-агент для моей организации', uz: 'Tashkilotim uchun AI agent' },
+    { id: 'surgery', en: 'Before / after simulation for surgery', ru: 'Симуляции «до / после» для хирургии', uz: 'Jarrohlik uchun «oldin / keyin» simulyatsiyasi' },
     { id: 'scan', en: '3D scan / motion analysis', ru: '3D-скан / анализ движения', uz: '3D skaner / harakat tahlili' },
     { id: 'partner', en: 'Partnership or distribution', ru: 'Партнёрство или дистрибуция', uz: 'Hamkorlik yoki distribyutsiya' },
     { id: 'invest', en: 'Investment', ru: 'Инвестиции', uz: 'Investitsiya' },

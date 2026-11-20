@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Activity, ArrowRight, Award, Bone, Bot, Building2, CheckCircle2, GraduationCap, Handshake, Loader2, MessageCircle, Rotate3d, ScanLine, Send, Sparkles,
+  Activity, ArrowRight, Award, Bone, Bot, Building2, CheckCircle2, GraduationCap, Handshake, Layers, Loader2, MessageCircle, Rotate3d, Scan as Scan3d, ScanFace, ScanLine, Send, Smile, Sparkles,
 } from 'lucide-react';
 import { ANATOMY_MODELS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { CONTACTS } from '@/data/content/launch';
@@ -81,6 +81,7 @@ export default function Forum() {
             <b className="text-[16px]">FAB3D AI</b>
           </a>
           <nav className="ml-auto hidden items-center gap-5 text-sm text-navy-300 md:flex">
+            <a href="#surgery" className="hover:text-white">{t(COPY.nav.surgery)}</a>
             <a href="#anatomy" className="hover:text-white">{t(COPY.nav.demo)}</a>
             <a href="#agents" className="hover:text-white">{t(COPY.nav.agents)}</a>
             <a href="#partners" className="hover:text-white">{t(COPY.nav.partners)}</a>
@@ -103,6 +104,7 @@ export default function Forum() {
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[13px] font-semibold text-cyan"><Sparkles className="h-4 w-4" /> {t(COPY.badge)}</div>
             <h1 className="mt-5 text-[34px] font-extrabold leading-[1.08] tracking-tight md:text-[52px]" data-testid="forum-title">{t(COPY.title)}</h1>
             <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-navy-300">{t(COPY.sub)}</p>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-2 text-[15px] font-bold" data-testid="forum-pilots"><Award className="h-5 w-5 text-cyan" /> {t(COPY.pilots)}</div>
             <div className="mt-8 flex flex-wrap gap-3">
               <button type="button" onClick={() => go('contact')} className="inline-flex h-12 items-center gap-2 rounded-xl bg-teal px-6 font-semibold" data-testid="forum-cta">{t(COPY.ctaContact)} <ArrowRight className="h-4 w-4" /></button>
               <button type="button" onClick={() => go('anatomy')} className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/30 px-6 font-semibold hover:bg-white/10"><Rotate3d className="h-4 w-4" /> {t(COPY.ctaDemo)}</button>
@@ -111,6 +113,33 @@ export default function Forum() {
           <img src={`${import.meta.env.BASE_URL}landing/body.webp`} alt="" className="mx-auto h-[340px] object-contain drop-shadow-[0_30px_60px_rgba(8,127,140,0.45)] md:h-[460px]" />
         </div>
       </section>
+
+      {/* Before/after simulations for surgeons */}
+      <Section id="surgery" title={t(COPY.surgTitle)}>
+        <div className="-mt-4 mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-3xl text-[16px] leading-relaxed text-navy-500">{t(COPY.surgSub)}</p>
+          <span className="shrink-0 rounded-2xl bg-navy px-5 py-3 text-center text-white"><b className="block text-[28px] leading-none">200+</b><span className="text-[13px] text-navy-300">{t(COPY.pilotsLabel)}</span></span>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="forum-surgery">
+          {COPY.surg.map((x, i) => {
+            const I = [Scan3d, Layers, Smile, ScanFace][i];
+            return (
+              <div key={x.title.en} className="flex flex-col rounded-3xl border border-line p-6">
+                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-50 text-teal"><I className="h-6 w-6" /></span>
+                <h3 className="mt-3 text-[18px] font-bold">{t(x.title)}</h3>
+                <p className="mt-2 text-[14px] leading-relaxed text-navy-500">{t(x.text)}</p>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-6 flex flex-col gap-4 rounded-3xl bg-bg p-5 md:flex-row md:items-center md:justify-between">
+          <p className="text-[13.5px] text-navy-500">{t(COPY.surgNote)}</p>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <a href="https://dycom-demo.vercel.app" target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-xl bg-navy px-5 font-semibold text-white" data-testid="forum-cbct-demo"><Layers className="h-4 w-4" /> {t(COPY.surgDemo)}</a>
+            <button type="button" onClick={() => go('contact')} className="inline-flex h-11 items-center rounded-xl bg-teal px-5 font-semibold text-white">{t(COPY.ctaContact)}</button>
+          </div>
+        </div>
+      </Section>
 
       {/* What we do */}
       <Section title={t(COPY.whatTitle)} className="bg-bg">
