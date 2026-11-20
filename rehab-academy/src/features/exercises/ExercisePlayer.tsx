@@ -27,12 +27,14 @@ function CameraView({ ex, view, nonce }: { ex: Exercise; view: View; nonce: numb
 const T = {
   ru: { play: 'Пуск', pause: 'Пауза', main: '3/4', side: 'Сбоку', front: 'Спереди', reps: 'Повтор', slow: 'Медленно', reset: 'Сбросить вид', drag: 'Крутите мышкой или пальцем' },
   kk: { play: 'Бастау', pause: 'Кідірту', main: '3/4', side: 'Бүйірден', front: 'Алдынан', reps: 'Қайталау', slow: 'Баяу', reset: 'Көріністі қайтару', drag: 'Тышқанмен не саусақпен айналдырыңыз' },
+  en: { play: 'Play', pause: 'Pause', main: '3/4', side: 'Side', front: 'Front', reps: 'Rep', slow: 'Slow', reset: 'Reset view', drag: 'Drag to rotate' },
+  uz: { play: 'Boshlash', pause: 'Pauza', main: '3/4', side: 'Yondan', front: 'Oldidan', reps: 'Takror', slow: 'Sekin', reset: 'Koʻrinishni tiklash', drag: 'Sichqoncha yoki barmoq bilan aylantiring' },
 };
 
 /** 3D figure performing the exercise, with play/pause, speed and camera views. */
-export default function ExercisePlayer({ ex, className }: { ex: Exercise; className?: string }) {
-  const lang = useLang();
-  const c = T[lang];
+export default function ExercisePlayer({ ex, className, lang: forced }: { ex: Exercise; className?: string; lang?: keyof typeof T }) {
+  const appLang = useLang();
+  const c = T[forced ?? appLang];
   const [playing, setPlaying] = useState(true);
   const [slow, setSlow] = useState(false);
   const [view, setView] = useState<View>('main');

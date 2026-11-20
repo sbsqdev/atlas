@@ -309,6 +309,53 @@ await page.route('**/api/brand-unpack', async (route) => {
   await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ patch: { positioning: 'Спортивный реабилитолог, который возвращает бегунов к тренировкам без боли (ИИ).', superpower: 'Эмпатия + экспертиза' } }) });
 });
 
+await check('MedTech forum page: EN/RU/UZ, open demos (3D anatomy, simulation, AI agent), lead to email', async () => {
+  await page.goto(`${BASE}/forum?lang=en`);
+  await page.getByTestId('forum-title').getByText('3D anatomy, simulations and AI agents').waitFor();
+  await page.getByTestId('forum-lang').getByText('UZ').click();
+  await page.getByTestId('forum-title').getByText('sunʼiy intellekt agentlari').waitFor();
+  await page.getByTestId('forum-lang').getByText('RU').click();
+  await page.getByTestId('forum-title').getByText('3D-анатомия, симуляции и ИИ-агенты').waitFor();
+  // 3D anatomy
+  await page.locator('[data-testid=anatomy-viewer][data-model=knee] canvas').waitFor();
+  await page.getByTestId('forum-model-foot').click();
+  await page.locator('[data-testid=anatomy-viewer][data-model=foot] canvas').waitFor();
+  await page.getByTestId('forum-struct-calcaneal_tendon').click();
+  await page.getByTestId('forum-structure').getByText('Tendo calcaneus').waitFor();
+  // Movement simulation
+  await page.locator('[data-testid=exercise-player][data-exercise=chair-squat] canvas').waitFor();
+  await page.getByTestId('forum-ex-glute-bridge').click();
+  await page.locator('[data-testid=exercise-player][data-exercise=glute-bridge] canvas').waitFor();
+  // AI agent
+  await page.getByTestId('forum-scenario-knee').click();
+  await page.getByTestId('forum-agent-result').waitFor();
+  await page.getByTestId('forum-agent-ex-step-down').click();
+  await page.locator('[data-testid=exercise-player][data-exercise=step-down] canvas').waitFor();
+  await page.getByTestId('forum-agent-3d').click();
+  await page.locator('[data-testid=anatomy-viewer][data-model=knee]').waitFor();
+  await page.getByTestId('forum-structure').getByText('Patella').waitFor();
+  await shot('00m-forum');
+  // Lead form
+  await page.getByTestId('forum-submit').click();
+  await page.getByTestId('forum-form').getByText('Заполните имя и контакт').waitFor();
+  await page.locator('[data-testid=forum-form] input[name=name]').fill('Dr. Aziz Karimov');
+  await page.locator('[data-testid=forum-form] input[name=contact]').fill('aziz@clinic.example');
+  await page.locator('[data-testid=forum-form] input[name=org]').fill('Clinic Tashkent');
+  await page.getByTestId('forum-interest-pilot').click();
+  await page.getByTestId('forum-interest-agent').click();
+  await page.locator('[data-testid=forum-form] input[name=consent]').check();
+  failNextForm = true;
+  await page.getByTestId('forum-submit').click();
+  const wa = await page.getByTestId('forum-form-whatsapp').getAttribute('href');
+  if (!decodeURIComponent(wa).includes('Clinic Tashkent')) throw new Error('fallback text');
+  await page.getByTestId('forum-submit').click();
+  await page.getByTestId('forum-form-sent').waitFor();
+  const lead = forms.at(-1);
+  if (!lead.url.includes('formsubmit.co/ajax/sbsqbiz@gmail.com')) throw new Error(lead.url);
+  const b = lead.body;
+  if (b._subject !== 'MedTech-форум: Dr. Aziz Karimov — Clinic Tashkent' || b['Интересы'] !== 'Пилот в клинике, ИИ-агент для моей организации' || b._replyto !== 'aziz@clinic.example' || b['Язык страницы'] !== 'RU') throw new Error(JSON.stringify(b));
+});
+
 await check('FAB3D Brand: landing, packages, application, free steps and teaser', async () => {
   await page.goto(`${BASE}/brand`);
   await page.getByTestId('brand-landing').waitFor();

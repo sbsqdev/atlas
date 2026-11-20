@@ -35,6 +35,7 @@ const Admin = lazy(() => import('@/pages/Admin'));
 const Review = lazy(() => import('@/pages/Review'));
 const Landing = lazy(() => import('@/pages/Landing'));
 const BrandApp = lazy(() => import('@/brand/BrandApp'));
+const Forum = lazy(() => import('@/forum/Forum'));
 /** brand.* subdomain serves only FAB3D Brand. */
 const BRAND_HOST = location.hostname.startsWith('brand.');
 const Activate = lazy(() => import('@/pages/Activate'));
@@ -83,6 +84,7 @@ export default function App() {
       ) : (
       <Routes>
         <Route path="/brand/*" element={<BrandApp />} />
+        <Route path="/forum" element={<Forum />} />
         <Route path="/brand-offer" element={<Legal doc="brandOffer" />} />
         <Route path="/login" element={<AuthPage mode="in" />} />
         <Route path="/register" element={<AuthPage mode="up" />} />
