@@ -5,13 +5,8 @@
   "outputDirectory": "dist",
   "redirects": [
     {
-      "source": "/academy",
-      "destination": "/",
-      "permanent": false
-    },
-    {
-      "source": "/academy/:path*",
-      "destination": "/:path*",
+      "source": "/academy/:path+",
+      "destination": "/:path+",
       "permanent": false
     }
   ],

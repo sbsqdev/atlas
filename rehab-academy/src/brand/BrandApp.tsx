@@ -420,7 +420,7 @@ export default function BrandApp() {
           <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white"><Send className="h-3.5 w-3.5" /> @{CONTACTS.telegram}</a>
           <Link to="/brand-offer" className="hover:text-white" data-testid="brand-offer-link">Договор-оферта</Link>
           <Link to="/privacy" className="hover:text-white">Конфиденциальность</Link>
-          <a href={import.meta.env.BASE_URL} className="hover:text-white">FAB3D Academy</a>
+          <a href={`${import.meta.env.BASE_URL}academy`} className="hover:text-white">FAB3D Academy</a>
         </div>
       </footer>
     </div>

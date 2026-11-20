@@ -141,7 +141,7 @@ export default function Legal({ doc }: { doc: 'offer' | 'privacy' | 'brandOffer'
   return (
     <div className="min-h-screen bg-bg px-4 py-10" data-testid={`legal-${doc}`}>
       <article className="mx-auto max-w-3xl rounded-3xl border border-line bg-white p-6 md:p-10">
-        <Link to="/" className="text-[13px] font-semibold text-teal">← FAB3D Academy</Link>
+        <Link to="/academy" className="text-[13px] font-semibold text-teal">← FAB3D Academy</Link>
         <h1 className="mt-4 text-[24px] font-bold leading-tight md:text-[28px]">{title}</h1>
         <Markdown source={body} />
         {doc === 'privacy' && <p className="mt-4 text-[14px]"><Link to="/offer" className="font-semibold text-teal">Договор-оферта →</Link></p>}

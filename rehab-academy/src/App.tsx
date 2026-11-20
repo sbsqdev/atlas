@@ -52,8 +52,8 @@ const AthleteCard = lazy(() => import('@/pages/AthleteCard'));
 function RequireAuth({ children }: { children: ReactNode }) {
   const u = useMe();
   const loc = useLocation();
-  // Signed-out visitors see the public course page at the root.
-  if (!u) return loc.pathname === '/' ? <Landing /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />;
+  // Signed-out visitors see the FAB3D AI page at the root (the academy page is at /academy).
+  if (!u) return loc.pathname === '/' ? <Forum /> : <Navigate to="/login" replace state={{ from: loc.pathname }} />;
   return <>{children}</>;
 }
 /** /atlas without the trailing slash reaches the SPA rewrite; send it to the Human Atlas app at /atlas/. */
@@ -85,6 +85,7 @@ export default function App() {
       <Routes>
         <Route path="/brand/*" element={<BrandApp />} />
         <Route path="/forum" element={<Forum />} />
+        <Route path="/academy" element={<Landing />} />
         <Route path="/brand-offer" element={<Legal doc="brandOffer" />} />
         <Route path="/login" element={<AuthPage mode="in" />} />
         <Route path="/register" element={<AuthPage mode="up" />} />

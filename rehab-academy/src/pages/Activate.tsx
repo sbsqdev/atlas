@@ -59,7 +59,7 @@ export default function Activate() {
         </div>
         {err && <p className="mt-4 rounded-lg bg-error/10 px-3 py-2 text-[13px] text-error" data-testid="activate-error">{t(err)}</p>}
         <Button type="submit" size="lg" loading={busy} className="mt-6 w-full" data-testid="activate-submit">{t('access.activate')}</Button>
-        <p className="mt-4 text-center text-[13px]"><Link to="/" className="text-navy-500 hover:text-teal">← {t('auth.toCourse')}</Link></p>
+        <p className="mt-4 text-center text-[13px]"><Link to="/academy" className="text-navy-500 hover:text-teal">← {t('auth.toCourse')}</Link></p>
       </form>
     </div>
   );

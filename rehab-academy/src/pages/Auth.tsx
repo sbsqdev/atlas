@@ -78,7 +78,7 @@ export default function AuthPage({ mode }: { mode: 'in' | 'up' }) {
               ))}
             </div>
             <div className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px] font-semibold">
-              <Link to="/" className="text-teal">← {t('auth.toCourse')}</Link>
+              <Link to="/academy" className="text-teal">← {t('auth.toCourse')}</Link>
               <Link to="/activate" className="text-navy-500 hover:text-teal" data-testid="auth-activate">{t('access.haveCode')}</Link>
             </div>
             <h2 className="text-[26px] font-bold tracking-tight">{t(mode === 'in' ? 'auth.signIn' : 'auth.signUp')}</h2>

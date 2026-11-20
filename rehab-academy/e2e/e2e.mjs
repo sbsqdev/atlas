@@ -55,8 +55,16 @@ await page.route('**/formsubmit.co/**', async (route) => {
 });
 const plain = (s) => s.replace(/ | /g, ' ');
 
-await check('public page: three courses, prices, Kaspi, WhatsApp and Telegram', async () => {
+await check('fab3d-scan.com root shows the FAB3D AI page with the logo', async () => {
   await page.goto(`${BASE}/`);
+  await page.getByTestId('forum').waitFor();
+  await page.getByTestId('forum-logo').waitFor();
+  const loaded = await page.getByTestId('forum-logo').evaluate((img) => img.naturalWidth);
+  if (loaded !== 192) throw new Error(`logo ${loaded}`);
+});
+
+await check('public page: three courses, prices, Kaspi, WhatsApp and Telegram', async () => {
+  await page.goto(`${BASE}/academy`);
   await page.getByTestId('landing').waitFor();
   for (const id of ['c-run', 'c-tri', 'c-kz']) await page.getByTestId(`landing-course-${id}`).waitFor();
   const prices = (await page.getByTestId('plan-price').allInnerTexts()).map(plain);
@@ -109,7 +117,7 @@ await check('offer and privacy pages', async () => {
 });
 
 await check('demo: athlete menu, trial banner, courses for athletes only', async () => {
-  await page.goto(`${BASE}/`);
+  await page.goto(`${BASE}/academy`);
   await page.getByTestId('landing-demo').first().click();
   await page.waitForURL(/courses\/c-run$/);
   await page.goto(`${BASE}/`);
@@ -407,7 +415,7 @@ async function fillBrandFree() {
 }
 
 await check('FAB3D Brand demo: click through an example and see the sample report', async () => {
-  await page.goto(`${BASE}/`);
+  await page.goto(`${BASE}/academy`);
   await page.getByTestId('footer-brand').click();
   await page.getByTestId('brand-landing').waitFor();
   await page.getByTestId('brand-demo-walk-exec').click();

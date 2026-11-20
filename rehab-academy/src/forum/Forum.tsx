@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Activity, ArrowRight, Award, Bone, Bot, Building2, CheckCircle2, GraduationCap, Handshake, Layers, Loader2, MessageCircle, Rotate3d, Scan as Scan3d, ScanFace, ScanLine, Send, Smile, Sparkles,
+  ArrowRight, Award, Bone, Bot, Building2, CheckCircle2, GraduationCap, Handshake, Layers, Loader2, MessageCircle, Rotate3d, Scan as Scan3d, ScanFace, ScanLine, Send, Smile, Sparkles,
 } from 'lucide-react';
 import { ANATOMY_MODELS, STRUCTURE_BY_ID } from '@/data/content/anatomy';
 import { CONTACTS } from '@/data/content/launch';
@@ -77,8 +77,8 @@ export default function Forum() {
       <header className="sticky top-0 z-30 border-b border-white/10 bg-navy/95 text-white backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 md:px-8">
           <a href="#top" className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-teal to-cyan"><Activity className="h-5 w-5" strokeWidth={2.4} /></span>
-            <b className="text-[16px]">FAB3D AI</b>
+            <img src={`${import.meta.env.BASE_URL}logo-192.png`} alt="FAB3D AI" className="h-10 w-10 rounded-xl" data-testid="forum-logo" />
+            <b className="text-[17px]">FAB3D AI</b>
           </a>
           <nav className="ml-auto hidden items-center gap-5 text-sm text-navy-300 md:flex">
             <a href="#surgery" className="hover:text-white">{t(COPY.nav.surgery)}</a>
@@ -307,8 +307,8 @@ export default function Forum() {
 
       <footer className="bg-[#0B1F33] text-navy-300">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-5 py-8 text-[13px] md:px-8">
-          <span className="font-semibold text-white">FAB3D AI · fab3d-scan.com</span>
-          <Link to="/" className="hover:text-white">FAB3D Academy</Link>
+          <span className="flex items-center gap-2 font-semibold text-white"><img src={`${import.meta.env.BASE_URL}logo-64.png`} alt="" className="h-6 w-6 rounded-md" /> FAB3D AI · fab3d-scan.com</span>
+          <Link to="/academy" className="hover:text-white">FAB3D Academy</Link>
           <Link to="/brand" className="hover:text-white">FAB3D Brand</Link>
           <Link to="/privacy" className="hover:text-white">{t(COPY.footer.privacy)}</Link>
           <span className="w-full">{t(COPY.footer.edu)} 3D: BodyParts3D © DBCLS, CC BY 4.0.</span>

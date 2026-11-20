@@ -23,7 +23,7 @@ export default function AthleteCard() {
     <div className="grid min-h-screen place-items-center bg-gradient-to-br from-navy to-teal-600 px-4 py-10 text-white">
       <div className="w-full max-w-md" data-testid="athlete-card">
         <div className="mb-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-bold"><span className="grid h-8 w-8 place-items-center rounded-lg bg-cyan"><Activity className="h-4 w-4" /></span> FAB3D Academy</Link>
+          <Link to="/academy" className="flex items-center gap-2 font-bold"><span className="grid h-8 w-8 place-items-center rounded-lg bg-cyan"><Activity className="h-4 w-4" /></span> FAB3D Academy</Link>
           <LangSwitch dark />
         </div>
         {!c ? <p className="rounded-3xl bg-white/10 p-6">{t('card.invalid')}</p> : (
@@ -47,7 +47,7 @@ export default function AthleteCard() {
             <div className="mt-6"><SocialLinks ig={c.ig} tg={c.tg} st={c.st} dark /></div>
           </div>
         )}
-        <Link to="/" className={buttonVariants({ size: 'lg', className: 'mt-5 w-full' })}>{t('card.join')}</Link>
+        <Link to="/academy" className={buttonVariants({ size: 'lg', className: 'mt-5 w-full' })}>{t('card.join')}</Link>
       </div>
     </div>
   );
