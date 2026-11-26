@@ -5,6 +5,28 @@
   "outputDirectory": "dist",
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.fab3d-scan.com"
+        }
+      ],
+      "destination": "https://pitch-ustoz.vercel.app/pitch/",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "fab3d-scan.com"
+        }
+      ],
+      "destination": "https://pitch-ustoz.vercel.app/pitch/",
+      "permanent": false
+    },
+    {
       "source": "/academy/:path+",
       "destination": "/:path+",
       "permanent": false
